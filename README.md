@@ -1,2 +1,42 @@
-# ClipStudioPaint-Smooth-Color-Adjustment
-By modifying the CSP software and developing CSP plugins, the performance of the software in color adjustment and blurring can be improved.
+# CSP流畅调色 ClipStudioPaint-Smooth-Color-Adjustment
+使用前请务必详细阅读此Readme文件！
+Please read this Readme file carefully before use!
+
+
+我通过对CSP程序的直接修改，以及CSP插件的开发，解决了当前CSP在调色、模糊功能上的预览不实时的问题。同时也让缩时摄影的导出能自定义视频大小与时长。
+
+由于我是在MacOS上进行开发的，所以这个库内容是不能在Windows系统中使用的，并且由于我是对3.2.3版本进行直接的修改，所以实际上是只能在M芯片（使用arm64指令集的芯片）的Mac电脑的3.2.3版本CSP上使用。。
+
+对于windows版本，应该是得等我以后购置windows电脑后才开始考虑开发（什么基于自己需要的软件开发者啊）。希望那之前CSP已经自己识趣地把这些基础问题给优化了。
+
+## 内容与使用限制
+
+《MacOS》文件夹中的内容是对ClipStudioPaint 3.2.3程序进行的修改，修改的内容有：包括插件功能在内的软件破解，对常用色调调整及其调整图层的实时预览（色相饱和度明度、色彩平衡、曲线），缩时摄影自定义视频大小与时长，应用后期调色而无需合并图层。
+只能用于
+
+《Plugin》文件夹的内容是使用ClipStudioPaint的官方插件SDK所开发的插件，可以在支持插件功能的mac版CSP中使用（没有3.2.3的版本限制）。
+
+## 安装方法
+
+对于《Plugin》文件夹中的.cpm文件，请保证你的CSP可以使用插件功能。打开访达，进入“文稿”文件夹，里面有个名为CELSYS的快捷方式，进入上述CELSYS文件夹后再进入其中的CLIPStudioModule/Plugin/PAINT文件夹，将.cpm文件放在这里面。然后启动CPS，如果成功了，在“滤镜”菜单下能找到名为“流畅调色”的滤镜组，其中便有我提供的模糊滤镜。
+
+《MacOS》中的内容只能在m芯片（或者其他arm指令集的芯片）的Mac电脑上使用，且只能用于3.2.3版本。
+从CSP官方下载并安装CSP的3.2.3版本，查看ClipStudioPaint的程序包内容，找到其中的MacOS文件夹，将我提供的MacOS文件里的所有内容放入其中。然后你就可以正常使用ClipStudioPaint并也能使用上述.cpm文件了。
+
+
+
+## 注意事项
+
+*色相饱和度明度的色调调整和新添加的滤镜不要在宽高超过16384像素的画布中使用。（metal图形接口的纹理大小限制纹理边长最大16384像素）
+
+*由于CSP的狗屎底层，就算用GPU加速瞬间把画面渲染出来，也要花时间进行大量单线程CPU内存拷贝才能显示，所以在画布较大的时候也并非流畅，
+
+*请教我画画
+
+*关注MMmmmoko谢谢喵
+
+## 吐槽
+
+逆向CSP的时候发现这个软件的开发人员几乎不知道多线程和GPU为何物，甚至还专门写了计时功能，来让你的调色或者滤镜在鼠标停下一会后才开始处理画面，试图这样子来遮自己不能实时渲染的羞。 对于调色的优化，我做的大部分工作其实是找到并跳过CSP的计时逻辑，来让CSP能在鼠标运动时就直接开始进行图像处理而不需要等鼠标停下， 就算这样就已经极大改善了使用体验了。
+日本程序员刻板印象时刻加深中。
+
