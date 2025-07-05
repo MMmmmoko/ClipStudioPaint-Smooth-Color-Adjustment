@@ -38,7 +38,7 @@ int64_t ColorBalance_hook::Hook_ColorBalanceDialog_Layer(uintptr_t arg0, uintptr
 	ins.beforeDrawParam0 = 0;
 	ins.beforeDrawParam1 = 0;
 
-	return 0;
+	return result;
 }
 
 
