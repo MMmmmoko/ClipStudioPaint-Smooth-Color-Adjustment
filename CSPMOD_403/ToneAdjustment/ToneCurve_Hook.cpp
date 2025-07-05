@@ -142,7 +142,7 @@ int64_t ToneCurve_hook::Hook_ToneCurveParamChange(uintptr_t arg1, uintptr_t arg2
 		uintptr_t pointData = ins.pRGB_Data + 0x208 * curPanel;
 		//数据复制到栈区
 
-		CurvePointList pointlist=_GetCurrentPanelPointList();
+		CurvePointList pointlist=_GetCurrentPanelPointList(); 
 		uint32_t pointCount= ((uintptr_t)pointlist.pEnd - (uintptr_t)pointlist.pStart) / 16;
 		*(uint32_t*)pointData = pointCount;
 		memcpy((void*)(pointData+8),pointlist.pStart,pointCount*2*sizeof(double));
