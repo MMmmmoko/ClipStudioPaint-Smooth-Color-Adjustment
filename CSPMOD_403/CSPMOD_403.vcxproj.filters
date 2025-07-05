@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ToneAdjustment">
+      <UniqueIdentifier>{dc479475-d295-458d-b570-822dbe1c5311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FunctionFix">
+      <UniqueIdentifier>{e2914606-45ba-4c0a-b187-d7a2c29e8cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DUI">
+      <UniqueIdentifier>{983d1f20-6253-4295-bcca-d658d039bb74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{ea2d3766-a0e7-4493-abab-2a792ff0c0fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DUI\Dialog">
+      <UniqueIdentifier>{43f838be-86de-4359-9a0b-e7c54ad049b6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CSPHook.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HookTool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ToneAdjustment\HSV_Hook.h">
+      <Filter>ToneAdjustment</Filter>
+    </ClInclude>
+    <ClInclude Include="ToneAdjustment\ColorBalance_Hook.h">
+      <Filter>ToneAdjustment</Filter>
+    </ClInclude>
+    <ClInclude Include="ToneAdjustment\ToneCurve_Hook.h">
+      <Filter>ToneAdjustment</Filter>
+    </ClInclude>
+    <ClInclude Include="FunctionFix\TimeLapseExport.h">
+      <Filter>FunctionFix</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FunctionFix\CspData.h">
+      <Filter>FunctionFix</Filter>
+    </ClInclude>
+    <ClInclude Include="FunctionFix\CspLayerObject.h">
+      <Filter>FunctionFix</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\DuiCommon.h">
+      <Filter>DUI</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\CatDui.h">
+      <Filter>DUI</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\basic_form.h">
+      <Filter>DUI</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\CatDuiThread.h">
+      <Filter>DUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjConfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\Dialog\TimeLapseExport_Dlg.h">
+      <Filter>DUI\Dialog</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CSPHook.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HookTool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ToneAdjustment\HSV_Hook.cpp">
+      <Filter>ToneAdjustment</Filter>
+    </ClCompile>
+    <ClCompile Include="ToneAdjustment\ColorBalance_Hook.cpp">
+      <Filter>ToneAdjustment</Filter>
+    </ClCompile>
+    <ClCompile Include="ToneAdjustment\ToneCurve_Hook.cpp">
+      <Filter>ToneAdjustment</Filter>
+    </ClCompile>
+    <ClCompile Include="FunctionFix\TimeLapseExport.cpp">
+      <Filter>FunctionFix</Filter>
+    </ClCompile>
+    <ClCompile Include="FunctionFix\CspData.cpp">
+      <Filter>FunctionFix</Filter>
+    </ClCompile>
+    <ClCompile Include="FunctionFix\CspLayerObject.cpp">
+      <Filter>FunctionFix</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\CatDui.cpp">
+      <Filter>DUI</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\basic_form.cpp">
+      <Filter>DUI</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\CatDuiThread.cpp">
+      <Filter>DUI</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\Dialog\TimeLapseExport_Dlg.cpp">
+      <Filter>DUI\Dialog</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CSPMOD_403.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="theme1.bin">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="theme2.bin">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="CSPMOD_res.zip" />
+  </ItemGroup>
+</Project>
