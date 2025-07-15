@@ -195,6 +195,7 @@
     <ResourceCompile Include="CSPMOD_403.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md" />
     <None Include="CSPMOD_res.zip" />
     <None Include="theme1.bin" />
     <None Include="theme2.bin" />

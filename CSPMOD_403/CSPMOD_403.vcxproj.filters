@@ -130,5 +130,6 @@
       <Filter>资源文件</Filter>
     </None>
     <None Include="CSPMOD_res.zip" />
+    <None Include="..\README.md" />
   </ItemGroup>
 </Project>
