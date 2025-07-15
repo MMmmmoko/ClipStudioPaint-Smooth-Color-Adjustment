@@ -3,6 +3,20 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+
+
+
+##自定义部分
+打包上传/
+CSP403_chinese_sc.zip
+
+
+
+
+
+##↓自动生成的部分
+
+
 # User-specific files
 *.rsuser
 *.suo

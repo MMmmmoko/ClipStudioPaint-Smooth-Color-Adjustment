@@ -124,8 +124,14 @@ int64_t ToneCurve_hook::Hook_ToneCurveParamChange(uintptr_t arg1, uintptr_t arg2
 	auto result= orig_ToneCurveParamChange(arg1, arg2, arg3);
 	
 	//必须添加这句提前退出，以防止调整当前面板的的时候闪退
-	if (!ins.ajustWorking || !ins.layerWorking)
+	//if (!ins.ajustWorking || !ins.layerWorking)
+	//	return result;
+	//上面这句会导致流畅调色失效....
+
+	if (!ins.ajustWorking && !ins.layerWorking)
 		return result;
+
+
 
 
 
