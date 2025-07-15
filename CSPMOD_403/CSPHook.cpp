@@ -34,6 +34,8 @@ static bool rtrue = false;
 static bool(*orig_CheckData)(void* p1, void* p2)=NULL;
 __declspec(noinline) bool __fastcall CSPHook::Hook_CheckData(void* p1, void* p2)
 {
+	//注：这个函数未被hook，仅保留了旧代码，未使用
+
 	//void* testValue = (void*)(CatHook::baseAddr + 0x144de5270);
 
 	//if (rtrue)return true;
@@ -108,6 +110,10 @@ void CSPHook::SetUpHook()
 
 #pragma region 基础hook
 
+
+#ifdef CSPHACK
+
+
 	////保存文件//已通过其他方式修改
 	////
 	//// 之前在Mac上的寻找思路是分别运行一份正版和一份体验版的CSP，体验版给对话框打个断点，运行到对话框时查看调用堆栈，对其上一定数量的调用打上断点，
@@ -146,7 +152,7 @@ void CSPHook::SetUpHook()
 	uint8_t op_Skip_Trial_String[2] = { 0xEB,0x57 };
 	CatHook::CodePatch((void*)(baseAddr + 0x1403D00FC), op_Skip_Trial_String, sizeof(op_Skip_Trial_String));
 
-
+#endif
 
 
 	//解锁插件功能
