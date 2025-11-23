@@ -23,7 +23,7 @@ void About_Dlg::OnInitWindow()
     std::string vstr = "c4.1.4-m2.0.0";
 
     versionStr->SetUTF8Text(vstr);
-
+    
 
 
 
@@ -47,7 +47,7 @@ void About_Dlg::OnInitWindow()
     {
         pBtn_OK->AttachClick(UiBind(&About_Dlg::OnButtonClick, this, std::placeholders::_1));
     }
-
+    //ui::GlobalManager::Instance().Thread().PostTask(ui::kThreadUI, [this] {static_cast<ui::Label*>(FindControl(L"text_version"))->Arrange(); }); 
 
   
    

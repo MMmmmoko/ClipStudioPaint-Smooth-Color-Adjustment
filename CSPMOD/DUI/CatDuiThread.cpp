@@ -74,6 +74,10 @@ void UIMainThread::OnInit()
         {
             langstr = L"schinese.ini";
         }
+        else if(0 == SDL_strcmp(localeList[0]->language, "ja"))
+        {
+            langstr=L"japanese.ini";
+        }
         else
         {
             langstr=L"english.ini";
@@ -93,6 +97,7 @@ void UIMainThread::OnInit()
 
 
     resParam.languageFileName = L"schinese.ini";
+    resParam.languageFileName = L"japanese.ini";
     //resParam.languageFileName = L"english.ini";
     //resParam.languageFileName = langstr;
 

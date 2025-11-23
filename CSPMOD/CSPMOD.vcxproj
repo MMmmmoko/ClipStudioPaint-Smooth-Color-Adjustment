@@ -211,6 +211,7 @@
     <None Include="DuiResource.zip">
       <FileType>Document</FileType>
     </None>
+    <None Include="DuiResource\lang\japanese.ini" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="DuiResource\lang\english.ini" />

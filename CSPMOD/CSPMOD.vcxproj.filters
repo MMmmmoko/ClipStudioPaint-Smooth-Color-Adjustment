@@ -181,6 +181,9 @@
     <None Include="DuiResource.zip">
       <Filter>Dui</Filter>
     </None>
+    <None Include="DuiResource\lang\japanese.ini">
+      <Filter>Dui\Lang</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="DuiResource\lang\english.ini">
