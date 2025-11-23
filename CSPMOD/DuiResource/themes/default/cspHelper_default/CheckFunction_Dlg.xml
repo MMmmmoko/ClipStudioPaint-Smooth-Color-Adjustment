@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window size="560,480"
+        caption="0,0,0,28" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36" 
+        shadow_type="default" shadow_attached="true" shadow_snap="true" layered_window="true" 
+        alpha="255" icon="public/caption/logo.ico"
+		
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://tempuri.org/NIMDUISchema.xsd"
+		>
+	
+	
+	<Class name="CF_ItemLable" max_width="320" valign="center" height="36" text_align="left,vcenter" halign="left" normal_text_color="#CSPColor_Content" font="system_14"/>
+	<Class name="CF_SupportedIcon" margin="27,0,27,0" valign="center" halign="center" width="36" height="36"  bkimage="check_green_36x.png" visible="false"/>
+	<Class name="CF_Checkbox_light"  valign="center" halign="center" height="36" width="90"
+		   normal_image="file='checkbox_24x.png' dest='33,6,57,30' source='0,24,24,48'"
+		   hot_image="file='checkbox_24x.png' dest='33,6,57,30' source='48,24,72,48'"
+	   selected_normal_image="file='checkbox_24x.png' dest='33,6,57,30' source='24,24,48,48'"
+		selected_hot_image="file='checkbox_24x.png' dest='33,6,57,30' source='72,24,96,48'"
+		   />
+	<Class name="CF_Checkbox_dark"  valign="center" halign="center" height="36" width="90"
+		   normal_image="file='checkbox_24x.png' dest='33,6,57,30' source='0,0,24,24'"
+		   hot_image="file='checkbox_24x.png' dest='33,6,57,30' source='48,0,72,24'"
+	   selected_normal_image="file='checkbox_24x.png' dest='33,6,57,30' source='24,0,48,24'"
+		selected_hot_image="file='checkbox_24x.png' dest='33,6,57,30' source='72,0,96,24'"
+		   />
+	<Class name="CF_Separator" height="1" bkcolor="#CSPColor_Separator"/>
+	
+	
+    <VBox bkcolor="#CSPColor_PanelBG" visible="true">    
+        <!-- 标题栏区域 -->
+        <HBox name="window_caption_bar" width="stretch" height="28" normal_color="#CSPColor_CaptionFocus" disabled_color="#CSPColor_CaptionNoFocus">
+			<Label name="text_Title" text_id="STRID_CHECKFUNCTIONS"  text_align="vcenter"  margin="8,0,8,0" valign="center"  normal_text_color="#CSPColor_CaptionContent" disabled_text_color="CSPColor_CaptionContentNoFocus" font="system_14"/>
+            <Control />
+
+            <!--<Button class="btn_wnd_close_11" height="stretch" width="40" name="closebtn" margin="0,0,0,2" tooltip_text="关闭"/>-->
+            <Button class="btn_wnd_close_11" height="stretch" width="40" name="btn_Close" margin="0,0,0,2" tooltip_text_id="STRING_CLOSE" normal_image="file='icon_close.svg' width='24' height='24' valign='center' halign='center'"/>
+        </HBox>
+        
+        <!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
+
+		<!--<Control />-->
+		<VBox height="auto" margin="25,20,25,0" >
+			<HBox height="auto">
+				<Control />
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_SUPPORTED" width="90" text_align="center" height="26" margin="0,10,0,0"/>
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_ENABLE" width="90"  text_align="center" height="26" margin="0,10,0,0"/>
+			</HBox>
+			<Control class="CF_Separator"/>
+			<HBox height="auto">
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_HSV"/>
+				<Control />
+				<Control class="CF_SupportedIcon" name="supportedIcon_hsv"/>
+				<CheckBox class="CF_Checkbox_dark" name="checkBox_hsv"/>
+			</HBox>
+			<Control class="CF_Separator"/>
+			<HBox height="auto">
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_COLORBALANCE"/>
+				<Control />
+				<Control class="CF_SupportedIcon" name="supportedIcon_colorbalance"/>
+				<CheckBox class="CF_Checkbox_dark" name="checkBox_colorbalance"/>
+			</HBox>
+			<Control class="CF_Separator"/>
+			<HBox height="auto">
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_TONECURVE"/>
+				<Control />
+				<Control class="CF_SupportedIcon" name="supportedIcon_tonecurve"/>
+				<CheckBox class="CF_Checkbox_dark" name="checkBox_tonecurve"/>
+			</HBox>
+			<Control class="CF_Separator"/>
+			<HBox height="auto">
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_PLUGIN_GAUSSBLUR"/>
+				<Control />
+				<Control class="CF_SupportedIcon" name="supportedIcon_plugin_gaussblur"/>
+				<Control width="90"/>
+			</HBox>
+			<Control class="CF_Separator"/>
+			<HBox height="auto">
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_PLUGIN_MOTIONBLUR"/>
+				<Control />
+				<Control class="CF_SupportedIcon" name="supportedIcon_plugin_motionblur"/>
+				<Control width="90"/>
+			</HBox>
+			<Control class="CF_Separator"/>
+			<HBox height="auto">
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_TIMELAPSEEXPORT"/>
+				<Control />
+				<Control class="CF_SupportedIcon" name="supportedIcon_timelapseexport"/>
+				<CheckBox class="CF_Checkbox_dark" name="checkBox_timelapseexport"/>
+			</HBox>
+			<Control class="CF_Separator"/>
+			<HBox height="auto">
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_APPLYEFFECTS"/>
+				<Control />
+				<Control class="CF_SupportedIcon" name="supportedIcon_applyeffects"/>
+				<CheckBox class="CF_Checkbox_dark" name="checkBox_applyeffects"/>
+			</HBox>
+		</VBox>
+		
+		<!--提示标签-->
+		<RichText text_color="#CSPColor_Content"  font="system_12" text_id="STRID_CHECKFUNCTIONS_WARNING" height="300" width="540" margin="10,20,10,20"/>
+		<!--<Label normal_text_color="#CSPColor_Content"  font="system_12" text_id="STRID_CHECKFUNCTIONS_WARNING" height="300" width="540" margin="10,20,10,20" word_wrap="true"/>-->
+		<Control />
+
+    </VBox>
+</Window>

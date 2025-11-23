@@ -1,0 +1,229 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{deff0bae-4a84-42c5-b6d6-af4283b2b883}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\Json">
+      <UniqueIdentifier>{cc88f86c-fd51-4dec-93e9-2cf4e8b823fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ToneAdjustment">
+      <UniqueIdentifier>{f92acd83-6eed-400b-bf7a-fe22f4a81dfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FunctionExpansion">
+      <UniqueIdentifier>{021f6257-f60d-4e27-a0ba-7a77ae6a2998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dui">
+      <UniqueIdentifier>{0d07e1ca-cb41-4e64-a49a-6132a6ec13ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dui\Dialog">
+      <UniqueIdentifier>{3f11fc21-9af1-420f-9732-6688663dd379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dui\Lang">
+      <UniqueIdentifier>{f9496763-c2e7-4d0e-a632-fac59328c5e9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AddressTable.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_tool.h">
+      <Filter>Util\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="CSPMOD.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TA_HSV.h">
+      <Filter>ToneAdjustment</Filter>
+    </ClInclude>
+    <ClInclude Include="TA_ColorBalance.h">
+      <Filter>ToneAdjustment</Filter>
+    </ClInclude>
+    <ClInclude Include="TA_ToneCurve.h">
+      <Filter>ToneAdjustment</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLapseExport.h">
+      <Filter>FunctionExpansion</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\CatDui.h">
+      <Filter>Dui</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\CatDuiThread.h">
+      <Filter>Dui</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\DuiCommon.h">
+      <Filter>Dui</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\basic_form.h">
+      <Filter>Dui</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\Dialog\TimeLapseExport_Dlg.h">
+      <Filter>Dui\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="CspData.h">
+      <Filter>FunctionExpansion</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="LayerObject.h">
+      <Filter>FunctionExpansion</Filter>
+    </ClInclude>
+    <ClInclude Include="CSPHelper.h">
+      <Filter>FunctionExpansion</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptAction_ApplyEffects.h">
+      <Filter>FunctionExpansion</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\Dialog\CheckFunction_Dlg.h">
+      <Filter>Dui\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="AppSettings.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\Dialog\ApplyEffects_Dlg.h">
+      <Filter>Dui\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="DUI\Dialog\About_Dlg.h">
+      <Filter>Dui\Dialog</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AddressTable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_value.cpp">
+      <Filter>Util\Json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_writer.cpp">
+      <Filter>Util\Json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_reader.cpp">
+      <Filter>Util\Json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\src\Util.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="CSPMOD.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TA_HSV.cpp">
+      <Filter>ToneAdjustment</Filter>
+    </ClCompile>
+    <ClCompile Include="TA_ColorBalance.cpp">
+      <Filter>ToneAdjustment</Filter>
+    </ClCompile>
+    <ClCompile Include="TA_ToneCurve.cpp">
+      <Filter>ToneAdjustment</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeLapseExport.cpp">
+      <Filter>FunctionExpansion</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\CatDuiThread.cpp">
+      <Filter>Dui</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\basic_form.cpp">
+      <Filter>Dui</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\CatDui.cpp">
+      <Filter>Dui</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\Dialog\TimeLapseExport_Dlg.cpp">
+      <Filter>Dui\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="CspData.cpp">
+      <Filter>FunctionExpansion</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerObject.cpp">
+      <Filter>FunctionExpansion</Filter>
+    </ClCompile>
+    <ClCompile Include="CSPHelper.cpp">
+      <Filter>FunctionExpansion</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptAction_ApplyEffects.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\Dialog\CheckFunction_Dlg.cpp">
+      <Filter>Dui\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="AppSettings.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\Dialog\ApplyEffects_Dlg.cpp">
+      <Filter>Dui\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="DUI\Dialog\About_Dlg.cpp">
+      <Filter>Dui\Dialog</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_valueiterator.inl">
+      <Filter>Util\Json</Filter>
+    </None>
+    <None Include="DuiResource.zip">
+      <Filter>Dui</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="DuiResource\lang\english.ini">
+      <Filter>Dui\Lang</Filter>
+    </Text>
+    <Text Include="DuiResource\lang\schinese.ini">
+      <Filter>Dui\Lang</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\TimeLapseExport_Dlg_.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\HelperMenu.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
+    <Xml Include="DuiResource\themes\default\global.xml">
+      <Filter>Dui</Filter>
+    </Xml>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\CheckFunction_Dlg.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\ApplyEffectsStart_Dlg.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\ApplyEffectsCheckFailed_Dlg.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\ApplyEffectsProgress_Dlg.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\About_Dlg.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Xsd Include="DUI\NIMDUISchema.xsd">
+      <Filter>Dui</Filter>
+    </Xsd>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CSPMOD.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

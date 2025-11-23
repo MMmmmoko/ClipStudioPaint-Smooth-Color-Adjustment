@@ -1,0 +1,4 @@
+GCC_VERSION =
+SDKROOT = macosx
+
+PRODUCT_NAME =  HSV

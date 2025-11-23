@@ -1,0 +1,1509 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Animation">
+      <UniqueIdentifier>{8d57cd68-fc27-46d6-bfbf-d43c969f12b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Box">
+      <UniqueIdentifier>{876147e7-d0f8-4380-9bd3-0075cf7ea1cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control">
+      <UniqueIdentifier>{84f4111f-0a08-43c9-8509-9063f8802cb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{5be13808-6dcf-4769-a719-b80d560bc6c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{244e0a53-1c33-4dcd-bfd2-f9f310f2e805}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="duilib">
+      <UniqueIdentifier>{d63d44fa-8100-4713-9f44-4f9c9d043250}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Image">
+      <UniqueIdentifier>{5a541f18-9357-4061-8935-710d8a836568}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{1f234e59-8715-40b0-956f-f4522df552bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party">
+      <UniqueIdentifier>{f35d83ee-c8c5-43ae-90a2-7b32443ee0dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\svg">
+      <UniqueIdentifier>{fb600588-5462-4429-bd41-b718781b7509}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\unzip">
+      <UniqueIdentifier>{e830306f-8d26-4a7d-8c75-488fd6671c6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\stb_image">
+      <UniqueIdentifier>{3f9265e5-a15a-4e95-9457-ac05cbf88a37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\apng">
+      <UniqueIdentifier>{418af93b-1aa2-4345-8118-2af96f4691e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderSkia">
+      <UniqueIdentifier>{0a39786a-5478-4647-b38c-4e57f94acfb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\xml">
+      <UniqueIdentifier>{94f29640-b8f0-4c7e-ad1d-dae80f83d3f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\utf">
+      <UniqueIdentifier>{cb38dc5a-5965-410d-9a6a-60d420e4f226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderSkia\Skia">
+      <UniqueIdentifier>{9c093c10-7a9b-4154-b865-18b9cde23965}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderSkia\SDL">
+      <UniqueIdentifier>{a02c0cab-6bee-4351-bfbd-c822c46a8e10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\SDL">
+      <UniqueIdentifier>{126a61ed-8dc3-476e-8c8b-bbcf4ba97677}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Windows">
+      <UniqueIdentifier>{661c22e9-c563-41cc-88b6-d83cb704c831}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderSkia\Windows">
+      <UniqueIdentifier>{1f14ee75-d2c8-4b95-8276-b9a8e21c99b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Windows">
+      <UniqueIdentifier>{480a2bd4-8217-469e-9d3f-ab9152a1fc33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\Windows">
+      <UniqueIdentifier>{1f1d0b6e-57aa-4bdb-a0ad-e0a880214efa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\SDL">
+      <UniqueIdentifier>{d7bb0053-b383-407e-a8d2-59a1614592d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\SDL">
+      <UniqueIdentifier>{be0e4864-bcc3-4091-97af-c44373bb7890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CEFControl">
+      <UniqueIdentifier>{673add5e-a1c1-4f08-bf1c-da1fb4f2ce4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CEFControl\internal">
+      <UniqueIdentifier>{41303673-a68f-4149-a9a6-9bea1132164b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CEFControl\Windows">
+      <UniqueIdentifier>{f5ec9395-859f-467e-95cc-d3317d2c7dcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CEFControl\internal\Windows">
+      <UniqueIdentifier>{eeacd0ad-992e-498d-88f2-c5963e05d711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\libudis86">
+      <UniqueIdentifier>{b0c15824-2ae6-4a01-b939-f84256133f8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebView2">
+      <UniqueIdentifier>{27c3f2eb-b279-490b-b0cc-ff9c309d4884}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Animation\AnimationPlayer.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\AnimationManager.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\TabBox.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\CircleProgress.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\Combo.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\Menu.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\Progress.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\Slider.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TreeView.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\StringUtil.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\WinImplBase.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="duilib.cpp">
+      <Filter>duilib</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\DateTime.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Image\Image.cpp">
+      <Filter>Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Box.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Control.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ControlFinder.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GlobalManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Window.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\WindowBuilder.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Image\ImageDecoder.cpp">
+      <Filter>Image</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\apng\decoder-apng.cpp">
+      <Filter>third_party\apng</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\BoxShadow.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\PerformanceUtil.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\AutoClip.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\RenderFactory_Skia.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\Render_Skia.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\Bitmap_Skia.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\BitmapAlpha.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\Pen_Skia.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\SkTextBox.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\SkUtils.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\Brush_Skia.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\Path_Skia.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\Matrix_Skia.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\xml\pugixml.cpp">
+      <Filter>third_party\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\RichText.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ColorManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\FontManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\Font_Skia.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ImageManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ZipManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DpiManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Shadow.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\TimerManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\LangManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\FileUtil.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ScrollBar.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\UiColors.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\EventArgs.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\AttributeUtil.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\Layout.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\VLayout.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\HLayout.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\ScrollBox.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\ListBox.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\VirtualListBox.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\VirtualHLayout.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\VirtualVLayout.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\HTileLayout.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\VTileLayout.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\VirtualVTileLayout.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\VirtualHTileLayout.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ControlLoading.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\FilterCombo.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\CheckCombo.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ComboButton.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorControl.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorConvert.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorSlider.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorPickerRegular.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorPickerStatard.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorPickerStatardGray.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorPickerCustom.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ColorPicker.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\Line.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\IPAddress.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\HotKey.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrl.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrlHeader.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrlHeaderItem.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrlItem.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrlSubItem.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ImageList.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrlData.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrlReportView.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrlIconView.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrlView.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\PropertyGrid.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\TabCtrl.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DragWindow.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\StateColorMap.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Image\ImageInfo.cpp">
+      <Filter>Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Image\ImageAttribute.cpp">
+      <Filter>Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Image\ImageLoadAttribute.cpp">
+      <Filter>Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Image\StateImageMap.cpp">
+      <Filter>Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Image\StateImage.cpp">
+      <Filter>Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Image\ImageGif.cpp">
+      <Filter>Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\FrameworkThread.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ThreadManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\LogUtil.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\convert_utf\ConvertUTF.cpp">
+      <Filter>third_party\utf</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\contrib\minizip\unzip.c">
+      <Filter>third_party\unzip</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\contrib\minizip\ioapi.c">
+      <Filter>third_party\unzip</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ZipStreamIO.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\WindowBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\WindowCreateParam.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\FontMgr_Skia.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DpiAwareness.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\FilePath.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\FilePathUtil.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\skia\tools\window\WindowContext.cpp">
+      <Filter>RenderSkia\Skia</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\skia\tools\window\GLWindowContext.cpp">
+      <Filter>RenderSkia\Skia</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\skia\tools\gpu\gl\win\SkWGL_win.cpp">
+      <Filter>RenderSkia\Skia</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\Render_Skia_SDL.cpp">
+      <Filter>RenderSkia\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\SkRasterWindowContext_SDL.cpp">
+      <Filter>RenderSkia\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\MessageLoop_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\NativeWindow_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CursorManager_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DpiAwareness_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\MessageLoop_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Keyboard_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\NativeWindow_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ThreadMessage_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ToolTip_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\WindowDropTarget_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Keyboard_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\Render_Skia_Windows.cpp">
+      <Filter>RenderSkia\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\SkGLWindowContext_Windows.cpp">
+      <Filter>RenderSkia\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\SkRasterWindowContext_Windows.cpp">
+      <Filter>RenderSkia\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\ApiWrapper_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\FileDialog_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\MonitorUtil_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\ScreenCapture_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\ShadowWnd_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\DateTimeWnd_Windows.cpp">
+      <Filter>Control\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Keycode_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CursorManager_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DpiAwareness_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ToolTip_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\WindowDropTarget_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ThreadMessage_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\MonitorUtil_SDL.cpp">
+      <Filter>Utils\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\BitmapHepler_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\FileDialog_SDL.cpp">
+      <Filter>Utils\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\ShadowWnd_SDL.cpp">
+      <Filter>Utils\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\RichEdit_Windows.cpp">
+      <Filter>Control\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\RichEditHost_Windows.cpp">
+      <Filter>Control\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\RichEdit_SDL.cpp">
+      <Filter>Control\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\RichEditData.cpp">
+      <Filter>Control\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Clipboard_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Clipboard_SDL.cpp">
+      <Filter>Utils\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\StringCharset.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\DateTimeWnd_SDL.cpp">
+      <Filter>Control\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PlaceHolder.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\SystemUtil_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\SystemUtil_SDL.cpp">
+      <Filter>Utils\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\BitmapHepler_SDL.cpp">
+      <Filter>Utils\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\StringConvert.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DragWindowFilter_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\CefManager.cpp">
+      <Filter>CEFControl</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\CefControlNative.cpp">
+      <Filter>CEFControl</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\CefControlOffScreen.cpp">
+      <Filter>CEFControl</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\CefBrowserHandler.cpp">
+      <Filter>CEFControl\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\CefClientApp.cpp">
+      <Filter>CEFControl\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\CefClientAppBrowser.cpp">
+      <Filter>CEFControl\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\CefClientAppRender.cpp">
+      <Filter>CEFControl\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\CefJSBridge.cpp">
+      <Filter>CEFControl\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\CefJsHandler.cpp">
+      <Filter>CEFControl\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\CefMemoryBlock.cpp">
+      <Filter>CEFControl\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\Windows\bytes_write_handler.cc">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\Windows\osr_dragdrop_win.cc">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\Windows\util_win.cc">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\Windows\osr_ime_handler_win.cc">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\CefControl.cpp">
+      <Filter>CEFControl</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSkia\DrawSkiaImage.cpp">
+      <Filter>RenderSkia</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\ProcessSingleton.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\IconControl.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\InlineHook_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\libudis86\decode.c">
+      <Filter>third_party\libudis86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\libudis86\itab.c">
+      <Filter>third_party\libudis86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\libudis86\syn.c">
+      <Filter>third_party\libudis86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\libudis86\syn-att.c">
+      <Filter>third_party\libudis86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\libudis86\syn-intel.c">
+      <Filter>third_party\libudis86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\libudis86\udis86.c">
+      <Filter>third_party\libudis86</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\DiskUtils_Windows.cpp">
+      <Filter>Utils\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\DirectoryTree.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IconManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\DirectoryTreeImpl_Windows.cpp">
+      <Filter>Control\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\DirectoryTreeImpl_Linux.cpp">
+      <Filter>Control\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\FileTime.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\ListCtrlListView.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Box\ListBoxHelper.cpp">
+      <Filter>Box</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\CefManager_Windows.cpp">
+      <Filter>CEFControl\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\CefWindowUtils_Windows.cpp">
+      <Filter>CEFControl\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\AddressBar.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ClickThrough_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="WebView2\WebView2Control.cpp">
+      <Filter>WebView2</Filter>
+    </ClCompile>
+    <ClCompile Include="WebView2\WebView2ControlImpl.cpp">
+      <Filter>WebView2</Filter>
+    </ClCompile>
+    <ClCompile Include="WebView2\WebView2Manager.cpp">
+      <Filter>WebView2</Filter>
+    </ClCompile>
+    <ClCompile Include="WebView2\WebView2EnvironmentOptions.cpp">
+      <Filter>WebView2</Filter>
+    </ClCompile>
+    <ClCompile Include="CEFControl\internal\Windows\CefOsrDropTarget.cpp">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ControlDropTargetImpl_SDL.cpp">
+      <Filter>Core\SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ControlDropTargetImpl_Windows.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ControlDropTargetUtils.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\WindowManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Animation\AnimationManager.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\AnimationPlayer.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\HBox.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\TabBox.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\TileBox.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\VBox.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Button.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\CheckBox.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\CircleProgress.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Combo.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Label.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Menu.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\observer_impl_base.hpp">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Option.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Progress.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Slider.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TreeView.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\IRender.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Delegate.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\StringUtil.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\WinImplBase.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="duilib.h">
+      <Filter>duilib</Filter>
+    </ClInclude>
+    <ClInclude Include="duilib_config.h">
+      <Filter>duilib</Filter>
+    </ClInclude>
+    <ClInclude Include="duilib_defs.h">
+      <Filter>duilib</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\DateTime.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Image\Image.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Box.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Control.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ControlFinder.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GlobalManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ToolTip.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Window.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WindowBuilder.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Image\ImageDecoder.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\svg\nanosvg.h">
+      <Filter>third_party\svg</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\svg\nanosvgrast.h">
+      <Filter>third_party\svg</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\stb_image\stb_image.h">
+      <Filter>third_party\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\apng\decoder-apng.h">
+      <Filter>third_party\apng</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\BoxShadow.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\PerformanceUtil.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ShadowWnd.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\AutoClip.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\RenderFactory_Skia.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\Render_Skia.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\Bitmap_Skia.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\BitmapAlpha.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\Pen_Skia.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\SkTextBox.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\SkUtils.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\Brush_Skia.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\Path_Skia.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\Matrix_Skia.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\xml\pugiconfig.hpp">
+      <Filter>third_party\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\xml\pugixml.hpp">
+      <Filter>third_party\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichText.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ColorManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\FontManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\Font_Skia.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ImageManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ZipManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DpiManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Shadow.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\TimerManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LangManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\FileUtil.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ScrollBar.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiFont.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiRect.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiSize.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiPoint.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiColor.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiColors.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\EventArgs.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\AttributeUtil.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiSize64.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\Layout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\VLayout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\HLayout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\ScrollBox.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\ListBox.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiMargin.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiPadding.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiTypes.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiEstInt.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiFixedInt.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\VirtualListBox.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\VirtualLayout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\VirtualHLayout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\VirtualVLayout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\HTileLayout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\VTileLayout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\VirtualVTileLayout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\VirtualHTileLayout.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiString.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ControlLoading.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Split.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\GroupBox.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\FilterCombo.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\CheckCombo.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ControlDropTarget.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ComboButton.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiPointF.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorControl.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorConvert.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorSlider.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorPickerRegular.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorPickerStatard.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorPickerStatardGray.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorPickerCustom.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ColorPicker.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Line.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\IPAddress.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\HotKey.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\HyperLink.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrl.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\ListBoxItem.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlHeader.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlHeaderItem.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlItem.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlSubItem.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlDefs.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ImageList.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlData.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlReportView.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlIconView.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlView.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\PropertyGrid.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\FileDialog.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\TabCtrl.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ControlDragable.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DragWindow.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\StateColorMap.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Image\ImageInfo.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Image\ImageAttribute.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Image\ImageLoadAttribute.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Image\StateImageMap.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Image\StateImage.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Image\ImageGif.h">
+      <Filter>Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ResourceParam.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DpiAwareness.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Callback.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\FrameworkThread.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ThreadManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\LogUtil.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="duilib_config_windows.h">
+      <Filter>duilib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\convert_utf\ConvertUTF.h">
+      <Filter>third_party\utf</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\contrib\minizip\unzip.h">
+      <Filter>third_party\unzip</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\contrib\minizip\ioapi.h">
+      <Filter>third_party\unzip</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ZipStreamIO.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CursorManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Keyboard.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WindowMessage.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ScreenCapture.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WindowBase.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\INativeWindow.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\stb_image\stb_image_resize2.h">
+      <Filter>third_party\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WindowCreateParam.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\FontMgr_Skia.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\MonitorUtil.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ThreadMessage.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\FilePath.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\FilePathUtil.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\skia\tools\window\DisplayParams.h">
+      <Filter>RenderSkia\Skia</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\skia\tools\window\WindowContext.h">
+      <Filter>RenderSkia\Skia</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\skia\tools\window\GLWindowContext.h">
+      <Filter>RenderSkia\Skia</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\skia\tools\window\RasterWindowContext.h">
+      <Filter>RenderSkia\Skia</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\skia\tools\gpu\gl\win\SkWGL.h">
+      <Filter>RenderSkia\Skia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\Render_Skia_SDL.h">
+      <Filter>RenderSkia\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\SkRasterWindowContext_SDL.h">
+      <Filter>RenderSkia\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\NativeWindow_SDL.h">
+      <Filter>Core\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\MessageLoop_SDL.h">
+      <Filter>Core\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WindowCreateAttributes.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\MessageLoop_Windows.h">
+      <Filter>Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\NativeWindow_Windows.h">
+      <Filter>Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\SkGLWindowContext_Windows.h">
+      <Filter>RenderSkia\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\SkRasterWindowContext_Windows.h">
+      <Filter>RenderSkia\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\Render_Skia_Windows.h">
+      <Filter>RenderSkia\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ApiWrapper_Windows.h">
+      <Filter>Utils\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Macros_Windows.h">
+      <Filter>Utils\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\DateTimeWnd_Windows.h">
+      <Filter>Control\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Keycode.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\BitmapHelper_Windows.h">
+      <Filter>Utils\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEdit_Windows.h">
+      <Filter>Control\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEditCtrl_Windows.h">
+      <Filter>Control\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEditHost_Windows.h">
+      <Filter>Control\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEdit.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEdit_SDL.h">
+      <Filter>Control\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiRectF.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\RichEditData.h">
+      <Filter>Control\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\SharePtr.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Clipboard.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\StringCharset.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\DateTimeWnd_SDL.h">
+      <Filter>Control\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\PlaceHolder.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\SystemUtil.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\BitmapHelper_SDL.h">
+      <Filter>Utils\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="duilib_string.h">
+      <Filter>duilib</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\StringConvert.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DragWindowFilter_SDL.h">
+      <Filter>Core\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="duilib_cef.h">
+      <Filter>duilib</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\CefControlEvent.h">
+      <Filter>CEFControl</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\CefManager.h">
+      <Filter>CEFControl</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\CefControlNative.h">
+      <Filter>CEFControl</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\CefControlOffScreen.h">
+      <Filter>CEFControl</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\CefAutoUnregister.h">
+      <Filter>CEFControl\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\CefBrowserHandler.h">
+      <Filter>CEFControl\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\CefClientApp.h">
+      <Filter>CEFControl\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\CefIPCStringDefs.h">
+      <Filter>CEFControl\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\CefJSBridge.h">
+      <Filter>CEFControl\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\CefJsHandler.h">
+      <Filter>CEFControl\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\CefMemoryBlock.h">
+      <Filter>CEFControl\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\Windows\bytes_write_handler.h">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\Windows\osr_dragdrop_win.h">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\Windows\util_win.h">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\osr_dragdrop_events.h">
+      <Filter>CEFControl\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\CefBrowserHandlerDelegate.h">
+      <Filter>CEFControl\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\Windows\osr_ime_handler_win.h">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\CefControl.h">
+      <Filter>CEFControl</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\DrawSkiaImage.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ProcessSingleton_Windows.h">
+      <Filter>Utils\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ProcessSingleton.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ProcessSingletonData.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\IconControl.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\InlineHook_Windows.h">
+      <Filter>Utils\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\libudis86\decode.h">
+      <Filter>third_party\libudis86</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\libudis86\extern.h">
+      <Filter>third_party\libudis86</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\libudis86\itab.h">
+      <Filter>third_party\libudis86</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\libudis86\syn.h">
+      <Filter>third_party\libudis86</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\libudis86\types.h">
+      <Filter>third_party\libudis86</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\libudis86\udint.h">
+      <Filter>third_party\libudis86</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\libudis86\udis86.h">
+      <Filter>third_party\libudis86</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UiSize16.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\DiskUtils_Windows.h">
+      <Filter>Utils\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\DirectoryTree.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IconManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\DirectoryTreeImpl.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\FileTime.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\MenuListBox.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\ListCtrlListView.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ControlPtrT.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Box\ListBoxHelper.h">
+      <Filter>Box</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\SkiaHeaderBegin.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSkia\SkiaHeaderEnd.h">
+      <Filter>RenderSkia</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\CefManager_Windows.h">
+      <Filter>CEFControl\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\CefWindowUtils.h">
+      <Filter>CEFControl</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ScopedLock.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\AddressBar.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ClickThrough.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="WebView2\WebView2Control.h">
+      <Filter>WebView2</Filter>
+    </ClInclude>
+    <ClInclude Include="WebView2\WebView2ControlImpl.h">
+      <Filter>WebView2</Filter>
+    </ClInclude>
+    <ClInclude Include="WebView2\WebView2Manager.h">
+      <Filter>WebView2</Filter>
+    </ClInclude>
+    <ClInclude Include="duilib_webview2.h">
+      <Filter>duilib</Filter>
+    </ClInclude>
+    <ClInclude Include="WebView2\ComPtr.h">
+      <Filter>WebView2</Filter>
+    </ClInclude>
+    <ClInclude Include="WebView2\ComCallback.h">
+      <Filter>WebView2</Filter>
+    </ClInclude>
+    <ClInclude Include="WebView2\WebView2EnvironmentOptions.h">
+      <Filter>WebView2</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFControl\internal\Windows\CefOsrDropTarget.h">
+      <Filter>CEFControl\internal\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WindowDropTarget_Windows.h">
+      <Filter>Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WindowDropTarget_SDL.h">
+      <Filter>Core\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ControlDropTargetImpl_SDL.h">
+      <Filter>Core\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ControlDropTargetImpl_Windows.h">
+      <Filter>Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ControlDropTargetUtils.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\WindowManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="duilib.ruleset" />
+  </ItemGroup>
+</Project>

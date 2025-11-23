@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window shadow_type="menu_round" shadow_attached="true" layered_window="true"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://tempuri.org/NIMDUISchema.xsd"
+		>
+	
+	<Class name="helperMenuElement" height="24" padding="20,0,20,0" margin="1,1,1,1"
+		   hot_color="#CSPColor_Selected"  fade_hot="false"/>
+	
+	<Class name="helperMenuText" normal_text_color="#CSPColor_Content" font="system_12" valign="center"/>
+	
+	
+	<MenuListBox class="menu" bkcolor="#CSPColor_PanelBG">
+		<MenuItem class="helperMenuElement" name="helperMenu_applyEffects" width="auto">
+			<Label class="helperMenuText"  text_id="STRID_HELPERMENU_APPLYEFFECTS" mouse_enabled="false" keyboard_enabled="false"/>
+		</MenuItem>
+		<MenuItem class="helperMenuElement" name="helperMenu_checkFunctions" width="auto">
+			<Label class="helperMenuText"  text_id="STRID_HELPERMENU_CHECKFUNCTIONS" mouse_enabled="false" keyboard_enabled="false"/>
+		</MenuItem>
+		<MenuItem class="helperMenuElement" name="helperMenu_about" width="auto">
+			<Label class="helperMenuText"  text_id="STRID_HELPERMENU_ABOUT" mouse_enabled="false" keyboard_enabled="false"/>
+		</MenuItem>
+	</MenuListBox>
+</Window>

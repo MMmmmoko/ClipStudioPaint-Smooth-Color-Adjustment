@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<Window size="500,240"-->
+<Window 
+        caption="0,0,0,28" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36"
+        shadow_type="default" shadow_attached="true" shadow_snap="true" layered_window="true"
+        alpha="255"  icon="public/caption/logo.ico"
+		
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://tempuri.org/NIMDUISchema.xsd"
+		>
+	<VBox bkcolor="#CSPColor_PanelBG" visible="true" height="auto" width="auto">
+		<!-- 标题栏区域 -->
+		<HBox name="window_caption_bar" width="stretch" height="28" normal_color="#CSPColor_CaptionFocus" disabled_color="#CSPColor_CaptionNoFocus">
+			<Label name="text_Title" text_id="STRID_APPLYEFFECTS"  text_align="vcenter"  margin="8,0,8,0" valign="center"  normal_text_color="#CSPColor_CaptionContent" disabled_text_color="CSPColor_CaptionContentNoFocus" font="system_14"/>
+			<Control />
+
+			<!--<Button class="btn_wnd_close_11" height="stretch" width="40" name="closebtn" margin="0,0,0,2" tooltip_text="关闭"/>-->
+			<Button class="btn_wnd_close_11" height="stretch" width="40" name="btn_Close" margin="0,0,0,2" tooltip_text_id="STRING_CLOSE" normal_image="file='icon_close.svg' width='24' height='24' valign='center' halign='center'"/>
+		</HBox>
+
+		<!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
+
+		<VBox width="auto" height="auto">
+			<Control height="30"/>
+			<Label text_id="STRID_APPLYEFFECTS_CHECKFILED_TITLE" valign="center" margin="24,0,8,12" text_align="right,vcenter"  normal_text_color="#CSPColor_Content" font="system_bold_16"/>
+			<Label text_id="STRID_APPLYEFFECTS_CHECKFILED_CONTENT1" valign="center" margin="24,0,24,0" text_align="right,vcenter"  normal_text_color="#CSPColor_Content" font="system_14"/>
+			<Label text_id="STRID_APPLYEFFECTS_CHECKFILED_CONTENT2" valign="center" margin="24,0,24,0" text_align="right,vcenter"  normal_text_color="#CSPColor_Content" font="system_14"/>
+
+			<Control height="30"/>
+
+			<!--按钮区-->
+			<HBox margin="8,8,8,8"  halign="center" height="auto">
+				<Control />
+				<Button margin="4,0,4,0" name="btn_OK" text_id="STRING_OK" width="90" height="30" border_size="1" border_round="2,2" border_color="#CSPColor_Separator" fade_hot="false"
+						normal_text_color="#FFFFFF" bkcolor="#CSPColor_BlueButton" hot_color="#CSPColor_BlueButtonHot" pushed_color="#CSPColor_BlueButtonPush"/>
+
+			</HBox>
+
+		</VBox>
+
+
+
+	</VBox>
+</Window>

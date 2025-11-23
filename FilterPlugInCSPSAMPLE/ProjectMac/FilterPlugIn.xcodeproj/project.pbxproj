@@ -1,0 +1,338 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DD732210148358F500E19CD0 /* HSV_InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DD73220F148358F500E19CD0 /* HSV_InfoPlist.strings */; };
+		DDD10DAF140B9F1E0044262B /* PIFirstHeader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DDD10C23140B85B70044262B /* PIFirstHeader.cpp */; };
+		DDD10DB1140B9F1E0044262B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
+		DDD10E37140BA4AE0044262B /* PIHSVMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DDD10E36140BA4AE0044262B /* PIHSVMain.cpp */; };
+		DDE4B5FC145A62C100B0470A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DDE4B5FB145A62C100B0470A /* Localizable.strings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		DD73220F148358F500E19CD0 /* HSV_InfoPlist.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = HSV_InfoPlist.strings; path = ../../ProjectMac/HSV/HSV_InfoPlist.strings; sourceTree = "<group>"; };
+		DDD10C23140B85B70044262B /* PIFirstHeader.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; path = PIFirstHeader.cpp; sourceTree = "<group>"; };
+		DDD10C24140B85B70044262B /* PIFirstHeader.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = PIFirstHeader.h; sourceTree = "<group>"; };
+		DDD10C25140B85B70044262B /* PIHSVFilter.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; path = PIHSVFilter.h; sourceTree = "<group>"; };
+		DDD10DB5140B9F1F0044262B /* HSV.cpm */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HSV.cpm; sourceTree = BUILT_PRODUCTS_DIR; };
+		DDD10DB6140B9F1F0044262B /* HSV_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = HSV_Info.plist; path = ../../ProjectMac/HSV/HSV_Info.plist; sourceTree = "<group>"; };
+		DDD10E36140BA4AE0044262B /* PIHSVMain.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = PIHSVMain.cpp; path = ../Source/HSV/PIHSVMain.cpp; sourceTree = "<group>"; };
+		DDD10EAC140BAB610044262B /* HSV_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = HSV_Prefix.pch; path = HSV/HSV_Prefix.pch; sourceTree = "<group>"; };
+		DDE4B5FB145A62C100B0470A /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
+		DDFEC0731C6D8294002D4126 /* FilterPlugInPrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilterPlugInPrefixHeader.pch; sourceTree = "<group>"; };
+		DDFEC0741C6D8A8A002D4126 /* FilterPlugInConfig.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = FilterPlugInConfig.xcconfig; sourceTree = "<group>"; };
+		DDFEC0751C6D8ABF002D4126 /* HSV.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = HSV.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DDD10DB0140B9F1E0044262B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDD10DB1140B9F1E0044262B /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		089C166AFE841209C02AAC07 /* FilterPlugIn */ = {
+			isa = PBXGroup;
+			children = (
+				DD3F56B0144DAA390067D1BA /* Configuration */,
+				08FB77AFFE84173DC02AAC07 /* Classes */,
+				DDD10C20140B85810044262B /* PlugInCommon */,
+				32C88E010371C26100C91783 /* Other Sources */,
+				089C167CFE841241C02AAC07 /* Resources */,
+				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
+				19C28FB8FE9D52D311CA2CBB /* Products */,
+			);
+			name = FilterPlugIn;
+			sourceTree = "<group>";
+		};
+		089C1671FE841209C02AAC07 /* Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */,
+			);
+			name = "Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		089C167CFE841241C02AAC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DDE4B5FA145A62C100B0470A /* HSV */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		08FB77AFFE84173DC02AAC07 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				DDD10E36140BA4AE0044262B /* PIHSVMain.cpp */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FB8FE9D52D311CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DDD10DB5140B9F1F0044262B /* HSV.cpm */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		32C88E010371C26100C91783 /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				DDD10EAC140BAB610044262B /* HSV_Prefix.pch */,
+				DDFEC0731C6D8294002D4126 /* FilterPlugInPrefixHeader.pch */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		DD3F56B0144DAA390067D1BA /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				DDFEC0741C6D8A8A002D4126 /* FilterPlugInConfig.xcconfig */,
+				DDFEC0751C6D8ABF002D4126 /* HSV.xcconfig */,
+			);
+			path = Configuration;
+			sourceTree = "<group>";
+		};
+		DDD10C20140B85810044262B /* PlugInCommon */ = {
+			isa = PBXGroup;
+			children = (
+				DDD10C23140B85B70044262B /* PIFirstHeader.cpp */,
+				DDD10C24140B85B70044262B /* PIFirstHeader.h */,
+				DDD10C25140B85B70044262B /* PIHSVFilter.h */,
+			);
+			name = PlugInCommon;
+			path = ../Source/PlugInCommon;
+			sourceTree = SOURCE_ROOT;
+		};
+		DDE4B5FA145A62C100B0470A /* HSV */ = {
+			isa = PBXGroup;
+			children = (
+				DDD10DB6140B9F1F0044262B /* HSV_Info.plist */,
+				DDE4B5FB145A62C100B0470A /* Localizable.strings */,
+				DD73220F148358F500E19CD0 /* HSV_InfoPlist.strings */,
+			);
+			name = HSV;
+			path = ../ResourceMac/HSV;
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DDD10DA9140B9F1E0044262B /* HSV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DDD10DB2140B9F1E0044262B /* Build configuration list for PBXNativeTarget "HSV" */;
+			buildPhases = (
+				DDD10DAA140B9F1E0044262B /* Resources */,
+				DDD10DAC140B9F1E0044262B /* Sources */,
+				DDD10DB0140B9F1E0044262B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HSV;
+			productInstallPath = "$(HOME)/Library/Bundles";
+			productName = FilterPlugIn;
+			productReference = DDD10DB5140B9F1F0044262B /* HSV.cpm */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		089C1669FE841209C02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 1DEB913E08733D840010E9CD /* Build configuration list for PBXProject "FilterPlugIn" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 089C166AFE841209C02AAC07 /* FilterPlugIn */;
+			projectDirPath = "";
+			projectRoot = ../../;
+			targets = (
+				DDD10DA9140B9F1E0044262B /* HSV */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DDD10DAA140B9F1E0044262B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDE4B5FC145A62C100B0470A /* Localizable.strings in Resources */,
+				DD732210148358F500E19CD0 /* HSV_InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DDD10DAC140B9F1E0044262B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDD10DAF140B9F1E0044262B /* PIFirstHeader.cpp in Sources */,
+				DDD10E37140BA4AE0044262B /* PIHSVMain.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB913F08733D840010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DDFEC0741C6D8A8A002D4126 /* FilterPlugInConfig.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = _DEBUG;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = "$(inherited)";
+				SYMROOT = ../OutputMac/FilterPlugIn;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../Source\" \"$(SRCROOT)/../Resource\" \"$(SRCROOT)/../..\"";
+			};
+			name = Debug;
+		};
+		1DEB914008733D840010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DDFEC0741C6D8A8A002D4126 /* FilterPlugInConfig.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = "$(inherited)";
+				SYMROOT = ../OutputMac/FilterPlugIn;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../Source\" \"$(SRCROOT)/../Resource\" \"$(SRCROOT)/../..\"";
+			};
+			name = Release;
+		};
+		DDD10DB3140B9F1E0044262B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DDFEC0751C6D8ABF002D4126 /* HSV.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = FilterPlugInPrefixHeader.pch;
+				INFOPLIST_FILE = HSV/HSV_Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				PRODUCT_NAME = "$(inherited)";
+				SDKROOT = "$(inherited)";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				WRAPPER_EXTENSION = cpm;
+			};
+			name = Debug;
+		};
+		DDD10DB4140B9F1E0044262B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DDFEC0751C6D8ABF002D4126 /* HSV.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = FilterPlugInPrefixHeader.pch;
+				INFOPLIST_FILE = HSV/HSV_Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				PRODUCT_NAME = "$(inherited)";
+				SDKROOT = "$(inherited)";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				WRAPPER_EXTENSION = cpm;
+			};
+			name = Release;
+		};
+		DDE3082F1C61E9710038591C /* Release_activation */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DDFEC0741C6D8A8A002D4126 /* FilterPlugInConfig.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					TRIGLAV_PLUGIN_ACTIVATION,
+					NDEBUG,
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = "$(inherited)";
+				SYMROOT = ../OutputMac/FilterPlugIn;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../Source\" \"$(SRCROOT)/../Resource\" \"$(SRCROOT)/../..\"";
+			};
+			name = Release_activation;
+		};
+		DDE308301C61E9710038591C /* Release_activation */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DDFEC0751C6D8ABF002D4126 /* HSV.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = FilterPlugInPrefixHeader.pch;
+				INFOPLIST_FILE = HSV/HSV_Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				PRODUCT_NAME = "$(inherited)";
+				SDKROOT = "$(inherited)";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				WRAPPER_EXTENSION = cpm;
+			};
+			name = Release_activation;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB913E08733D840010E9CD /* Build configuration list for PBXProject "FilterPlugIn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB913F08733D840010E9CD /* Debug */,
+				1DEB914008733D840010E9CD /* Release */,
+				DDE3082F1C61E9710038591C /* Release_activation */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DDD10DB2140B9F1E0044262B /* Build configuration list for PBXNativeTarget "HSV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DDD10DB3140B9F1E0044262B /* Debug */,
+				DDD10DB4140B9F1E0044262B /* Release */,
+				DDE308301C61E9710038591C /* Release_activation */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 089C1669FE841209C02AAC07 /* Project object */;
+}

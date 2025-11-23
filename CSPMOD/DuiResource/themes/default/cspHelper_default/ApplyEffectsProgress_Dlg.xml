@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window size="320,140"
+        caption="0,0,0,28" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36"
+        shadow_type="default" shadow_attached="true" shadow_snap="true" layered_window="true"
+        alpha="255" size_box="4,4,4,4" icon="public/caption/logo.ico"
+		
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://tempuri.org/NIMDUISchema.xsd"
+		>
+	<VBox bkcolor="#CSPColor_PanelBG" visible="true">
+		<!-- 标题栏区域 -->
+		<HBox name="window_caption_bar" width="stretch" height="28" normal_color="#CSPColor_CaptionFocus" disabled_color="#CSPColor_CaptionNoFocus">
+			<Label name="text_Title" text_id="STRID_APPLYEFFECTS"  text_align="vcenter"  margin="8,0,8,0" valign="center"  normal_text_color="#CSPColor_CaptionContent" disabled_text_color="CSPColor_CaptionContentNoFocus" font="system_14"/>
+			<Control />
+		</HBox>
+
+		<!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
+
+		<VBox>
+			<Control />
+			<Label text_id="STRID_APPLYEFFECTS_EXECUTING_TITLE" valign="center" margin="16,0,6,0" text_align="right,vcenter"  normal_text_color="#CSPColor_Content" font="system_16"/>
+
+			<HBox>
+				<Label name="label_finishedCount" width="stretch" text="0" valign="center" margin="6,0,6,0" text_align="right,vcenter"  normal_text_color="#CSPColor_Content" font="system_bold_18"/>
+				<Label text="/" valign="center" normal_text_color="#CSPColor_Content" font="system_bold_18"/>
+				<Label name="label_totalCount" width="stretch"  text="0" valign="center" margin="6,0,6,0" text_align="left,vcenter"  normal_text_color="#CSPColor_Content" font="system_bold_18"/>
+			</HBox>
+			<Control />
+		</VBox>
+
+
+
+	</VBox>
+</Window>

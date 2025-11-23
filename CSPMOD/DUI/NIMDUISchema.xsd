@@ -1,0 +1,1750 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="NIMDUISchema"
+    targetNamespace="http://tempuri.org/NIMDUISchema.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/NIMDUISchema.xsd"
+    xmlns:mstns="http://tempuri.org/NIMDUISchema.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+	
+	<!--针对nimduilib(民间维护的基于网易的duilib的跨平台版本)的XSD文件-->
+	<!--https://github.com/rhett-lee/nim_duilib/blob/main/docs/Control.md-->
+
+	
+	<!--************经常修改的部分，Global文件中的Color*************-->
+
+		<xs:simpleType name="COLOR">
+		<xs:union memberTypes="xs:string COLOR_NAME"/>
+	</xs:simpleType>
+	<xs:simpleType name="COLOR_NAME">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="white"/>
+			<xs:enumeration value="black"/>
+			<xs:enumeration value="darkcolor"/>
+			<xs:enumeration value="lightcolor"/>
+			<xs:enumeration value="gray"/>
+			<xs:enumeration value="light_gray"/>
+			<xs:enumeration value="dark_gray"/>
+			<xs:enumeration value="green"/>
+			<xs:enumeration value="light_green"/>
+			<xs:enumeration value="blue"/>
+			<xs:enumeration value="red"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+		<!--*************************-->
+	<xs:simpleType name="INT_STRING">
+		<xs:union memberTypes="xs:integer xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="RECT">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d+,\d+,\d+,\d+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SIZE">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d+,\d+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="INT_RECT">
+		<xs:union memberTypes="xs:integer RECT"/>
+	</xs:simpleType>
+	<xs:simpleType name="STRING">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="INT">
+		<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	<xs:simpleType name="BOOL">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="true"/>
+			<xs:enumeration value="false"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DOUBLE">
+		<xs:restriction base="xs:decimal"/>
+	</xs:simpleType>
+	<xs:simpleType name="DWORD">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="0x[0-9A-Fa-f]{8}"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="INT_WIDTH_HEIGHT">
+		<xs:union memberTypes="xs:integer WIDTH_HEIGHT_STR PERCENTAGE"/>
+	</xs:simpleType>
+	<xs:simpleType name="WIDTH_HEIGHT_STR">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="stretch"/>
+			<xs:enumeration value="auto"/>
+		</xs:restriction>
+	</xs:simpleType> 
+	<xs:simpleType name="PERCENTAGE">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="\d+%"/>
+  </xs:restriction>
+</xs:simpleType>
+		
+	<xs:simpleType name="HALIGN">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="left"/>
+			<xs:enumeration value="center"/>
+			<xs:enumeration value="right"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="VALIGN">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="top"/>
+			<xs:enumeration value="center"/>
+			<xs:enumeration value="bottom"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CONTROL_STATE">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="normal"/>
+			<xs:enumeration value="hot"/>
+			<xs:enumeration value="pushed"/>
+			<xs:enumeration value="disabled"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CURSOR_TYPE">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="arrow"/>
+			<xs:enumeration value="hand"/>
+			<xs:enumeration value="wait"/>
+			<xs:enumeration value="cross"/>
+			<xs:enumeration value="ibeam"/>
+			<xs:enumeration value="size_we"/>
+			<xs:enumeration value="size_ns"/>
+			<xs:enumeration value="size_nwse"/>
+			<xs:enumeration value="size_nesw"/>
+			<xs:enumeration value="size_all"/>
+			<xs:enumeration value="no"/>
+			<xs:enumeration value="progress"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TEXT_ALIGN">
+		<xs:union memberTypes="xs:string TEXT_ALIGN_ENUM"/>
+	</xs:simpleType>
+	<xs:simpleType name="TEXT_ALIGN_ENUM">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="left"/>
+			<xs:enumeration value="right"/>
+			<xs:enumeration value="hcenter"/>
+			<xs:enumeration value="vcenter"/>
+			<xs:enumeration value="center"/>
+			<xs:enumeration value="bottom"/>
+			<xs:enumeration value="hcenter,vcenter"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RICH_EDIT_ALIGN">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="left"/>
+			<xs:enumeration value="right"/>
+			<xs:enumeration value="hcenter"/>
+			<xs:enumeration value="top"/>
+			<xs:enumeration value="vcenter"/>
+			<xs:enumeration value="bottom"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="IMG_HINT">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="xxx.png"/>
+			<xs:enumeration value="file='aaa.jpg' dest='0,0,0,0' source='0,0,0,0' corner='0,0,0,0' fade='255' xtiled='false' ytiled='false'"/>
+			<xs:enumeration value="file='aaa.jpg' dest='0,0,0,0' source='0,0,0,0' corner='0,0,0,0' fade='255' xtiled='false' ytiled='false' playcount='-1' antialiasing='false'"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="IMG">
+		<xs:union memberTypes="xs:string IMG_HINT"/>
+	</xs:simpleType>
+	
+	<xs:simpleType name="COMBO_TYPE">
+			<xs:restriction base="xs:string">
+			<xs:enumeration value="drop_list"/>
+			<xs:enumeration value="drop_down"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="SHADOW_HINT">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="color='red' offset='0,0' blurradius='8' spreadradius='8'"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SHADOW">
+		<xs:union memberTypes="xs:string SHADOW_HINT"/>
+	</xs:simpleType>
+
+	<xs:simpleType name="SHADOW_TYPE">
+			<xs:restriction base="xs:string">
+			<xs:enumeration value="default"/>
+			<xs:enumeration value="big"/>
+			<xs:enumeration value="big_round"/>
+			<xs:enumeration value="small"/>
+			<xs:enumeration value="small_round"/>
+			<xs:enumeration value="menu"/>
+			<xs:enumeration value="menu_round"/>
+			<xs:enumeration value="none"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="DATE_FORMAT">
+			<xs:restriction base="xs:string">
+			<xs:enumeration value="date_calendar"/>
+			<xs:enumeration value="date_up_down"/>
+			<xs:enumeration value="date_time_up_down"/>
+			<xs:enumeration value="date_minute_up_down"/>
+			<xs:enumeration value="time_up_down"/>
+			<xs:enumeration value="minute_up_down"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="COLOR_DIRECTION">
+			<xs:restriction base="xs:string">
+			<xs:enumeration value="1"/>
+			<xs:enumeration value="2"/>
+			<xs:enumeration value="3"/>
+			<xs:enumeration value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="DASH_STYLE">
+			<xs:restriction base="xs:string">
+			<xs:enumeration value="solid"/>
+			<xs:enumeration value="dash"/>
+			<xs:enumeration value="dot"/>
+			<xs:enumeration value="dash_dot"/>
+			<xs:enumeration value="dash_dot_dot"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="TRIM_POLICY">
+			<xs:restriction base="xs:string">
+			<xs:enumeration value="all"/>
+			<xs:enumeration value="none"/>
+			<xs:enumeration value="keep_one"/>
+		</xs:restriction>
+	</xs:simpleType>
+				
+	<xs:simpleType name="FONT">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="system_12"/>
+			<xs:enumeration value="system_14"/>
+			<xs:enumeration value="system_16"/>
+			<xs:enumeration value="system_18"/>
+			<xs:enumeration value="system_20"/>
+			<xs:enumeration value="system_22"/>
+			<xs:enumeration value="system_bold_12"/>
+			<xs:enumeration value="system_bold_14"/>
+			<xs:enumeration value="system_bold_16"/>
+			<xs:enumeration value="system_bold_18"/>
+			<xs:enumeration value="system_bold_20"/>
+			<xs:enumeration value="system_bold_22"/>
+			<xs:enumeration value="arial_12"/>
+			<xs:enumeration value="arial_14"/>
+			<xs:enumeration value="arial_16"/>
+			<xs:enumeration value="arial_18"/>
+			<xs:enumeration value="arial_20"/>
+			<xs:enumeration value="arial_22"/>
+			<xs:enumeration value="arial_bold_12"/>
+			<xs:enumeration value="arial_bold_14"/>
+			<xs:enumeration value="arial_bold_16"/>
+			<xs:enumeration value="arial_bold_18"/>
+			<xs:enumeration value="arial_bold_20"/>
+			<xs:enumeration value="arial_bold_22"/>
+			<xs:enumeration value="system_underline_12"/>
+			<xs:enumeration value="system_underline_14"/>
+			<xs:enumeration value="system_underline_16"/>
+			<xs:enumeration value="system_underline_18"/>
+			<xs:enumeration value="system_underline_20"/>
+			<xs:enumeration value="system_underline_22"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	
+	<!--控件标签-->
+	<xs:element name="Control" type="ControlAttr"/>
+	<xs:element name="ScrollBar" type="ScrollBarAttr"/>
+	<xs:element name="Label" type="LabelAttr"/>
+	<xs:element name="LabelBox" type="LabelBoxAttr"/>
+	<xs:element name="Button" type="ButtonAttr"/>
+	<xs:element name="ButtonBox" type="ButtonBoxAttr"/>
+	<xs:element name="CheckBox" type="CheckBoxAttr"/>
+	<xs:element name="CheckBoxBox" type="CheckBoxBoxAttr"/>
+	<xs:element name="Option" type="OptionAttr"/>
+	<xs:element name="OptionBox" type="OptionBoxAttr"/>
+	<xs:element name="GroupBox" type="GroupBoxAttr"/>
+	<xs:element name="GroupVBox" type="GroupVBoxAttr"/>
+	<xs:element name="GroupHBox" type="GroupHBoxAttr"/>
+	<xs:element name="Combo" type="ComboAttr"/>
+	<xs:element name="FilterCombo" type="FilterComboAttr"/>
+	<xs:element name="ComboButton" type="ComboButtonAttr"/>
+	<xs:element name="CheckCombo" type="CheckComboAttr"/>
+	<xs:element name="DateTime" type="DateTimeAttr"/>
+	<xs:element name="HotKey" type="HotKeyAttr"/>
+	<xs:element name="HyperLink" type="HyperLinkAttr"/>
+	<xs:element name="IPAddress" type="IPAddressAttr"/>
+	<xs:element name="Line" type="LineAttr"/>
+	<!--<xs:element name="Menu" type="MenuAttr"/>-->
+	<xs:element name="Progress" type="ProgressAttr"/>
+	<xs:element name="Slider" type="SliderAttr"/>
+	<xs:element name="CircleProgress" type="CircleProgressAttr"/>
+	<xs:element name="RichEdit" type="RichEditAttr"/>
+	<xs:element name="RichText" type="RichTextAttr"/>
+	<xs:element name="Split" type="SplitAttr"/>
+	<xs:element name="SplitBox" type="SplitBoxAttr"/>
+	<xs:element name="TabCtrl" type="TabCtrlAttr"/>
+	<xs:element name="TabCtrlItem" type="TabCtrlItemAttr"/>
+	<xs:element name="ControlDragableT" type="ControlDragableTAttr"/>
+	<xs:element name="TreeView" type="TreeViewAttr"/>
+	<xs:element name="TreeNode" type="TreeNodeAttr"/>
+	<xs:element name="DirectoryTree" type="DirectoryTreeAttr"/>
+	<xs:element name="ListCtrl" type="ListCtrlAttr"/>
+	<xs:element name="PropertyGrid" type="PropertyGridAttr"/>
+	<xs:element name="ColorPicker" type="ColorPickerAttr"/>
+	<xs:element name="ControlDragable" type="ControlDragableAttr"/>
+	<xs:element name="CefControl" type="CefControlAttr"/>
+	<xs:element name="IconControl" type="IconControlAttr"/>
+	<xs:element name="AddressBar" type="AddressBarAttr"/>
+	
+	<xs:element name="Box" type="BoxAttr"/>
+	<xs:element name="VBox" type="VBoxAttr"/>
+	<xs:element name="HBox" type="HBoxAttr"/>
+	<xs:element name="TabBox" type="TabBoxAttr"/>
+	<xs:element name="VTileBox" type="VTileBoxAttr"/>
+	<xs:element name="HTileBox" type="HTileBoxAttr"/>
+	<xs:element name="ScrollBox" type="ScrollBoxAttr"/>
+	<xs:element name="VScrollBox" type="VScrollBoxAttr"/>
+	<xs:element name="HScrollBox" type="HScrollBoxAttr"/>
+	<xs:element name="VTileScrollBox" type="VTileScrollBoxAttr"/>
+	<xs:element name="HTileScrollBox" type="HTileScrollBoxAttr"/>
+	<xs:element name="ListBox" type="ListBoxAttr"/>
+	<xs:element name="VListBox" type="VListBoxAttr"/>
+	<xs:element name="HListBox" type="HListBoxAttr"/>
+	<xs:element name="VTileListBox" type="VTileListBoxAttr"/>
+	<xs:element name="HTileListBox" type="HTileListBoxAttr"/>
+	<xs:element name="VirtualListBox" type="VirtualListBoxAttr"/>
+	<xs:element name="VirtualVListBox" type="VirtualVListBoxAttr"/>
+	<xs:element name="VirtualHListBox" type="VirtualHListBoxAttr"/>
+	<xs:element name="VirtualVTileListBox" type="VirtualVTileListBoxAttr"/>
+	<xs:element name="VirtualHTileListBox" type="VirtualHTileListBoxAttr"/>
+	<xs:element name="BoxDragable" type="BoxDragableAttr"/>
+	<xs:element name="HBoxDragable" type="HBoxDragableAttr"/>
+	<xs:element name="VBoxDragable" type="VBoxDragableAttr"/>
+	
+	<xs:element name="Window" type="WindowAttr"/>
+	<xs:element name="Menu" type="MenuAttr"/>
+	<xs:element name="MenuItem" type="MenuItemAttr"/>
+	<xs:element name="SubMenu" type="SubMenuAttr"/>
+	
+<!--STRING INT_WIDTH_HEIGHT COLOR_DIRECTION DASH_STYLE CONTROL_STATE CURSOR_TYPE SIZE SHADOW-->
+<!--COMBO_TYPE SHADOW_TYPE DATE_FORMAT TRIM_POLICY-->
+<xs:complexType name="ControlAttr">
+	<xs:sequence>
+  <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+		<xs:attribute name="class" default="" type="STRING">
+			<xs:annotation>
+				<xs:documentation>控件样式,用样式里面的属性值来设置本控件的属性,如(btn_default),可以同时指定多个样式,各个样式之间用空格分隔,需要写在第一个属性位置.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+			<xs:attribute name="name" default="" type="STRING" >
+			<xs:annotation>
+				<xs:documentation>控件名字,同一窗口内必须唯一,如(testbtn)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="width" default="stretch" type="INT_WIDTH_HEIGHT" >
+			<xs:annotation>
+				<xs:documentation>可以设置int或string类型的值.当值为int是则设置控件的宽度值,如(100);当值为string时,stretch代表由父容器计算控件宽度,auto代表根据内容情况自动计算宽度,如果为百分比值"50%"，代表该控件的宽度期望值为父控件宽度的50%</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="height" default="stretch" type="INT_WIDTH_HEIGHT" >
+			<xs:annotation>
+				<xs:documentation>可以设置int或string类型的值.当值为int是则设置控件的高度值,如(100);当值为string时,stretch代表由父容器计算控件高度,auto代表根据内容情况自动计算高度,如果为百分比值"30%"，代表该控件的宽度期望值为父控件高度的30%</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="min_width" default="-1" type="INT" >
+			<xs:annotation>
+				<xs:documentation>控件的最小宽度,如(30)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="min_height" default="-1" type="INT" >
+			<xs:annotation>
+				<xs:documentation>控件的最小高度,如(30)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="max_width" type="INT_WIDTH_HEIGHT" >
+			<xs:annotation>
+				<xs:documentation>控件的最大宽度,描述同width</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="max_height" type="INT_WIDTH_HEIGHT" >
+			<xs:annotation>
+				<xs:documentation>控件的最大高度,描述同height</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="margin" default="0,0,0,0" type="RECT" >
+			<xs:annotation>
+				<xs:documentation>外边距,如0,0,0,0</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="padding" default="0,0,0,0" type="RECT" >
+			<xs:annotation>
+				<xs:documentation>内边距,如0,0,0,0</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="control_padding" default="true" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否允许控件自身运用内边距</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="halign" default="left" type="HALIGN" >
+			<xs:annotation>
+				<xs:documentation>控件的横向位置,如(center),支持left、center、right三种位置</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="valign" default="top" type="VALIGN" >
+			<xs:annotation>
+				<xs:documentation>控件的纵向位置,如(center),支持top、center、bottom三种位置</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="float" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否使用绝对定位,如(true)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="keep_float_pos" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>设置当父控件位置和大小调整时，是否保持浮动控件相对父控件的位置不变,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="bkcolor" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>背景颜色字符串常量,如(white/#FFFFFF/#FFFFFFFF(ARGB))</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="bkcolor2" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>第二背景颜色字符串常量,如果设置了第二背景色，则支持背景颜色渐变,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="bkcolor2_direction" type="COLOR_DIRECTION" >
+			<xs:annotation>
+				<xs:documentation>第二背景色方向，"1": 左->右，"2": 上->下，"3": 左上->右下，"4": 右上->左下</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="hot_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>普通状态颜色,如(white)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="normal_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>悬浮状态颜色,如(white)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="pushed_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>按下状态颜色,如(white)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="disabled_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>禁用状态颜色,如(white)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="border_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>设置所有状态下的边框颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="normal_border_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>正常状态的边框颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="hot_border_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>悬浮状态的边框颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="pushed_border_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>按下状态的边框颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="disabled_border_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>禁止状态的边框颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="focus_border_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>焦点状态的边框颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="border_size" default="0" type="INT_RECT" >
+			<xs:annotation>
+				<xs:documentation>可以设置int或rect类型的值。当值为int时则左、上、右、下都用该值作为宽。值为rect类型时则分别设置左、上、右、下的边框</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="border_dash_style" default="solid" type="DASH_STYLE" >
+			<xs:annotation>
+				<xs:documentation>
+					线的形状，可选值：&#xA;"solid"：实线&#xA;"dash"：短划线构成的虚线&#xA;"dot"：点构成的虚线&#xA;"dash_dot"：交替短划线点线&#xA;"dash_dot_dot"：交替短划线点点线
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="borders_on_top" default="true" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>边框是否在顶层（即先绘制子控件，后绘制边框，避免边框被子控件覆盖）</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="left_border_size" default="0" type="INT" >
+			<xs:annotation>
+				<xs:documentation>左边边框大小,如(1),设置该值大于0,则将忽略border_size属性的设置</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="top_border_size" default="0" type="INT" >
+			<xs:annotation>
+				<xs:documentation>顶部边框大小,如(1),设置该值大于0,则将忽略border_size属性的设置</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="right_border_size" default="0" type="INT" >
+			<xs:annotation>
+				<xs:documentation>右边边框大小,如(1),设置该值大于0,则将忽略border_size属性的设置</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="bottom_border_size" default="0" type="INT" >
+			<xs:annotation>
+				<xs:documentation>底部边框大小,如(1),设置该值大于0,则将忽略border_size属性的设置</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="border_round" default="0,0" type="SIZE" >
+			<xs:annotation>
+				<xs:documentation>边框圆角半径,如(2,2)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="bkimage" default="" type="IMG" >
+			<xs:annotation>
+				<xs:documentation>背景图片,如(bk.bmp或file='aaa.jpg' res='' dest='0,0,0,0' source='0,0,0,0' corner='0,0,0,0' fade='255' xtiled='false' ytiled='false')</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="normal_image" default="" type="IMG" >
+			<xs:annotation>
+					<xs:documentation>普通状态图片</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="hot_image" default="" type="IMG" >
+			<xs:annotation>
+					<xs:documentation>鼠标悬浮的状态图片</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="pushed_image" default="" type="IMG" >
+			<xs:annotation>
+					<xs:documentation>鼠标按下的状态图片</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="disabled_image" default="" type="IMG" >
+			<xs:annotation>
+					<xs:documentation>禁用的状态图片</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fore_normal_image" default="" type="IMG" >
+			<xs:annotation>
+					<xs:documentation>普通状态前景图片</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fore_hot_image" default="" type="IMG" >
+			<xs:annotation>
+					<xs:documentation>鼠标悬浮的状态前景图片</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fore_pushed_image" default="" type="IMG" >
+			<xs:annotation>
+					<xs:documentation>鼠标按下的状态前景图片</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fore_disabled_image" default="" type="IMG" >
+			<xs:annotation>
+					<xs:documentation>禁用的状态前景图片</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="tooltip_text" default="" type="STRING" >
+			<xs:annotation>
+					<xs:documentation>鼠标悬浮提示,如(请在这里输入你的密码)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="tooltip_text_id" default="" type="STRING" >
+			<xs:annotation>
+					<xs:documentation>鼠标悬浮提示,如(请在这里输入你的密码)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="tooltip_width" type="INT" >
+			<xs:annotation>
+					<xs:documentation>鼠标悬浮提示所占的宽度</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="data_id" default="" type="STRING" >
+			<xs:annotation>
+					<xs:documentation>自定义字符串数据,辅助函数，供用户使用</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="user_data_id" type="INT" >
+			<xs:annotation>
+					<xs:documentation>自定义整型数据, 供用户使用</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="enabled" default="true" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否可以响应用户操作,如(true)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="mouse_enabled" default="true" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>本控件是否可以响应鼠标操作,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="keyboard_enabled" default="true" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>非CButtonUI类忽略该值,为false时不支持TAB_STOP,且该对象不处理键盘信息</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="visible" default="true" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否可见,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fade_visible" default="true" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否可见,如(true),此属性会触发控件动画效果</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="menu" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否需要右键菜单,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="no_focus" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否可以获取焦点,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="tab_stop" default="true" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否允许通过按TAB键切换到此控件</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="show_focus_rect" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否显示焦点状态(一个虚线构成的矩形)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="focus_rect_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>焦点状态矩形的颜色</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="alpha" default="255" type="INT" >
+			<xs:annotation>
+				<xs:documentation>控件的整体透明度,如(128)，有效值为 0-255</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="state" default="normal" type="CONTROL_STATE" >
+			<xs:annotation>
+				<xs:documentation>控件的当前状态: 支持normal、hot、pushed、disabled状态</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="cursor_type" default="arrow" type="CURSOR_TYPE" >
+			<xs:annotation>
+				<xs:documentation>鼠标移动到控件上时的鼠标光标:&#xA;"arrow"：箭头&#xA;"hand"：手型&#xA;"wait"：忙碌&#xA;"cross"：十字线&#xA;"ibeam"：I型光标,文本光标&#xA;"size_we"：水平调整&#xA;"size_ns"：垂直调整&#xA;"size_nwse"：对角线调整，西北-东南调整&#xA;"size_nesw"：对角线调整，东北-西南调整&#xA;"size_all"：移动，四向调整&#xA;"no"：禁止光标&#xA;"progress"：进度，应用启动光标</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="render_offset" default="0,0" type="SIZE" >
+			<xs:annotation>
+				<xs:documentation>控件绘制时的偏移量,如(10,10),一般用于绘制动画</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fade_alpha" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否启用控件透明渐变动画,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fade_hot" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否启用控件悬浮状态下 的透明渐变动画,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fade_width" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否启用控件宽度渐变动画,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fade_height" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否启用控件高度渐变动画,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fade_in_out_x_from_left" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否启用控件从左到右的动画,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fade_in_out_x_from_right" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否启用控件从右到左的动画,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fade_in_out_y_from_top" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否启用控件从上到下的动画,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="fade_in_out_y_from_bottom" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否启用控件从下到上的动画,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="loading_image" default="" type="IMG" >
+			<xs:annotation>
+				<xs:documentation>加载中状态的图片</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="loading_bkcolor" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>加载中状态的背景色</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="paint_order" type="INT" >
+			<xs:annotation>
+				<xs:documentation>设置绘制顺序：0 表示常规绘制，非0表示指定绘制顺序，值越大表示越晚绘制</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="start_gif_play" type="INT" >
+			<xs:annotation>
+				<xs:documentation>播放动画，参数表示播放循环次数</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="stop_gif_play" type="INT" >
+			<xs:annotation>
+				<xs:documentation>停止动画，参数表示停止在哪一帧</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="box_shadow" default="" type="SHADOW" >
+			<xs:annotation>
+				<xs:documentation>	设置控件的阴影属性，举例：boxshadow="color='red' offset='0,0' blurradius='8' spreadradius='8'"</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="cache" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否启用控件绘制缓存,如“true”</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="enable_drag_drop" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否允许拖放操作</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="enable_drop_file" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否允许拖放文件操作</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="drop_file_types" default="false" type="STRING" >
+			<xs:annotation>
+				<xs:documentation>拖放文件操作支持的后缀名列表，比如:".txt;.csv"，表示仅支持txt和csv文件；如果为空，表示支持所有文件</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+</xs:complexType>
+
+
+	<xs:complexType name="ScrollBarAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlAttr">
+				<xs:attribute name="button1_normal_image" default="" type="IMG" >
+					<xs:annotation>
+						<xs:documentation>左或上按钮普通状态图片</xs:documentation>
+				</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="button1_hot_image" default="" type="IMG" >
+					<xs:annotation>
+						<xs:documentation>左或上按钮鼠标悬浮状态图片</xs:documentation>
+				</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="button1_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>左或上按钮鼠标按下状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="button1_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>左或上按钮禁用状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="button2_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>右或下按钮普通状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="button2_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>右或下按钮鼠标悬浮状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="button2_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>右或下按钮鼠标按下状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="button2_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>右或下按钮禁用状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="thumb_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>滑块普通状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="thumb_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>滑块鼠标悬浮状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="thumb_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>滑块鼠标按下状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="thumb_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>滑块禁用状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rail_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>滑块中间标识普通状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rail_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>滑块中间标识鼠标悬浮状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rail_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>滑块中间标识鼠标按下状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rail_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>滑块中间标识禁用状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="bk_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>背景普通状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="bk_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>背景鼠标悬浮状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="bk_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>背景鼠标按下状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="bk_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>背景禁用状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="horizontal" default="false" type="BOOL" ><xs:annotation><xs:documentation>水平或垂直,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="line_size" default="8" type="INT" ><xs:annotation><xs:documentation>滚动一行的大小,如(8)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="thumb_min_length" default="30" type="INT" ><xs:annotation><xs:documentation>滑块的最小长度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="range" default="100" type="INT" ><xs:annotation><xs:documentation>滚动范围,如(100)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="value" default="0" type="INT" ><xs:annotation><xs:documentation>滚动位置,如(0)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="show_button1" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否显示左或上按钮,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="show_button2" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否显示右或下按钮,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="auto_hide_scroll" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否自动隐藏滚动条,如(true)</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+		<xs:attributeGroup name="LabelBaseAttr">
+		<xs:attribute name="text" default="" type="STRING" >
+			<xs:annotation>
+				<xs:documentation>显示文本,如(测试文本)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="text_id" default="" type="STRING" >
+			<xs:annotation>
+				<xs:documentation>多语言功能的ID,如(TEXT_OUT)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="text_align" default="left" type="TEXT_ALIGN" >
+			<xs:annotation>
+				<xs:documentation>文本的输出位置,如(center),支持left、center、right、top、vcenter、bottom</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="text_padding" default="0,0,0,0" type="RECT" >
+			<xs:annotation>
+				<xs:documentation>文本的输出位置,如(center),支持left、center、right、top、vcenter、bottom</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="font" default="system_12" type="FONT" >
+			<xs:annotation>
+				<xs:documentation>字体id,如system_12</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="end_ellipsis" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>句末显示不完是否使用...代替,如(true)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="path_ellipsis" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>对于路径，显示不完整时是否使用...代替中间路径</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="normal_text_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>普通字体颜色,不指定则使用默认颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="hot_text_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>鼠标悬浮字体颜色,不指定则使用默认颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="pushed_text_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>鼠标按下字体颜色,不指定则使用默认颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="disabled_text_color" default="" type="COLOR" >
+			<xs:annotation>
+				<xs:documentation>disabled字体颜色,不指定则使用默认颜色,如(blue)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="single_line" default="true" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否限制正行输出,如(true)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="multi_line" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>是否单行输出文字,如(true)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="auto_tooltip" default="false" type="BOOL" >
+			<xs:annotation>
+				<xs:documentation>鼠标悬浮到控件显示的提示文本是否省略号出现时才显示</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+	<xs:complexType name="LabelAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlAttr">
+				<xs:attributeGroup ref="LabelBaseAttr"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="LabelBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attributeGroup ref="LabelBaseAttr"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ButtonAttr">
+		<xs:complexContent>
+			<xs:extension base="LabelAttr"/>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="ButtonBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="LabelBoxAttr"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:attributeGroup name="CheckBoxBaseAttr">
+		<xs:attribute name="selected" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否选中</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>选择状态时，选中的普通状态图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>选择状态时，选中的鼠标悬浮的状态图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>选择状态时，选中的鼠标按下的状态图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>选择状态时，选中的禁用的状态图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_fore_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>选择状态时，选中的前景图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_fore_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>选择状态时，选中的鼠标悬浮状态的图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_fore_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>选择状态时，选中的鼠标按下状态的前景图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_fore_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>选择状态时，选中的禁用状态的前景图片</xs:documentation></xs:annotation></xs:attribute>
+
+		<xs:attribute name="part_selected_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>部分选择时，选中的普通状态图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="part_selected_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>部分选择时，选中的鼠标悬浮的状态图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="part_selected_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>部分选择时，选中的鼠标按下的状态图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="part_selected_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>部分选择时，选中的禁用的状态图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="part_selected_fore_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>部分选择时，选中的前景图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="part_selected_fore_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>部分选择时，选中的鼠标悬浮状态的图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="part_selected_fore_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>部分选择时，选中的鼠标按下状态的前景图片</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="part_selected_fore_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>部分选择时，选中的禁用状态的前景图片</xs:documentation></xs:annotation></xs:attribute>
+
+		<xs:attribute name="selected_text_color" default="" type="COLOR" ><xs:annotation><xs:documentation>选中状态字体颜色,不指定则使用默认颜色,如(blue)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_normal_text_color" default="" type="COLOR" ><xs:annotation><xs:documentation>选中的普通状态字体颜色,不指定则使用默认颜色,如(blue)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_hot_text_color" default="" type="COLOR" ><xs:annotation><xs:documentation>选中的鼠标悬浮状态字体颜色,不指定则使用默认颜色,如(blue)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_pushed_text_color" default="" type="COLOR" ><xs:annotation><xs:documentation>选中的鼠标按下状态字体颜色,不指定则使用默认颜色,如(blue)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="selected_disabled_text_color" default="" type="COLOR" ><xs:annotation><xs:documentation>选中的禁用状态字体颜色,不指定则使用默认颜色,如(blue)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="normal_first" type="BOOL" ><xs:annotation><xs:documentation>控件在选择状态下，没有设置背景色或背景图时，用非选择状态的对应属性来绘制</xs:documentation></xs:annotation></xs:attribute>
+		</xs:attributeGroup>
+
+	<xs:complexType name="CheckBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ButtonAttr">
+				<xs:attributeGroup ref="CheckBoxBaseAttr"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="CheckBoxBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ButtonBoxAttr">
+				<xs:attributeGroup ref="CheckBoxBaseAttr"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:attributeGroup name="OptionBaseAttr">
+		<xs:attribute name="group" default="" type="STRING" ><xs:annotation><xs:documentation>所属组的名称</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+	</xs:attributeGroup>
+
+	<xs:complexType name="OptionAttr">
+		<xs:complexContent>
+			<xs:extension base="CheckBoxAttr">
+				<xs:attributeGroup ref="OptionBaseAttr"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="OptionBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="CheckBoxBoxAttr">
+				<xs:attributeGroup ref="OptionBaseAttr"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+	
+	<xs:complexType name="GroupBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="LabelBoxAttr">
+				<xs:attribute name="corner_size" default="0,0" type="SIZE"><xs:annotation><xs:documentation>圆角大小</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="line_width" default="0" type="INT"><xs:annotation><xs:documentation>线条宽度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="line_color" default="" type="COLOR"><xs:annotation><xs:documentation>线条颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="text" default="" type="STRING"><xs:annotation><xs:documentation>文本内容</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="GroupVBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="GroupBoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="GroupHBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="GroupBoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ComboAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attribute name="combo_type" default="drop_down" type="COMBO_TYPE" ><xs:annotation><xs:documentation>组合框的类型："drop_list" 表示为不可编辑列表，"drop_down" 表示为可编辑列表</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="dropbox_size" default="0,150" type="SIZE" ><xs:annotation><xs:documentation>下拉列表的大小（宽度和高度）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="popup_top" default="false" type="BOOL" ><xs:annotation><xs:documentation>下拉列表是否向上弹出</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="combo_tree_view_class" default="" type="STRING" ><xs:annotation><xs:documentation>下拉表TreeView的Class属性，定义方法请参考global.xml中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="combo_tree_node_class" default="" type="STRING" ><xs:annotation><xs:documentation>下拉表TreeView的节点的Class属性，定义方法请参考global.xml 中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="combo_icon_class" default="" type="STRING" ><xs:annotation><xs:documentation>显示图标的Class属性，定义方法请参考global.xml 中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="combo_edit_class" default="" type="STRING" ><xs:annotation><xs:documentation>编辑控件的Class属性，定义方法请参考global.xml 中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="combo_button_class" default="" type="STRING" ><xs:annotation><xs:documentation>按钮控件的Class属性，定义方法请参考global.xml 中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="shadow_type" default="menu" type="SHADOW_TYPE" ><xs:annotation><xs:documentation>	设置下拉窗口的阴影类型：&#xA;"default", 默认阴影&#xA;"big", 大阴影，直角（适合普通窗口）&#xA;"big_round", 大阴影，圆角（适合普通窗口）&#xA;"small", 小阴影，直角（适合普通窗口）&#xA;"small_round", 小阴影，圆角（适合普通窗口）&#xA;"menu", 小阴影，直角（适合弹出式窗口，比如菜单等）&#xA;"menu_round", 小阴影，圆角（适合弹出式窗口，比如菜单等）&#xA;"none", 无阴影</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="FilterComboAttr">
+		<xs:complexContent>
+			<xs:extension base="ComboAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ComboButtonAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attribute name="dropbox_size" default="0,150" type="SIZE" ><xs:annotation><xs:documentation>下拉列表的大小（宽度和高度）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="popup_top" default="false" type="BOOL" ><xs:annotation><xs:documentation>下拉列表是否向上弹出</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="combo_box_class" default="" type="STRING" ><xs:annotation><xs:documentation>下拉表组合框的Class属性，定义方法请参考global.xml 中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="left_button_class" default="" type="STRING" ><xs:annotation><xs:documentation>左侧按钮控件的Class属性，定义方法请参考global.xml 中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="left_button_top_label_class" default="" type="STRING" ><xs:annotation><xs:documentation>左侧按钮上侧的Label控件的Class属性，定义方法请参考global.xml 中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="left_button_bottom_label_class" default="" type="STRING" ><xs:annotation><xs:documentation>左侧按钮下侧的Label控件的Class属性，定义方法请参考global.xml 中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="left_button_top_label_text" default="" type="STRING" ><xs:annotation><xs:documentation>	左侧按钮上侧的Label控件的文本</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="left_button_bottom_label_text" default="" type="STRING" ><xs:annotation><xs:documentation>左侧按钮下侧的Label控件的文本</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="left_button_top_label_bkcolor" default="" type="COLOR" ><xs:annotation><xs:documentation>左侧按钮上侧的Label控件的背景色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="left_button_bottom_label_bkcolor" default="" type="COLOR" ><xs:annotation><xs:documentation>左侧按钮下侧的Label控件的背景色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="right_button_class" default="" type="STRING" ><xs:annotation><xs:documentation>右侧按钮控件的Class属性，定义方法请参考global.xml 中的对应内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="shadow_type" default="menu" type="SHADOW_TYPE" ><xs:annotation><xs:documentation>设置下拉窗口的阴影类型：&#xA;"default", 默认阴影&#xA;"big", 大阴影，直角（适合普通窗口）&#xA;"big_round", 大阴影，圆角（适合普通窗口）&#xA;"small", 小阴影，直角（适合普通窗口）&#xA;"small_round", 小阴影，圆角（适合普通窗口）&#xA;"menu", 小阴影，直角（适合弹出式窗口，比如菜单等）&#xA;"menu_round", 小阴影，圆角（适合弹出式窗口，比如菜单等）&#xA;"none", 无阴影</xs:documentation></xs:annotation></xs:attribute>	
+		</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="CheckComboAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attribute name="dropbox" default="" type="STRING" ><xs:annotation><xs:documentation>下拉框的属性信息，具体设置方法可参照示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="dropbox_size" default="0,150" type="SIZE" ><xs:annotation><xs:documentation>下拉列表的大小（宽度和高度）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="popup_top" default="false" type="BOOL" ><xs:annotation><xs:documentation>下拉列表是否向上弹出</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="dropbox_item_class" default="" type="STRING" ><xs:annotation><xs:documentation>下拉列表中每一个列表项的属性，具体设置方法可参照示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="selected_item_class" default="" type="STRING" ><xs:annotation><xs:documentation>选择项中每一个子项的属性，具体设置方法可参照示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="shadow_type" default="menu" type="SHADOW_TYPE" ><xs:annotation><xs:documentation>设置下拉窗口的阴影类型：&#xA;"default", 默认阴影&#xA;"big", 大阴影，直角（适合普通窗口）&#xA;"big_round", 大阴影，圆角（适合普通窗口）&#xA;"small", 小阴影，直角（适合普通窗口）&#xA;"small_round", 小阴影，圆角（适合普通窗口）&#xA;"menu", 小阴影，直角（适合弹出式窗口，比如菜单等）&#xA;"menu_round", 小阴影，圆角（适合弹出式窗口，比如菜单等）&#xA;"none", 无阴影</xs:documentation></xs:annotation></xs:attribute>	
+		</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="DateTimeAttr">
+		<xs:complexContent>
+			<xs:extension base="LabelAttr">
+				<xs:attribute name="format" default="" type="STRING" ><xs:annotation><xs:documentation>日期的格式，具体可参考：DateTime.h中函数的说明</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="edit_format" type="DATE_FORMAT" ><xs:annotation><xs:documentation>编辑状态时，日期的编辑格式，可选值："date_calendar"：年-月-日，通过下拉框展示月日历的方式来修改日期；"date_up_down"： 编辑时显示：年-月-日，通过控件的右侧放置一个向上-向下的控件以修改日期；"date_time_up_down"：编辑时显示：年-月-日 时:分:秒；"date_minute_up_down"：编辑时显示：年-月-日 时:分；"time_up_down"：编辑时显示：时:分:秒；"minute_up_down"：编辑时显示：时:分</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="spin_class" default="" type="STRING" ><xs:annotation><xs:documentation>日期中的Spin控件的Class属性，仅当使用SDL时有效，默认值为："rich_edit_spin_box,rich_edit_spin_btn_up,rich_edit_spin_btn_down"</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="HotKeyAttr">
+		<xs:complexContent>
+			<xs:extension base="HBoxAttr">
+				<xs:attribute name="default_text" default="" type="STRING" ><xs:annotation><xs:documentation>默认显示的文字</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="HyperLinkAttr">
+		<xs:complexContent>
+			<xs:extension base="LabelAttr">
+				<xs:attribute name="url" default="" type="STRING" ><xs:annotation><xs:documentation>URL</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="IPAddressAttr">
+		<xs:complexContent>
+			<xs:extension base="HBoxAttr">
+				<xs:attribute name="ip" default="" type="STRING" ><xs:annotation><xs:documentation>IP地址，比如："192.168.0.0"</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="LineAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlAttr">
+				<xs:attribute name="vertical" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否为垂直的线</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="line_color" default="" type="COLOR" ><xs:annotation><xs:documentation>线的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="line_width" type="INT" ><xs:annotation><xs:documentation>线的宽度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="dash_style" type="DASH_STYLE" ><xs:annotation><xs:documentation>线的形状，可选值："solid"：实线；"dash"：短划线构成的虚线；"dot"：点构成的虚线；"dash_dot"：交替短划线点线；"dash_dot_dot"：交替短划线点点线</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="MenuAttr">
+		<xs:complexContent>
+			<xs:extension base="WindowAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="MenuItemAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="SubMenuAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ProgressAttr">
+		<xs:complexContent>
+			<xs:extension base="LabelAttr">
+				<xs:attribute name="horizontal" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否水平的，true表示水平，false表示垂直</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="min" default="0" type="INT" ><xs:annotation><xs:documentation>进度最小值,如(0)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="max" default="100" type="INT" ><xs:annotation><xs:documentation>进度最大值,如(100)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="value" default="0" type="INT" ><xs:annotation><xs:documentation>进度值,如(50)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="progress_image" default="" type="IMG" ><xs:annotation><xs:documentation>进度条前景图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="stretch_fore_image" default="true" type="BOOL" ><xs:annotation><xs:documentation>指定进度条前景图片是否缩放显示</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="progress_color" default="" type="COLOR" ><xs:annotation><xs:documentation>进度条前景颜色,不指定则使用默认颜色,如(blue)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="marquee" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否滚动显示</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="marquee_width" type="INT" ><xs:annotation><xs:documentation>滚动的宽度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="marquee_step" type="INT" ><xs:annotation><xs:documentation>滚动的步长</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="reverse" default="false" type="BOOL" ><xs:annotation><xs:documentation>进度值是否倒数（进度从100 到 0）</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="SliderAttr">
+		<xs:complexContent>
+			<xs:extension base="ProgressAttr">
+				<xs:attribute name="thumb_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>拖动滑块普通状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="thumb_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>拖动滑块鼠标悬浮状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="thumb_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>拖动滑块鼠标按下状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="thumb_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>拖动滑块鼠标禁用状态图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="thumb_size" default="10,10" type="SIZE" ><xs:annotation><xs:documentation>拖动滑块大小,如(10,10)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="step" default="1" type="INT" ><xs:annotation><xs:documentation>进度步长,如(1)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="progress_bar_padding" default="0,0,0,0" type="RECT" ><xs:annotation><xs:documentation>滑动条绘制时缩小的内边距</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="CircleProgressAttr">
+		<xs:complexContent>
+			<xs:extension base="ProgressAttr">
+				<xs:attribute name="circular" default="true" type="BOOL" ><xs:annotation><xs:documentation>功能开关：是否为环形进度条</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="circle_width" default="1" type="INT" ><xs:annotation><xs:documentation>环形进度条的宽度，如(10)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="indicator" default="" type="STRING" ><xs:annotation><xs:documentation>设置进度指示移动图标</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="clockwise" default="true" type="BOOL" ><xs:annotation><xs:documentation>设置递增方向,true为顺时针</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="bgcolor" default="" type="COLOR" ><xs:annotation><xs:documentation>设置进度条背景颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="fgcolor" default="" type="COLOR" ><xs:annotation><xs:documentation>设置进度条背前景色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="gradient_color" default="" type="COLOR" ><xs:annotation><xs:documentation>设置进度条前景渐变颜色，与 fgcolor 同时使用，可以不设置则无渐变效果</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	
+	<xs:complexType name="RichEditAttr">
+		<xs:complexContent>
+			<xs:extension base="ScrollBoxAttr">
+				<xs:attribute name="vscrollbar" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否使用竖向滚动条,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="auto_vscroll" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否随输入竖向滚动,如“true”(当为SDL实现时，该选项无效)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hscrollbar" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否使用横向滚动条,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="auto_hscroll" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否随输入横向滚动,如“true”(当为SDL实现时，该选项无效)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="want_tab" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否接受tab按键消息,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="want_return" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否接受return按键消息,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="want_ctrl_return" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否接受ctrl+return按键消息,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rich_text" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否使用富格式,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="single_line" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否使用单行,如“true”</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="multi_line" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否使用多行,该属性与single_line互斥,如“true”</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="readonly" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否只读,如(false)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="password" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否显示密码符,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				
+				<xs:attribute name="show_password" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否显示密码符,如“true”</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="password_char" default="" type="STRING" ><xs:annotation><xs:documentation>设置密码字符，默认为 " * " 字符，可用通过这个属性改变</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="flash_password_char" default="false" type="BOOL" ><xs:annotation><xs:documentation>先显示字符，然后再显示密码字符</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="number_only" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否只允许输入数字,如(false)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="max_number" type="INT" ><xs:annotation><xs:documentation>允许的最大数字(仅当number_only为true的时候有效)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="min_number" type="INT" ><xs:annotation><xs:documentation>允许的最小数字(仅当number_only为true的时候有效</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="text_align" default="left,top" type="STRING" ><xs:annotation><xs:documentation>文字对齐方式, 取值: left、right、hcenter、top、vcenter、bottom, 如"right,bottom"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="text_padding" type="RECT" ><xs:annotation><xs:documentation>文本内边距，如："2,2,2,2"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="text" default="" type="STRING" ><xs:annotation><xs:documentation>显示文本</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="text_id" default="" type="STRING" ><xs:annotation><xs:documentation>显示文本的多语言功能ID</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="font" type="FONT" ><xs:annotation><xs:documentation>字体ID</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="normal_text_color" default="" type="COLOR" ><xs:annotation><xs:documentation>普通状态文字颜色,不指定则使用默认颜色,如"blue"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="disabled_text_color" default="" type="COLOR" ><xs:annotation><xs:documentation>禁用状态文字颜色,不指定则使用默认颜色,如"blue"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="caret_color" default="" type="COLOR" ><xs:annotation><xs:documentation>光标的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="prompt_mode" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否显示提示文字,如“true”</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="prompt_text" default="" type="STRING" ><xs:annotation><xs:documentation>文本框内提示文字,当文本框text为空时显示</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="prompt_text_id" default="" type="STRING" ><xs:annotation><xs:documentation>多语言功能的ID,如(TEXT_OUT)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="prompt_color" default="" type="STRING" ><xs:annotation><xs:documentation>文本框内提示文字的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="focused_image" default="" type="IMG" ><xs:annotation><xs:documentation>焦点状态下的图片</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="auto_detect_url" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否自动检测URL，如果是URL则显示为超链接 (当为SDL实现时，该选项无效)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="limit_text" type="INT" ><xs:annotation><xs:documentation>限制最多字符数</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="limit_chars" default="" type="STRING" ><xs:annotation><xs:documentation>限制允许输入哪些字符，比如"abc"表示只允许输入a、b、c字符，不允许输入其他字符</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="allow_beep" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否允许发出Beep声音 (当为SDL实现时，该选项无效)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="word_wrap" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否自动换行</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="no_caret_readonly" default="false" type="BOOL" ><xs:annotation><xs:documentation>只读模式，不显示光标</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="save_selection" default="false" type="BOOL" ><xs:annotation><xs:documentation>如果 为 true，则当控件处于非活动状态时，应保存所选内容的边界 (当为SDL实现时，该选项无效)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hide_selection" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否隐藏选择内容</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="zoom" type="SIZE" ><xs:annotation><xs:documentation>设置缩放比例：设 wParam：缩放比例的分子，lParam：缩放比例的分母。"wParam,lParam" 表示按缩放比例分子/分母显示的缩放，取值范围：1/64~(wParam / lParam)~64。举例：则："0,0"表示关闭缩放功能，"2,1"表示放大到200%，"1,2"表示缩小到50%</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="wheel_zoom" type="BOOL" ><xs:annotation><xs:documentation>是否允许Ctrl + 滚轮来调整缩放比例</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="default_context_menu" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否使用默认的右键菜单</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="spin_class" default="" type="STRING" ><xs:annotation><xs:documentation>设置Spin功能的Class名称，如果不为空则显示Spin按钮，详细用法参见示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="clear_btn_class" default="" type="STRING" ><xs:annotation><xs:documentation>设置清除按钮功能的Class名称，如果不为空则显示清楚按钮，详细用法参见示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="show_passowrd_btn_class" default="" type="STRING" ><xs:annotation><xs:documentation>设置显示密码按钮功能的Class名称，如果不为空则显示显示密码按钮 ，详细用法参见示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="selection_bkcolor" default="CornflowerBlue" type="COLOR" ><xs:annotation><xs:documentation>选择文本的背景色（焦点状态） 如果设置为空，则不显示</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="inactive_selection_bkcolor" default="DarkGray" type="COLOR" ><xs:annotation><xs:documentation>选择文本的背景色（非焦点状态），如果设置为空，则不显示</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="current_row_bkcolor" default="" type="COLOR" ><xs:annotation><xs:documentation>当前行的背景色（焦点状态），如果设置为空，则在焦点状态不显示当前行的背景色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="inactive_current_row_bkcolor" default="" type="COLOR" ><xs:annotation><xs:documentation>当前行的背景色（非焦点状态），如果设置为空，则在非焦点状态不显示当前行的背景色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="select_all_on_focus" default="false" type="BOOL" ><xs:annotation><xs:documentation>获取焦点的时候，是否全选</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="focus_bottom_border_size" default="0" type="INT" ><xs:annotation><xs:documentation>焦点状态时，底部边框的大小</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="focus_bottom_border_color" default="" type="COLOR" ><xs:annotation><xs:documentation>焦点状态时，底部边框的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="enable_drag_drop" default="false" type="BOOL" ><xs:annotation><xs:documentation>SetEnableDragDrop</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="enable_drop_file" default="false" type="BOOL" ><xs:annotation><xs:documentation>SetEnableDropFile</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="drop_file_types" default="" type="STRING" ><xs:annotation><xs:documentation>拖放文件操作支持的后缀名列表，比如:".txt;.csv"，表示仅支持txt和csv文件；如果为空，表示支持所有文件</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+
+	<xs:complexType name="RichTextAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlAttr">
+				<xs:attribute name="text_align" default="left,top" type="STRING" ><xs:annotation><xs:documentation>文字对齐方式, 取值: left、right、hcenter、top、vcenter、bottom, 如(right,bottom)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="text_padding" type="RECT" ><xs:annotation><xs:documentation>文本内边距，如："2,2,2,2"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="font" type="FONT" ><xs:annotation><xs:documentation>字体ID</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="text_color" default="" type="COLOR" ><xs:annotation><xs:documentation>默认文本颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="text" default="" type="STRING" ><xs:annotation><xs:documentation>设置格式文本内容，其中允许使用'{'代替'&lt;'，'}'代替'&gt;'，从而避免使用转移字符，便于阅读</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="text_id" default="" type="STRING" ><xs:annotation><xs:documentation>设置格式文本内容ID，其中对应的内容允许使用'{'代替'&lt;'，'}'代替'&gt;'，从而避免使用转移字符，便于阅读</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="trim_policy" default="all" type="TRIM_POLICY" ><xs:annotation><xs:documentation>设置Trim文本的策略："all"表示去除全部空格；"none"表示不需要去除空格；"keep_one"表示只保留一个空格</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="default_link_font_color" default="" type="COLOR" ><xs:annotation><xs:documentation>超级链接：常规文本颜色值</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hover_link_font_color" default="" type="COLOR" ><xs:annotation><xs:documentation>超级链接：Hover状态文本颜色值</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="mouse_down_link_font_color" default="" type="COLOR" ><xs:annotation><xs:documentation>超级链接：鼠标按下状态文本颜色值</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="link_font_underline" default="true" type="BOOL" ><xs:annotation><xs:documentation>超级链接：是否使用带下划线的字体</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="row_spacing_mul" type="DOUBLE" ><xs:annotation><xs:documentation>行间距倍数, 比如1.5代表1.5倍行间距</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="word_wrap" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否自动换行，如果为false，则只有在<br/>标签的时候才换行</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="SplitAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlAttr">
+				<xs:attribute name="enable_split_single" default="false" type="BOOL" ><xs:annotation><xs:documentation>当只有一个控件的时候，是否允许调整其宽度</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="SplitBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attribute name="enable_split_single" default="false" type="BOOL" ><xs:annotation><xs:documentation>当只有一个控件的时候，是否允许调整其宽度</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="TabCtrlAttr">
+		<xs:complexContent>
+			<xs:extension base="ListBoxAttr">
+				<xs:attribute name="selected_id" type="INT" ><xs:annotation><xs:documentation>默认选择的子项</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="tab_box_name" default="" type="STRING" ><xs:annotation><xs:documentation>绑定的TabBox控件名称，绑定后TabCtrl的选择项变化时，TabBox的选择项会跟随变化</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="drag_order" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持拖动调整顺序（在同一个标签内），默认是开启的</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="drag_out_id" default="0" type="INT" ><xs:annotation><xs:documentation>设置是否支持拖拽拖出该容器：如果不等于0，支持拖出，否则不支持拖出（拖出到drop_in_id==drag_out_id的容器）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="drop_in_id" default="0" type="INT" ><xs:annotation><xs:documentation>设置是否支持拖拽投放进入该容器: 如果不等于0，支持拖入，否则不支持拖入(从drag_out_id==drop_in_id的容器拖入到该容器)</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="TabCtrlItemAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlDragableTAttr">
+				<xs:attribute name="tab_box_item_index" type="INT" ><xs:annotation><xs:documentation>绑定的TabBox子项索引号（即点击这个标签页，切换到此索引号的TabBox页面）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="title" default="" type="STRING" ><xs:annotation><xs:documentation>标签页的标题文字</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="title_class" default="" type="STRING" ><xs:annotation><xs:documentation>标签页的标题文字资源属性Class值</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="icon" default="" type="STRING" ><xs:annotation><xs:documentation>标签页的图标资源字符串</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="icon_class" default="" type="STRING" ><xs:annotation><xs:documentation>标签页的图标资源属性Class值</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="close_button_class" default="" type="STRING" ><xs:annotation><xs:documentation>标签页的关闭按钮资源属性Class值</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="line_class" default="" type="STRING" ><xs:annotation><xs:documentation>标签页的分割线资源属性Class值</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="selected_round_corner" type="SIZE" ><xs:annotation><xs:documentation>标签页选择状态时的圆角大小</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hot_round_corner" type="SIZE" ><xs:annotation><xs:documentation>标签页悬停状态时的圆角大小</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hot_padding" type="SIZE" ><xs:annotation><xs:documentation>标签页Hot状态的背景色的内边距</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="auto_hide_close_button" default="false" type="BOOL" ><xs:annotation><xs:documentation>关闭按钮是否自动隐藏</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+
+	
+<xs:complexType name="ControlDragableTAttr">
+	<xs:sequence>
+  <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+		<xs:attribute name="drag_order" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持拖动调整顺序（在同一个容器内），默认是开启的</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="drag_out" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持拖出操作（在相同窗口的不同容器内），默认是开启的</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="drag_alpha" default="216" type="INT" ><xs:annotation><xs:documentation>拖动顺序时，控件的透明度 0~255</xs:documentation></xs:annotation></xs:attribute>
+</xs:complexType>
+
+	
+	<xs:complexType name="TreeViewAttr">
+		<xs:complexContent>
+			<xs:extension base="ListBoxAttr">
+				<xs:attribute name="indent" type="INT" ><xs:annotation><xs:documentation>树节点的缩进（每层节点缩进一个indent单位）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="multi_select" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否支持多选</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="check_box_class" default="" type="STRING" ><xs:annotation><xs:documentation>显示CheckBox的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="expand_image_class" default="" type="STRING" ><xs:annotation><xs:documentation>显示展开/收起图标的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="show_icon" default="" type="STRING" ><xs:annotation><xs:documentation>显示图标的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="TreeNodeAttr">
+		<xs:complexContent>
+			<xs:extension base="ListBoxItemAttr">
+				<xs:attribute name="expand_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>展开时，正常状态的图片，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="expand_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>展开时，悬停状态的图片，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="expand_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>展开时，按下状态的图片，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="expand_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>展开时，禁止状态的图片，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="collapse_normal_image" default="" type="IMG" ><xs:annotation><xs:documentation>收起时，正常状态的图片，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="collapse_hot_image" default="" type="IMG" ><xs:annotation><xs:documentation>收起时，悬停状态的图片，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="collapse_pushed_image" default="" type="IMG" ><xs:annotation><xs:documentation>收起时，按下状态的图片，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="collapse_disabled_image" default="" type="IMG" ><xs:annotation><xs:documentation>收起时，禁止状态的图片，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="expand_image_right_space" type="INT" ><xs:annotation><xs:documentation>展开图片右侧的空隙</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="check_box_image_right_space" type="INT" ><xs:annotation><xs:documentation>CheckBox图片右侧的空隙</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="icon_image_right_space" type="INT" ><xs:annotation><xs:documentation>图标右侧的空隙</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="DirectoryTreeAttr">
+		<xs:complexContent>
+			<xs:extension base="TreeViewAttr">
+				<xs:attribute name="small_icon_size" default="16" type="INT" ><xs:annotation><xs:documentation>树节点的图标大小</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="large_icon_size" default="32" type="INT" ><xs:annotation><xs:documentation>大图标大小，用于展示目录里面的内容，树节点本身未使用该属性</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="show_hiden_files" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否显示隐藏文件</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="show_system_files" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否显示系统文件</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="ListCtrlAttr">
+		<xs:complexContent>
+			<xs:extension base="VBoxAttr">
+				<xs:attribute name="type" default="report" type="STRING" ><xs:annotation><xs:documentation>类型，可选值："report"、"icon"、"list"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="header_class" default="" type="STRING" ><xs:annotation><xs:documentation>ListCtrlHeader的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="header_item_class" default="" type="STRING" ><xs:annotation><xs:documentation>	ListCtrlHeaderItem的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="header_split_box_class" default="" type="STRING" ><xs:annotation><xs:documentation>ListCtrlHeader/SplitBox的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="header_split_control_class" default="" type="STRING" ><xs:annotation><xs:documentation>ListCtrlHeader/SplitBox/Control的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="enable_header_drag_order" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持列表头拖动改变列的顺序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="check_box_class" default="" type="STRING" ><xs:annotation><xs:documentation>CheckBox的Class属性(应用于Header和ListCtrl数据)，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="data_item_class" default="" type="STRING" ><xs:annotation><xs:documentation>ListCtrlItem的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="data_sub_item_class" default="" type="STRING" ><xs:annotation><xs:documentation>ListCtrlItem/ListCtrlSubItem的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="row_grid_line_width" type="INT" ><xs:annotation><xs:documentation>横向网格线的宽度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="row_grid_line_color" default="" type="COLOR" ><xs:annotation><xs:documentation>横向网格线的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="column_grid_line_width" type="INT" ><xs:annotation><xs:documentation>纵向网格线的宽度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="column_grid_line_color" default="" type="COLOR" ><xs:annotation><xs:documentation>纵向网格线的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="report_view_class" default="" type="STRING" ><xs:annotation><xs:documentation>数据Report视图中的ListBox的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="header_height" type="INT" ><xs:annotation><xs:documentation>表头控件的高度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="data_item_height" type="INT" ><xs:annotation><xs:documentation>数据项的默认高度(行高)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="show_header" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否显示表头控件</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="multi_select" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持多选</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="enable_column_width_auto" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持双击Header的分割条自动调整列宽</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="auto_check_select" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否自动勾选选择的数据项(作用于Header与每行)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="show_header_checkbox" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否在表头最左侧显示CheckBox</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="show_data_item_checkbox" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否在每行行首显示CheckBox</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="icon_view_class" default="" type="STRING" ><xs:annotation><xs:documentation>数据Icon视图中的ListBox的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="icon_view_item_image_class" default="" type="STRING" ><xs:annotation><xs:documentation>数据Icon视图中的ListBox的子项中图片的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="icon_view_item_label_class" default="" type="STRING" ><xs:annotation><xs:documentation>	数据Icon视图中的ListBox的子项中Label的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="list_view_class" default="" type="STRING" ><xs:annotation><xs:documentation>数据List视图中的ListBox的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="list_view_item_class" default="" type="STRING" ><xs:annotation><xs:documentation>数据List视图中的ListBox的子项Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="list_view_item_image_class" default="" type="STRING" ><xs:annotation><xs:documentation>数据List视图中的ListBox的子项的图片的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="list_view_item_label_class" default="" type="STRING" ><xs:annotation><xs:documentation>数据List视图中的ListBox的子项的Label的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="enable_item_edit" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持子项编辑</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="list_ctrl_richedit_class" default="" type="STRING" ><xs:annotation><xs:documentation>编辑框的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+		</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="PropertyGridAttr">
+		<xs:complexContent>
+			<xs:extension base="VBoxAttr">
+				<xs:attribute name="property_grid_xml" default="" type="STRING" ><xs:annotation><xs:documentation>配置文件XML，如果为空，默认为："public/property_grid/property_grid.xml"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="row_grid_line_width" type="INT" ><xs:annotation><xs:documentation>横向网格线的宽度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="row_grid_line_color" default="" type="COLOR" ><xs:annotation><xs:documentation>横向网格线的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="column_grid_line_width" type="INT" ><xs:annotation><xs:documentation>纵向网格线的宽度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="column_grid_line_color" default="" type="COLOR" ><xs:annotation><xs:documentation>纵向网格线的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="header_class" default="" type="STRING" ><xs:annotation><xs:documentation>表头的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="group_class" default="" type="STRING" ><xs:annotation><xs:documentation>分组的ClassClass属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="propterty_class" default="" type="STRING" ><xs:annotation><xs:documentation>属性的ClassClass属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="left_column_width" type="INT" ><xs:annotation><xs:documentation>左侧一列的宽度</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="ColorPickerAttr">
+		<xs:complexContent>
+			<xs:extension base="WindowAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+	<xs:complexType name="ControlDragableAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlAttr">
+				<xs:attribute name="property_grid_xml" default="" type="STRING" ><xs:annotation><xs:documentation>配置文件XML，如果为空，默认为："public/property_grid/property_grid.xml"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="row_grid_line_width" type="INT" ><xs:annotation><xs:documentation>横向网格线的宽度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="row_grid_line_color" default="" type="COLOR" ><xs:annotation><xs:documentation>横向网格线的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="column_grid_line_width" type="INT" ><xs:annotation><xs:documentation>纵向网格线的宽度</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="column_grid_line_color" default="" type="COLOR" ><xs:annotation><xs:documentation>纵向网格线的颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="header_class" default="" type="STRING" ><xs:annotation><xs:documentation>表头的Class属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="group_class" default="" type="STRING" ><xs:annotation><xs:documentation>分组的ClassClass属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="propterty_class" default="" type="STRING" ><xs:annotation><xs:documentation>属性的ClassClass属性，定义方法请参考global.xml 中的对应内容和示例程序</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="left_column_width" type="INT" ><xs:annotation><xs:documentation>左侧一列的宽度</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="CefControlAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlAttr">
+				<xs:attribute name="url" default="" type="STRING" ><xs:annotation><xs:documentation>控件创建成功后，导航到此URL网址</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="url_is_local_file" default="" type="STRING" ><xs:annotation><xs:documentation>url指定的URL网址否为本地文件，如果是本地文件并且指定的是相对路径，则根目录是可执行程序所在目录</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="F12" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否允许F12快捷键(显示/隐藏开发者工具)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="download_favicon_image" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否下载网站的FavIcon图标</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="IconControlAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+
+	<xs:complexType name="AddressBarAttr">
+		<xs:complexContent>
+			<xs:extension base="HBoxAttr">
+				<xs:attribute name="path_tooltip" default="true" type="BOOL" ><xs:annotation><xs:documentation>设置是否显示路径的tooltip</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="return_update_ui" default="true" type="BOOL" ><xs:annotation><xs:documentation>设置按回车时自动更新显示控件</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="esc_update_ui" default="true" type="BOOL" ><xs:annotation><xs:documentation>设置按ESC时自动更新显示控件</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="kill_focus_update_ui" default="true" type="BOOL" ><xs:annotation><xs:documentation>设置失去焦点时自动更新显示控件</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rich_edit_class" default="address_bar_edit" type="STRING" ><xs:annotation><xs:documentation>设置编辑框的Class</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rich_edit_clear_btn_class" default="rich_edit_clear_btn" type="STRING" ><xs:annotation><xs:documentation>设置编辑框的清除按钮Class</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="sub_path_hbox_class" default="address_bar_sub_path_hbox" type="STRING" ><xs:annotation><xs:documentation>设置地址栏路径的容器（HBox）Class，每个子路径一个HBox容器</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="sub_path_button_class" default="address_bar_sub_path_button" type="STRING" ><xs:annotation><xs:documentation>设置地址栏子路径按钮的Class</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="sub_path_root_class" default="address_bar_sub_path_root" type="STRING" ><xs:annotation><xs:documentation>设置地址栏根路径的Class（"/"路径）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="path_separator_class" default="address_bar_path_separator" type="STRING" ><xs:annotation><xs:documentation>设置地址栏路径分隔符的Class</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+
+
+<xs:complexType name="WindowAttr">
+	<xs:sequence>
+  <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+		<xs:attribute name="caption" default="0,0,0,0" type="RECT" ><xs:annotation><xs:documentation>窗口可拖动的标题栏大小的边距, 最后一个参数是指离上边框的距离,如(0,0,0,36)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="use_system_caption" default="false" type="BOOL" ><xs:annotation><xs:documentation>设置是否使用系统标题栏</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="snap_layout_menu" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持显示贴靠布局菜单（Windows 11新功能：通过将鼠标悬停在窗口的最大化按钮上或按 Win + Z，可以轻松访问对齐布局。）</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="sys_menu" default="true" type="BOOL" ><xs:annotation><xs:documentation>在右键点击标题栏时，是否显示系统的窗口菜单（可进行调整窗口状态，关闭窗口等操作）</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="sys_menu_rect" default="0,0,0,0" type="RECT" ><xs:annotation><xs:documentation>窗口菜单区域，在窗口标题栏的左上角（双击该区域可退出窗口，点击显示系统的窗口菜单），该功能若XML中无设置，默认是关闭的</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="icon" default="" type="STRING" ><xs:annotation><xs:documentation>设置窗口的图标文件路径，支持ico格式</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="text" default="" type="STRING" ><xs:annotation><xs:documentation>窗体标题字符串</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="textid" default="" type="STRING" ><xs:annotation><xs:documentation>窗体标题字符串的ID, ID在多语言文件中指定, 如(STRID_MIANWINDOW_TITLE)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="drag_drop" default="true" type="BOOL" ><xs:annotation><xs:documentation>设置是否允许拖放操作</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="shadow_attached" default="true" type="BOOL" ><xs:annotation><xs:documentation>窗口是否附加阴影效果,如(true)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="shadow_type" type="SHADOW_TYPE" ><xs:annotation><xs:documentation>设置窗口的阴影类型：&#xA;"default"：默认阴影&#xA;"big"：有阴影（大），直角，有边框（适合普通窗口）&#xA;"big_round"：有阴影（大），圆角，有边框（适合普通窗口）&#xA;"small"：有阴影（小），直角，有边框（适合普通窗口）&#xA;"small_round"：有阴影（小），圆角，有边框（适合普通窗口）&#xA;"menu"：有阴影（小），直角，有边框（适合弹出式窗口，比如菜单等）&#xA;"menu_round"：有阴影（小），圆角，有边框（适合弹出式窗口，比如菜单等）&#xA;"none"：无阴影，直角，有边框&#xA;"none_round"：无阴影，圆角，有边框</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="shadow_image" default="" type="IMG" ><xs:annotation><xs:documentation>使用自定义的阴影图片去代替默认的阴影效果，设置的路径要注意相对路径以及九宫格属性，如(file='../public/shadow/shadow_big.svg' corner='64,64,68,70')</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="shadow_corner" default="0,0,0,0" type="RECT" ><xs:annotation><xs:documentation>设置了shadow_image属性后，设置此属性来指定阴影素材的九宫格描述</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="shadow_border_round" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>设置了shadow_image属性后，设置此属性来指定阴影的圆角属性</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="shadow_border_color" default="#FFA3A3A3" type="COLOR" ><xs:annotation><xs:documentation>设置窗口阴影的边框颜色</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="shadow_border_size" default="2" type="INT" ><xs:annotation><xs:documentation>设置窗口阴影的边框大小，实际显示的边框大小为此值的一半</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="shadow_snap" default="true" type="BOOL" ><xs:annotation><xs:documentation>设置阴影是否支持窗口贴边操作，如果为true，则在窗口贴近屏幕边缘时，这一侧的阴影自动隐藏，以增大视图内的有效空间</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="size" default="0,0" type="STRING" ><xs:annotation><xs:documentation>窗口的初始化大小, 支持的格式：size="1200,800", 或者size="50%,50%", 或者size="1200,50%", size="50%,800"，百分比是指屏幕宽度或者高度的百分比</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="size_contain_shadow" default="false" type="BOOL" ><xs:annotation><xs:documentation>窗口的初始化大小(size属性)，是否包含窗口的阴影，默认不包含，窗口的实际大小是配置的size值 + 阴影大小</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="min_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>窗口最小大小, 如(320,240)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="max_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>窗口最大大小, 如(1600,1200)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="size_box" default="0,0,0,0" type="RECT" ><xs:annotation><xs:documentation>窗口可拖动改变窗口大小的边距, 如(4,4,6,6)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="round_corner" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>窗口圆角大小, 如(4,4)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="alpha_fix_corner" default="0,0,0,0" type="RECT" ><xs:annotation><xs:documentation>窗口圆角的透明通道修补范围</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="layered_window" default="false" type="BOOL" ><xs:annotation><xs:documentation>设置是否为层窗口</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="alpha" default="255" type="INT" ><xs:annotation><xs:documentation>设置透明度数值[0, 255]，当 alpha 为 0 时，窗口是完全透明的。 当 alpha 为 255 时，窗口是不透明的。&#xA;仅当layered_window="true"时有效，&#xA;该参数在UpdateLayeredWindow函数中作为参数使用(BLENDFUNCTION.SourceConstantAlpha)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="opacity" default="255" type="INT" ><xs:annotation><xs:documentation>设置透不明度数值[0, 255]，当 opacity 为 0 时，窗口是完全透明的。 当 opacity 为 255 时，窗口是不透明的。&#xA;仅当IsLayeredWindow()为true的时候有效，所以如果当前不是分层窗口，内部会自动设置为分层窗口&#xA;该参数在SetLayeredWindowAttributes函数中作为参数使用(bAlpha)</xs:documentation></xs:annotation></xs:attribute>
+		<xs:attribute name="render_backend_type" default="CPU" type="STRING" ><xs:annotation><xs:documentation>"CPU": CPU绘制&#xA;"GL": 使用OpenGL绘制&#xA;注意事项:&#xA;（1）一个线程内，只允许有一个窗口使用OpenGL绘制，否则会出现导致程序崩溃的问题&#xA;（2）OpenGL绘制的窗口，不能是分层窗口（即带有WS_EX_LAYERED属性的窗口）&#xA;（3）使用OpenGL的窗口，每次绘制都是绘制整个窗口，不支持局部绘制，所以不一定比使用CPU绘制的情况下性能更好</xs:documentation></xs:annotation></xs:attribute>
+</xs:complexType>
+
+	
+	
+	<xs:complexType name="BoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ControlAttr">
+				<xs:attribute name="child_margin" default="0" type="INT" ><xs:annotation><xs:documentation>子控件之间的额外边距: X 轴方向 和 Y 轴方向同时设置为相同值</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="child_margin_x" default="0" type="INT" ><xs:annotation><xs:documentation>子控件之间的额外边距: X 轴方向</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="child_margin_y" default="0" type="INT" ><xs:annotation><xs:documentation>子控件之间的额外边距: Y 轴方向</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="margin" default="0,0,0,0" type="RECT" ><xs:annotation><xs:documentation>外边距,如(2,2,2,2)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="padding" default="0,0,0,0" type="RECT" ><xs:annotation><xs:documentation>内边距,如(2,2,2,2)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="mouse_child" default="true" type="BOOL" ><xs:annotation><xs:documentation>本控件的子控件是否可以响应用户操作, true 或者 false</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="drag_out_id" default="0" type="INT" ><xs:annotation><xs:documentation>设置是否支持拖拽拖出该容器：如果不等于0，支持拖出，否则不支持拖出（拖出到drop_in_id==drag_out_id的容器）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="drop_in_id" default="0" type="INT" ><xs:annotation><xs:documentation>设置是否支持拖拽投放进入该容器: 如果不等于0，支持拖入，否则不支持拖入(从drag_out_id==drop_in_id的容器拖入到该容器)</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="HBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="TabBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attribute name="fade_switch" default="false" type="BOOL" ><xs:annotation><xs:documentation>当切换页面时是否使用动画效果, 如(false)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="selected_id" default="0" type="INT" ><xs:annotation><xs:documentation>默认选中的页面id, 如(0)</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VTileBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attribute name="item_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>子项大小, 该宽度和高度，是包含了控件的外边距和内边距的，比如"100,40"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="columns" default="0" type="INT_WIDTH_HEIGHT" ><xs:annotation><xs:documentation>如果设置为"auto"，表示自动计算列数，如果为数值，表示设置为固定列数</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scale_down" default="true" type="BOOL" ><xs:annotation><xs:documentation>当控件内容超出边界时，按比例缩小，以使控件内容完全显示在瓦片区域内</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="HTileBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attribute name="item_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>子项大小, 该宽度和高度，是包含了控件的外边距和内边距的，比如"100,40"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rows" default="0" type="INT_WIDTH_HEIGHT" ><xs:annotation><xs:documentation>如果设置为"auto"，表示自动计算列数，如果为数值，表示设置为固定列数</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scale_down" default="true" type="BOOL" ><xs:annotation><xs:documentation>当控件内容超出边界时，按比例缩小，以使控件内容完全显示在瓦片区域内</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="ScrollBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attribute name="vscrollbar" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否使用竖向滚动条,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hscrollbar" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否使用横向滚动条,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="vscrollbar_style" default="" type="STRING" ><xs:annotation><xs:documentation>设置本容器的纵向滚动条的样式</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hscrollbar_style" default="" type="STRING" ><xs:annotation><xs:documentation>设置本容器的横向滚动条的样式</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="vscrollbar_class" default="" type="STRING" ><xs:annotation><xs:documentation>设置本容器的纵向滚动条的Class</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hscrollbar_class" default="" type="STRING" ><xs:annotation><xs:documentation>设置本容器的横向滚动条的Class</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scrollbar_padding" default="0,0,0,0" type="RECT" ><xs:annotation><xs:documentation>滚动条的外边距,可以让滚动条不占满容器,如(2,2,2,2)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="vscroll_unit" default="30" type="INT" ><xs:annotation><xs:documentation>容器的垂直滚动条滚动步长, 0代表使用默认步长</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hscroll_unit" default="30" type="INT" ><xs:annotation><xs:documentation>容器的水平滚动条滚动步长, 0代表使用默认步长</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scrollbar_float" default="true" type="BOOL" ><xs:annotation><xs:documentation>容器的滚动条是否悬浮在子控件上面,如(true)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="vscrollbar_left" default="false" type="BOOL" ><xs:annotation><xs:documentation>容器的滚动条是否在左侧显示</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="hold_end" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否一直保持显示末尾位置,如(true)</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VScrollBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ScrollBoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="HScrollBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ScrollBoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VTileScrollBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ScrollBoxAttr">
+				<xs:attribute name="item_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>子项大小, 该宽度和高度，是包含了控件的外边距和内边距的，比如"100,40"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="columns" default="0" type="INT_WIDTH_HEIGHT" ><xs:annotation><xs:documentation>如果设置为"auto"，表示自动计算列数，如果为数值，表示设置为固定列数</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scale_down" default="true" type="BOOL" ><xs:annotation><xs:documentation>当控件内容超出边界时，按比例缩小，以使控件内容完全显示在瓦片区域内</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="HTileScrollBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ScrollBoxAttr">
+				<xs:attribute name="item_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>子项大小, 该宽度和高度，是包含了控件的外边距和内边距的，比如"100,40"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rows" default="0" type="INT_WIDTH_HEIGHT" ><xs:annotation><xs:documentation>如果设置为"auto"，表示自动计算列数，如果为数值，表示设置为固定列数</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scale_down" default="true" type="BOOL" ><xs:annotation><xs:documentation>当控件内容超出边界时，按比例缩小，以使控件内容完全显示在瓦片区域内</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="ListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ScrollBoxAttr">
+				<xs:attribute name="multi_select" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否支持多选</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="paint_selected_colors" type="BOOL" ><xs:annotation><xs:documentation>多选的时候，是否显示选择背景色&#xA;默认规则：如果有CheckBox，多选的时候，默认不显示选择背景色；其他情况下显示背景色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scroll_select" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否随鼠标滚轮的滚动改变选中项设置(此选项仅单选有效)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="select_next_when_active_removed" type="BOOL" ><xs:annotation><xs:documentation>在移除一个子项后, 如果被移除项是选择项，是否自动选择下一项(此选项仅单选有效)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="frame_selection" default="false" type="BOOL" ><xs:annotation><xs:documentation>是否支持鼠标框选功能，仅多选模式下生效</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="frame_selection_color" default="#FFAACCEE" type="COLOR" ><xs:annotation><xs:documentation>鼠标框选填充颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="frame_selection_border_size" default="1" type="INT" ><xs:annotation><xs:documentation>鼠标框选边框的大小</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="frame_selection_border_color" default="#FF0078D7" type="COLOR" ><xs:annotation><xs:documentation>鼠标框选边框颜色</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="frame_selection_alpha" default="128" type="INT" ><xs:annotation><xs:documentation>鼠标框选填充颜色的Alpha值</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="select_none_when_click_blank" default="true" type="BOOL" ><xs:annotation><xs:documentation>设置当鼠标点击空白部分时，是否取消选择(仅当开启鼠标框选功能时有效)</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="select_like_list_ctrl" default="false" type="BOOL" ><xs:annotation><xs:documentation>设置选择模式：与ListCtrl类似（即Windows资源管理器中，对文件操作类似的方式），仅多选模式有效</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ListBoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="HListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ListBoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VTileListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ListBoxAttr">
+				<xs:attribute name="item_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>子项大小, 该宽度和高度，是包含了控件的外边距和内边距的，比如"100,40"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="columns" default="0" type="INT_WIDTH_HEIGHT" ><xs:annotation><xs:documentation>如果设置为"auto"，表示自动计算列数，如果为数值，表示设置为固定列数</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scale_down" default="true" type="BOOL" ><xs:annotation><xs:documentation>当控件内容超出边界时，按比例缩小，以使控件内容完全显示在瓦片区域内</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="HTileListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ListBoxAttr">
+				<xs:attribute name="item_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>子项大小, 该宽度和高度，是包含了控件的外边距和内边距的，比如"100,40"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rows" default="0" type="INT_WIDTH_HEIGHT" ><xs:annotation><xs:documentation>如果设置为"auto"，表示自动计算列数，如果为数值，表示设置为固定列数</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scale_down" default="true" type="BOOL" ><xs:annotation><xs:documentation>当控件内容超出边界时，按比例缩小，以使控件内容完全显示在瓦片区域内</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	
+	<xs:complexType name="VirtualListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="ListBoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VirtualVListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="VirtualListBoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VirtualHListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="VirtualListBoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VirtualVTileListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="VirtualListBoxAttr">
+				<xs:attribute name="item_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>子项大小, 该宽度和高度，是包含了控件的外边距和内边距的，比如"100,40"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="columns" default="0" type="INT_WIDTH_HEIGHT" ><xs:annotation><xs:documentation>如果设置为"auto"，表示自动计算列数，如果为数值，表示设置为固定列数</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scale_down" default="true" type="BOOL" ><xs:annotation><xs:documentation>当控件内容超出边界时，按比例缩小，以使控件内容完全显示在瓦片区域内</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="VirtualHTileListBoxAttr">
+		<xs:complexContent>
+			<xs:extension base="VirtualListBoxAttr">
+				<xs:attribute name="item_size" default="0,0" type="SIZE" ><xs:annotation><xs:documentation>子项大小, 该宽度和高度，是包含了控件的外边距和内边距的，比如"100,40"</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="rows" default="0" type="INT_WIDTH_HEIGHT" ><xs:annotation><xs:documentation>如果设置为"auto"，表示自动计算列数，如果为数值，表示设置为固定列数</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="scale_down" default="true" type="BOOL" ><xs:annotation><xs:documentation>当控件内容超出边界时，按比例缩小，以使控件内容完全显示在瓦片区域内</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="BoxDragableAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+				<xs:attribute name="drag_order" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持拖动调整顺序（在同一个容器内）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="drag_alpha" default="216" type="INT" ><xs:annotation><xs:documentation>设置拖动顺序时，控件的透明度（0 - 255）</xs:documentation></xs:annotation></xs:attribute>
+				<xs:attribute name="drag_out" default="true" type="BOOL" ><xs:annotation><xs:documentation>是否支持拖出操纵（在相同窗口的不同容器内）</xs:documentation></xs:annotation></xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:complexType name="HBoxDragableAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxDragableAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	
+	<xs:complexType name="VBoxDragableAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxDragableAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	
+	<!--nim_duilib文档中没有说明-->
+	<xs:complexType name="ListBoxItemAttr">
+		<xs:complexContent>
+			<xs:extension base="BoxAttr">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+
+
+
+
+
+
+
+
+</xs:schema>
