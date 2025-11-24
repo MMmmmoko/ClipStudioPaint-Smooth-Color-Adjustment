@@ -372,8 +372,8 @@ FodyWeavers.xsd
 
 # dependence
 
-!Common/bin/*.pdb
-!Common/bin/*.lib
+Common/bin/*.pdb
+Common/bin/*.lib
 
 Common/bin/msvc.x64.MD/*
 !Common/bin/msvc.x64.MD/*.pdb
