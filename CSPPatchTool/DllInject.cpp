@@ -225,6 +225,9 @@ bool DllInject::Patch()
 
 
     bool baseHack = false;
+
+
+    //嘘~~~~
     if (std::filesystem::exists("hack.txt"))
     {
         SDL_Log("Try Crack...");
@@ -250,8 +253,6 @@ bool DllInject::Patch()
             SDL_Log("Crack Success");
         } while (false);
     }
-    //草，好像因为DoBaseHack的模糊检查，这里插件的判断条件已经被自动跳过了，所以不用改了
-    //但是还是要过一轮的，因为需要发布无破解的版本
     if (!baseHack)
     {
         if (!hacker.DoPluginUnlock())
@@ -295,13 +296,15 @@ bool DllInject::Patch()
 
 
 
-
     const char* outFileName = "CLIPStudioPaint_Patched.exe";
     if (_isUDM)outFileName = "UDMPaintPRO_Patched.exe";
     
     std::ofstream out(outFileName, std::ios::binary | std::ios::trunc);
     if (!out) {
         std::cerr << "Error When Write File"<< outFileName <<"\n";
+
+        SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "写文件失败，请尝试右键以管理员身份运行此程序");
+        SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "The program does not have write permission for this folder. Please try running this program as administrator.");
         return false;
     }
 

@@ -93,7 +93,7 @@ private:
     static SDL_Color _defaultBackgroundColor;
 
 
-    char* prefpath = nullptr;
+    std::string  prefpath ;
     //bool loaded = false;//这个变量用来帮助进行一些特殊处理，比如判断是否锁定
 };
 

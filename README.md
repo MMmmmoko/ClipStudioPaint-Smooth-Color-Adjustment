@@ -57,6 +57,7 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 模糊功能在滤镜菜单里，进入滤镜菜单下的“流畅调色”子菜单可以找到。
 
 此工具将“帮助”->“初步了解”改为了菜单入口。可以在这里点击或者将其加入命令栏后点击命令栏图标，会出现工具入口。
+
   <img src="Docs/Images/readme_menuEntrance.png"/>
   <img src="Docs/Images/readme_menuEntrance2.png"/>
 
@@ -66,7 +67,9 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 应用后期组是此工具提供的一个可以进行多图层同时调色的功能，主要用于绘画中后期在保持图层的情况下进行整体调整。
 使用方法为先创建一个名为“后期”的模式为“穿透”的未锁定的图层组（这个图层组不能在其他图层组内），按自己的需要向里面添加带混合模式的图层或者色调调整图层以进行调色。
+
   <img src="Docs/Images/readme_applyEffects_group.png"/>
+
 调整满意后从工具菜单入口点击应用后期组，执行完后，这个“后期”组的内容便被应用到了其下方的所有未锁定图层中。然后就可以继续在原图层上作画了。
 
 ***注意！应用后期组是一个不可撤回、不稳定的功能，不论是为了防止结果与期望不同还是防止中途软件崩溃，你都应该在执行前对作品进行保存！**

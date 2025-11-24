@@ -26,12 +26,13 @@ SDL_Color AppSettings::_defaultBackgroundColor = { 255,255,255,0 };//低到高 r
 
 AppSettings::AppSettings()
 {
-	prefpath = SDL_GetPrefPath("CatSoft", "CSPMOD");
+	auto _prefpath = SDL_GetPrefPath("CatSoft", "CSPMOD");
+	prefpath = _prefpath;
+	SDL_free(_prefpath);
 }
 
 AppSettings::~AppSettings()
 {
-	SDL_free(prefpath);
 }
 
 void AppSettings::Load()
@@ -79,7 +80,34 @@ else \
  Set##settingGroup##setting(_##settingGroup##setting);\
 }
 
-	{ CATTUBER_APPSETTINGS_LIST(APPSETTINGS_Load) }
+	{
+		if (configJson.isMember("FunctionEnable") && configJson["FunctionEnable"].isMember("HSV") && _Is_bool_Type(configJson["FunctionEnable"]["HSV"])) {
+			SetFunctionEnableHSV(_Get_bool(configJson["FunctionEnable"]["HSV"]));
+		}
+		else {
+			SetFunctionEnableHSV(_FunctionEnableHSV);
+		} if (configJson.isMember("FunctionEnable") && configJson["FunctionEnable"].isMember("ColorBalance") && _Is_bool_Type(configJson["FunctionEnable"]["ColorBalance"])) {
+			SetFunctionEnableColorBalance(_Get_bool(configJson["FunctionEnable"]["ColorBalance"]));
+		}
+		else {
+			SetFunctionEnableColorBalance(_FunctionEnableColorBalance);
+		} if (configJson.isMember("FunctionEnable") && configJson["FunctionEnable"].isMember("ToneCurve") && _Is_bool_Type(configJson["FunctionEnable"]["ToneCurve"])) {
+			SetFunctionEnableToneCurve(_Get_bool(configJson["FunctionEnable"]["ToneCurve"]));
+		}
+		else {
+			SetFunctionEnableToneCurve(_FunctionEnableToneCurve);
+		} if (configJson.isMember("FunctionEnable") && configJson["FunctionEnable"].isMember("TimeLapseExport") && _Is_bool_Type(configJson["FunctionEnable"]["TimeLapseExport"])) {
+			SetFunctionEnableTimeLapseExport(_Get_bool(configJson["FunctionEnable"]["TimeLapseExport"]));
+		}
+		else {
+			SetFunctionEnableTimeLapseExport(_FunctionEnableTimeLapseExport);
+		} if (configJson.isMember("FunctionEnable") && configJson["FunctionEnable"].isMember("Script_ApplyEffects") && _Is_bool_Type(configJson["FunctionEnable"]["Script_ApplyEffects"])) {
+			SetFunctionEnableScript_ApplyEffects(_Get_bool(configJson["FunctionEnable"]["Script_ApplyEffects"]));
+		}
+		else {
+			SetFunctionEnableScript_ApplyEffects(_FunctionEnableScript_ApplyEffects);
+		}
+	}
 
 #undef APPSETTINGS_Load
 
@@ -395,7 +423,7 @@ int64_t AppSettings::_Get_int64_t(Json::Value& json)
 
 bool AppSettings::_Is_bool_Type(Json::Value& json)
 {
-	return json.isInt64();
+	return json.isBool();
 }
 void AppSettings::_Save_bool_Type(Json::Value& json, bool value)
 {
