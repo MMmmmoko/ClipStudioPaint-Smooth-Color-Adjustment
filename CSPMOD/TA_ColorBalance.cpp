@@ -126,8 +126,8 @@ int64_t TA_ColorBalance::Hook_ColorBalanceOnParamChange(uintptr_t arg0, uintptr_
 	static uint64_t startTimer = SDL_GetTicks();
 	uint64_t curTimer = SDL_GetTicks();
 	//SDL_Log("toneCurveCall:%llu ms", curTimer- startTimer);
-	if (curTimer - startTimer < 16)return result;
-	startTimer = curTimer;
+	if (curTimer - startTimer < 33)return result;
+	startTimer = SDL_GetTicks();
 
 
 
