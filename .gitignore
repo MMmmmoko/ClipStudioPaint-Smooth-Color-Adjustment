@@ -33,7 +33,7 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
+# [Bb]in/
 [Oo]bj/
 [Oo]ut/
 [Ll]og/
@@ -371,4 +371,14 @@ FodyWeavers.xsd
 
 
 # dependence
+
+!Common/bin/*.pdb
 !Common/bin/*.lib
+
+Common/bin/msvc.x64.MD/*
+!Common/bin/msvc.x64.MD/*.pdb
+!Common/bin/msvc.x64.MD/*.lib
+
+Common/bin/msvc.x64.MDd/*
+!Common/bin/msvc.x64.MDd/*.pdb
+!Common/bin/msvc.x64.MDd/*.lib
