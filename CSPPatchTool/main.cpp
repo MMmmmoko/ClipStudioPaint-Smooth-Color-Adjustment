@@ -5,11 +5,11 @@
 
 
 
-void ProcessCSP(uint8_t* mem,size_t size,bool isUDM)
+void ProcessCSP(uint8_t* mem,size_t size,DllInject::EXETYPE exeType)
 {
     DllInject cspExeInject;
 
-    cspExeInject.SetUpPE(mem, size, isUDM);
+    cspExeInject.SetUpPE(mem, size, exeType);
 
 
 
@@ -103,28 +103,37 @@ int main()
     SetUpLogFunc();
 	const char* CSP_Path = "CLIPStudioPaint.exe";
     const char* UDM_Path = "UDMPaintPRO.exe";
+    const char* UDMEX_Path = "UDMPaintEX.exe";
     FILE* fp = nullptr;
     errno_t err= fopen_s(&fp, CSP_Path, "rb");
     bool openSuccess = false;
-    bool isUDM = false;
+
+    DllInject::EXETYPE exetype = DllInject::EXETYPE::CSP;
+    const char* openfileName = CSP_Path;
     if (err!=0||fp==nullptr)
     {
         err = fopen_s(&fp, UDM_Path, "rb");
-        isUDM = true;
+        openfileName = UDM_Path;
+        exetype=DllInject::EXETYPE::UDMPRO;
     }
     if (err!=0||fp==nullptr)
     {
-        err = fopen_s(&fp, UDM_Path, "rb");
-        printf("Open CLIPStudioPaint.exe/UDMPaintPRO.exe File Failed.");
+        err = fopen_s(&fp, UDMEX_Path, "rb");
+        openfileName = UDMEX_Path;
+        exetype= DllInject::EXETYPE::UDMEX;
+    }
+    if (err!=0||fp==nullptr)
+    {
+        SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR,"Open CLIPStudioPaint.exe/UDMPaintPRO.exe/UDMPaintEX.exe File Failed.\n");
         system("pause");
         return 1;
     }
 
-
-    if(isUDM)
-        printf("Open CSP File Success: %s", CSP_Path);
-    else
-        printf("Open UDM File Success: %s", CSP_Path);
+    printf("Open CSP File Success: %s\n", openfileName);
+    //if(!isUDM)
+    //    printf("Open CSP File Success: %s\n", CSP_Path);
+    //else
+    //    printf("Open UDM File Success: %s\n", UDM_Path);
 
 
 
@@ -144,7 +153,7 @@ int main()
     fread(buffer, 1, size, fp);
 
 
-    ProcessCSP(buffer,size, isUDM);
+    ProcessCSP(buffer,size, exetype);
 
     fclose(fp);
     // buffer 里就是文件内容

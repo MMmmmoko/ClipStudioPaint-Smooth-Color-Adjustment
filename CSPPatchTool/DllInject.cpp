@@ -31,7 +31,7 @@ bool CheckExeHead(const uint8_t* exeFileMem, size_t exeFileSize)
 
 //https://www.cnblogs.com/zheh/p/4008268.html
 
-bool DllInject::SetUpPE(uint8_t* exeFileMem, size_t exeFileSize,bool isUDM)
+bool DllInject::SetUpPE(uint8_t* exeFileMem, size_t exeFileSize,EXETYPE exeType)
 {
     if (!CheckExeHead(exeFileMem, exeFileSize))
     {
@@ -40,7 +40,7 @@ bool DllInject::SetUpPE(uint8_t* exeFileMem, size_t exeFileSize,bool isUDM)
     }
     _exeFileMem = exeFileMem;
     _exeFileSize= exeFileSize;
-    _isUDM = isUDM;
+    _exeType = exeType;
 
     //读取节数量
 
@@ -214,14 +214,25 @@ bool DllInject::Patch()
     AddressGenerator addrGenerator;
     //获取代码段
     size_t sumData = 0;
+
+    bool _textSectionFinded = false;
     for (auto& x : sectionheads)
     {
         if (0 == strcmp(x.name, ".text"))
         {
             hacker.SetUp(newExeFileMem.data()+x.pointerToRawData,x.virtualSize,x.virtualAddress);
+            _textSectionFinded = true;
             break;
         }
     }
+    if (!_textSectionFinded)
+    {
+        //hacker.SetUp(newExeFileMem.data(),newExeFileMem.size(),0);
+		SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "Can not Find .text Section!");
+		SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "Can not patch this version of CSP.");
+        return false;
+    }
+
 
 
     bool baseHack = false;
@@ -250,7 +261,7 @@ bool DllInject::Patch()
                 SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "Hack Jump HideTrialText Failed\n");
                 //break;
             }
-            SDL_Log("Crack Success");
+            //SDL_Log("Crack Success");
         } while (false);
     }
     if (!baseHack)
@@ -293,11 +304,11 @@ bool DllInject::Patch()
 
 
 
+    const char* _outFileName[3] =
+    { "CLIPStudioPaint_Patched.exe","UDMPaintPRO_Patched.exe","UDMPaintEX_Patched.exe" };
 
 
-
-    const char* outFileName = "CLIPStudioPaint_Patched.exe";
-    if (_isUDM)outFileName = "UDMPaintPRO_Patched.exe";
+    const char* outFileName = _outFileName[_exeType];
     
     std::ofstream out(outFileName, std::ios::binary | std::ios::trunc);
     if (!out) {
@@ -311,6 +322,36 @@ bool DllInject::Patch()
     out.write(reinterpret_cast<const char*>(newExeFileMem.data()),
         static_cast<std::streamsize>(newExeFileMem.size()));
     out.close();
+
+    //写在代码里以减少发布的文件数量
+    //优动漫做正版验证的人直接拉去埋了吧哈哈哈哈哈哈哈哈哈哈哈哈哈，什么傻逼玩意乐死我了哈哈哈哈哈
+    //我草这么会有这么搞笑的东西
+    if (_exeType != EXETYPE::CSP)
+    {
+        std::ofstream batFileOut("UDMLaunch.bat");
+        if (!batFileOut) {
+            if(_exeType== EXETYPE::UDMPRO)
+            std::cerr << "start /b UDMPaintPRO.exe" << "UDMLaunch.bat" << "\n";
+            //return false;
+        }
+        else
+        {
+            if (_exeType == EXETYPE::UDMPRO)
+            {
+                batFileOut << "start /b UDMPaintPRO.exe" << std::endl;
+                batFileOut << "start /b UDMPaintPRO_Patched.exe" << std::endl;
+            }
+            else if (_exeType == EXETYPE::UDMEX)
+            {
+                batFileOut << "start /b UDMPaintEX.exe" << std::endl;
+                batFileOut << "start /b UDMPaintEX_Patched.exe" << std::endl;
+            }
+            batFileOut.close();
+        }
+    }
+
+
+
 
     //如果成功则重命名原CSP进程写入新文件
     SDL_Log("Patch Success!");

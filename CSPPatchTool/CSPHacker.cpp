@@ -21,7 +21,7 @@ void CSPHacker::SetUp(uint8_t* codeMem, size_t codeMemSize, uint32_t VA)
 
     if (0 == pos_CheckLicense)
     {
-        printf("Func Not Founded: CheckLicense\n");
+        printf("Func Not Founded: CheckLic\n");
     }
 
 

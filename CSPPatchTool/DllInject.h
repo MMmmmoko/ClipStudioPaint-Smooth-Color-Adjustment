@@ -21,9 +21,14 @@ class DllInject
 	friend class AddressGenerator;
 public:
 
+	enum EXETYPE
+	{
+		CSP,
+		UDMPRO,
+		UDMEX
+	};
 
-
-	bool SetUpPE(uint8_t* exeFileMem, size_t exeFileSize,bool isUDM);
+	bool SetUpPE(uint8_t* exeFileMem, size_t exeFileSize, EXETYPE exeType);
 
 	size_t RVA2FOA(size_t RVA);
 	size_t FOA2RVA(size_t FOA);
@@ -66,7 +71,7 @@ private:
 
 	uint8_t* _exeFileMem=nullptr;
 	size_t _exeFileSize=0;
-	bool _isUDM = false;
+	EXETYPE _exeType = CSP;
 
 
 };

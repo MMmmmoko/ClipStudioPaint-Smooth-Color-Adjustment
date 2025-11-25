@@ -18,8 +18,19 @@ bool AddressTable::LoadFromFile()
         return false;
     }
 
+
+    //测试启动UDM
+    bool isUDM = (ins.addressMap.isMember("IsUDM") && ins.addressMap["IsUDM"].isBool() && ins.addressMap["IsUDM"].asBool());
+    if (isUDM)
+    {
+        //WinExec("UDMPaintPRO.exe",SW_HIDE);
+        //WinExec("UDMPaintEX.exe", SW_HIDE);
+
+    }
+
+
 #ifdef _DEBUG
-    if (!(ins.addressMap.isMember("IsUDM") && ins.addressMap["IsUDM"].isBool() && ins.addressMap["IsUDM"].asBool()))
+    if (!isUDM)
     {
         //优动漫和控制台窗口有冲突，仅对CSP启用控制台窗口
         AllocConsole(); // 创建控制台窗口
@@ -69,6 +80,11 @@ bool AddressTable::LoadFromFile()
 
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "CSPMOD Error", "No Version Info in CSPAddressTable.json", nullptr);
     return false;
+
+
+
+
+
 
 
 }

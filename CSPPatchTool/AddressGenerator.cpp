@@ -63,8 +63,12 @@ void AddressGenerator::SetUp(DllInject* parent)
             _codeMem = parent->newExeFileMem.data() + x.pointerToRawData;
             _codeMemSize = x.virtualSize;
             _VA = x.virtualAddress;
+            return;
         }
     }
+    _codeMem = parent->newExeFileMem.data();
+    _codeMemSize = parent->newExeFileMem.size();
+    _VA = 0;
 }
 
 
