@@ -2,6 +2,7 @@
 
 
 
+
 # CSP流畅调色 ClipStudioPaint-Smooth-Color-Adjustment
 
 使用前请务必详细阅读此Readme文件！
@@ -22,9 +23,11 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 此工具设计为**可以用于未来版本的CSP**，但是在使用未来版本的CSP时需要对功能是否可用进行一次验证。因为工具在生成关于新版本的信息时，即使没有报错也不代表CSP没有修改底层逻辑，这些无法预料的底层修改是可能造成本工具提供的功能产生错误的。测试的版本：4.0.3、4.1.4
 
+**对于某些来源的学习版不可用**
+
 ### 优动漫
 
-工具能够识别到优动漫调色相关的代码，所以调色相关的功能可用。但可能会因为优动漫的反修改机制而有时无法启动修改后软件。在我的电脑上表现为部分时间打不开软件，在成功打开优动漫软件的时候对调色功能进行测试是成功的。此工具不会破坏原始软件，可以试试。测试的版本：3.0.6
+工具能够识别到优动漫调色相关的代码，所以调色相关的功能可用。**但可能会因为优动漫的防篡改机制而无法启动软件，详阅使用方法中的关于优动漫部分**，测试的版本：3.0.6PRO体验版。
 
 ### MacOS
 
@@ -36,7 +39,7 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 ## 使用方法
 
-将下载到的文件CSPMOD.dll和CSPPatchTool.exe移动到CLIPStudioPaint.exe所在的文件夹内（注意是有Paint后缀的，不是CLIPStudio.exe，优动漫是UDMPaintPRO.exe）。双击运行CSPPatchTool.exe，如果成功，此时文件夹内的情况应该如下图所示。
+将下载到的文件CSPMOD.dll和CSPPatchTool.exe移动到CLIPStudioPaint.exe所在的文件夹内（注意是有Paint后缀的，不是CLIPStudio.exe，优动漫是UDMPaintPRO.exe/UDMPaintEX.exe）。双击运行CSPPatchTool.exe，如果成功，此时文件夹内的情况应该如下图所示。
 
 <img src="Docs/Images/readme_foldScreenCapture.png"/>
 
@@ -75,6 +78,12 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 ***注意！应用后期组是一个不可撤回、不稳定的功能，不论是为了防止结果与期望不同还是防止中途软件崩溃，你都应该在执行前对作品进行保存！**
 ***注意！“后期”图层组下方不应该有其他调色功能的图层（带混合模式的图层或者色调调整图层），这会使执行结果与预期出现明显不同**
 
+### 关于在优动漫中使用
+
+优动漫中仅能使用调色预览功能（测试版本PRO体验版）。
+
+由于优动漫的防纂改机制，修改后无法直接打开*_Patched.exe，请使用CSPPatchTool.exe修改文件成功时连带生成的**UDMLaunch.bat**的文件进行启动。
+
 ## 问题反馈
 
 我不会经常浏览Github，如果有问题需要我尽快答复的话请不要在这里问，我看不到的..可以来b站私信问我https://space.bilibili.com/5808772
@@ -93,6 +102,7 @@ CSP流畅调色是一个免费提供的，用于改善CSP功能的辅助工具�
 想感受CSP狗屎代码可以阅读或者编译此库中的HSV滤镜插件，代码是官方提供的SDK里的，它的逻辑逻辑和CSP内部自带的HSV调色代码逻辑是相同的。
 
 如果CSP官方哪天突然一激灵改善了基础体验问题，请不要忘记我来过。
+
 
 
 ## 编译
