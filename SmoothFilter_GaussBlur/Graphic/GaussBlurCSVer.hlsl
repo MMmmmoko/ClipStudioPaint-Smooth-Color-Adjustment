@@ -73,7 +73,8 @@ uint3 GTid : SV_GroupThreadID,
     cache[GTid.x][GTid.y] = inputTex.SampleLevel(sampler_line, float2(_texWidth, _texHeight) * (readPos + float2(0.5, 0.5)), 0);
     //cache[GTid.x][GTid.y] = inputTex.Load(int3(readPos, 0));
     
-
+    //cache[GTid.x][GTid.y].rgb *= cache[GTid.x][GTid.y].a;
+    
     GroupMemoryBarrierWithGroupSync();
     
        //边界像素判断

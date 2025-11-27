@@ -396,6 +396,27 @@ void MotionBlurContext::CalcMotionBlurKerner(float strength, float directionX_no
 
 
 
+            float weightTable[2 * 256 + 1];
+            float remainWeight = 1.f;
+            weightTable[radius_i_sampler] = weightInside;
+            remainWeight -= weightInside;
+            for (int i = 0; i < radius_i_sampler ; i++)
+            {
+                if (remainWeight > 2 * weightInside)
+                {
+                    weightTable[radius_i_sampler - i - 1]= weightInside;
+                    weightTable[radius_i_sampler + i + 1] = weightInside;
+                    remainWeight -= 2 * weightInside;
+                }
+                else
+                {
+                    weightTable[radius_i_sampler - i - 1] = remainWeight*0.5f;
+                    weightTable[radius_i_sampler + i + 1] = remainWeight * 0.5f;
+                    remainWeight = 0;
+                }
+            }
+
+
             for (int i = 0; i < 2 * radius_i_sampler + 1; i++)
             {
 
@@ -411,7 +432,7 @@ void MotionBlurContext::CalcMotionBlurKerner(float strength, float directionX_no
                 float weight;
                 if (i == 0 || i == 2 * radius_i_sampler)weight = weightSide;
                 else weight = weightInside;
-                DoSamplerPoint(pointsMemory, samplerPosX, samplerPosY, weight, radius_i);
+                DoSamplerPoint(pointsMemory, samplerPosX, samplerPosY, weightTable[i], radius_i);
             }
 
 
@@ -423,8 +444,31 @@ void MotionBlurContext::CalcMotionBlurKerner(float strength, float directionX_no
             float weightSide = (strength-floorf(strength))/ (1.f + strength);
 
 
+
+            float weightTable[2 * 256 + 1];
+            float remainWeight = 1.f;
+            weightTable[0] = weightInside;
+            remainWeight -= weightInside;
             for (int i = 0; i < samplerLen; i++)
             {
+                if (remainWeight >  weightInside)
+                {
+                    weightTable[i] = weightInside;
+                    remainWeight -=  weightInside;
+                }
+                else
+                {
+                    weightTable[i] = remainWeight;
+                    remainWeight = 0;
+                }
+
+            }
+
+            for (int i = 0; i < samplerLen; i++)
+            {
+
+
+
 
 
 
@@ -442,10 +486,13 @@ void MotionBlurContext::CalcMotionBlurKerner(float strength, float directionX_no
                 }
 
                 float weight;
-                if (positiveDirection&&i == samplerLen-1)weight = weightSide;
-                if (!positiveDirection&&i == 0)weight = weightSide;
+                if (positiveDirection)weight = weightTable[i];
+                else
+                    weight = weightTable[samplerLen - i - 1];
 
-                else weight = weightInside;
+
+
+
                 DoSamplerPoint(pointsMemory, samplerPosX, samplerPosY, weight, positiveDirection?0:(length-1));
             }
 

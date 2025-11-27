@@ -70,7 +70,9 @@ uint3 GTid : SV_GroupThreadID,
     float2(_texWidth, _texHeight) * (readPos + float2(0.5, 0.5)), 0);
     cache[GTid.x][2] = origTex.SampleLevel(sampler_line, 
     float2(_texWidth, _texHeight) * (readPos + float2(0.5, 1.5)), 0);
-
+    cache[GTid.x][0].rgb *= cache[GTid.x][0].a;
+    cache[GTid.x][1].rgb *= cache[GTid.x][1].a;
+    cache[GTid.x][2].rgb *= cache[GTid.x][2].a;
     
     GroupMemoryBarrierWithGroupSync();
             //边界像素判断 //横向暂时不考虑对Y方向越界进行判断
@@ -92,13 +94,17 @@ uint3 GTid : SV_GroupThreadID,
         resultColor+= cache[cacheReadIndex][2] * PointsWeightsInfo[weightsReadIndex].value.z;
     }
     
-    
+    if (resultColor.a > 0)
+        resultColor.rgb /= resultColor.a;
     //readPos=clamp(readPos, float2(0, 0), float2(1 / _texWidth, 1 / _texHeight));
     //混合
-    float4 origColor = origTex[readPos];
+        float4 origColor = origTex[readPos];
     float selectAlpha = selectAreaTex.SampleLevel(sampler_line, float2(_texWidth, _texHeight) * (readPos + float2(0.5, 0.5)), 0).z;
     float4 BlendColor = (resultColor - origColor) * selectAlpha + origColor;
 
+    
+    
+    
     rtTex[readPos] = BlendColor;
     
     

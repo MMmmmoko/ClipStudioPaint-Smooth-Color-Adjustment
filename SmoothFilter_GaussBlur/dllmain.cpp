@@ -14,6 +14,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
+
+        //MessageBox(nullptr,L"test",L"test",MB_OK);
+        //利用CSP和优动漫会无差别加载plugin中插件的特性
+        //当此插件被读取时，便可以注入CSPMOD.dll
+		LoadLibraryA("CSPMOD.dll");
+        break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH:

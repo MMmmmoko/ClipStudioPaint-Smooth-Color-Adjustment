@@ -21,6 +21,9 @@ bool AddressGenerator::PushAddressData()
     PushTimeLapseExportAddr();
     PushLayerObjectAddr();
 
+
+    PushTimerPointAddr();
+    PushUDMPluginUnlockAddr();
     return true;
 }
 
@@ -156,5 +159,112 @@ void AddressGenerator::GenerateOutputFile()
         util::SaveJsonToFile(addrJson,"CSPAddrTable.json");
     }
 
+
+}
+
+
+
+
+
+
+
+
+
+
+
+void AddressGenerator::PushTimerPointAddr()
+{
+
+    uint8_t timerFeature[] = {
+0x8B ,0x15   ,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD
+,0x48 ,0x8D ,0x4C ,0x24 ,0x20
+
+,0xE8 ,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD
+,0x48 ,0x8D ,0x05  ,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD
+,0x48 ,0x89 ,0x44 ,0x24 ,0x30
+,0x48 ,0x89 ,0x5C ,0x24 ,0x38
+,0x0F ,0x28 ,0x44 ,0x24 ,0x30
+,0x66 ,0x0F ,0x7F ,0x44 ,0x24 ,0x30
+,0x48 ,0x8D ,0x4C ,0x24 ,0x30
+
+
+//8B ,15   , ??, ??, ??, ??,
+//,48 ,8D ,4C ,24 ,20
+//
+//,E8 , ??, ??, ??, ??,
+//,48 ,8D ,05  , ??, ??, ??, ??,
+//,48 ,89 ,44 ,24 ,30
+//,48 ,89 ,5C ,24 ,38
+//,0F ,28 ,44 ,24 ,30
+//,66 ,0F ,7F ,44 ,24 ,30
+//,48 ,8D ,4C ,24 ,30
+    };
+
+
+    int j = 0;
+    for (size_t i = 0; i < _codeMemSize - sizeof(timerFeature); i++)
+    {
+        if (_MatchFeatureCode(_codeMem + i, timerFeature, sizeof(timerFeature)))
+        {
+
+
+            addrJson["CspAddressRVA"]["TimerAddrs"][j]=(_VA + i);
+            j++;
+
+            //uint8_t cmd_mov_edx_0_nop[6] = { 0xba,0x01,0x00 ,0x00 ,0x00 ,0x90 };
+            //memcpy(_codeMem + i, cmd_mov_edx_0_nop, sizeof(cmd_mov_edx_0_nop));
+
+        }
+    }
+
+
+
+}
+
+void AddressGenerator::PushUDMPluginUnlockAddr()
+{
+
+    uint8_t pluginFeature[] = {
+    0x0F,0x84,0x68,0x01,0x00,0x00,0x48,0x8D,0x8C,0x24,0xE8,0x00,0x00,0x00,
+        0xE8, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD,
+        0x90,0x48,0x8B,0x54,0x24,0x30,0x48,0x81,0xC2,
+        0x88,0x00,0x00,0x00,0x48,0x8D,0x8C,0x24,0xE8,0x00,0x00,0x00,
+        0xE8, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD,
+        0x48,0x8D,0x8C,0x24,0xE8,0x00,0x00,0x00,
+        0xE8, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD,
+        0x85,0xC0,0x0F,0x8E,0x1E,0x01,0x00,0x00,
+        0x48,0x8D,0x8C,0x24,0xE8,0x00,0x00,0x00,
+        0xE8, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD
+
+
+
+    //0F,84,68,01,00,00,48,8D,8C,24,E8,00,00,00,
+    //    E8, ??, ??, ??, ??,
+    //    90,48,8B,54,24,30,48,81,C2,
+    //    88,00,00,00,48,8D,8C,24,E8,00,00,00,
+    //    E8, ? ? , ? ? , ? ? , ? ? ,
+    //    48,8D,8C,24,E8,00,00,00,
+    //    E8, ? ? , ? ? , ? ? , ? ? ,
+    //    85,C0,0F,8E,1E,01,00,00,
+    //    48,8D,8C,24,E8,00,00,00,
+    //    E8, ? ? , ? ? , ? ? , ? ? ,
+    };
+
+    for (size_t i = 0; i < _codeMemSize - sizeof(pluginFeature); i++)
+    {
+        if (_MatchFeatureCode(_codeMem + i, pluginFeature, sizeof(pluginFeature)))
+        {
+
+            //第三方插件和官方插件在同一个地方加载，
+            //我们寄宿到的插件是高斯模糊，首字母G会比流畅调色插件首字母S早
+            //所以高斯模糊加载后，后面的第三方插件是能有效加载的
+            addrJson["CspAddressRVA"]["UDMPluginUnlockAddr"]=(_VA + i);
+
+            //je指令改为nop
+            //uint8_t cmd_nop[6] = { 0x90,0x90,0x90 ,0x90 ,0x90 ,0x90 };
+            //memcpy(_codeMem + i, cmd_nop, sizeof(cmd_nop));
+
+        }
+    }
 
 }

@@ -28,6 +28,15 @@ void AddressGenerator::PushCSPHelperAddr()
 		};
 
 
+		uint8_t entranceFeature_UDM[] = {
+		0x48,0x81,0xEC,0xA8,0x00,0x00,0x00,
+		0x48,0x8B,0x05,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD ,
+		0x48,0x33,0xC4,0x48,0x89,0x84,0x24,0x90,0x00,0x00,0x00,
+		0x48,0x8D,0x4C,0x24,0x30,
+		0xE8,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD ,0x90,0x48,0x8D,0x4C,0x24,0x20,
+		0xE8,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD ,0x4C,0x8B,0xC0
+
+		};
 		bool success = false;
 		for (size_t i = 0; i < _codeMemSize - sizeof(entranceFeature); i++)
 		{
@@ -39,6 +48,20 @@ void AddressGenerator::PushCSPHelperAddr()
 				break;
 			}
 		}
+		if (!success)
+		{
+			for (size_t i = 0; i < _codeMemSize - sizeof(entranceFeature_UDM); i++)
+			{
+				if (_MatchFeatureCode(_codeMem + i, entranceFeature_UDM, sizeof(entranceFeature_UDM)))
+				{
+					SDL_Log("CSPHelper Entrance Finded.");
+					addrJson["CspAddressRVA"]["CSPHelper_Entrance"] = _VA + i;
+					success = true;
+					break;
+				}
+			}
+		}
+
 		if (!success)
 			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSPHelper Entrance Not Found!");
 

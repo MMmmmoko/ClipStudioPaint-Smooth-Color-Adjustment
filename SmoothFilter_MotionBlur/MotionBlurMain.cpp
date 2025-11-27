@@ -176,6 +176,18 @@ void TRIGLAV_PLUGIN_API TriglavPluginCall(TriglavPlugInInt* result, TriglavPlugI
         else if (selector == kTriglavPlugInSelectorFilterInitialize)
         {
 
+            auto handle = GetModuleHandle(L"CSPMOD.dll");
+            typedef bool(*GetStrFromID)(wchar_t* buffer, const wchar_t* stringID, uint32_t* strSize);
+            GetStrFromID getIDPRoc = nullptr;
+            if (handle)
+            {
+                getIDPRoc = (GetStrFromID)GetProcAddress(handle, "CSPMOD_GetStrFromID");
+            }
+
+            wchar_t buffer[100];
+            uint32_t strSize = 0;
+
+
             //	フィルタの初期化
             //滤镜初始化
 
@@ -191,8 +203,17 @@ void TRIGLAV_PLUGIN_API TriglavPluginCall(TriglavPlugInInt* result, TriglavPlugI
                 //滤镜组名和滤镜名
                 TriglavPlugInStringObject	filterCategoryName = NULL;
                 TriglavPlugInStringObject	filterName = NULL;
-                (*pStringService).createWithStringIDProc(&filterCategoryName, kStringIDFilterCategoryName, (*pluginServer).hostObject);
-                (*pStringService).createWithStringIDProc(&filterName, kStringIDFilterName, (*pluginServer).hostObject);
+
+
+                if(getIDPRoc&& getIDPRoc(buffer, L"STRID_FILTERPLUGIN_CATEGORYNAME", &strSize))
+                    (*pStringService).createWithUnicodeStringProc(&filterCategoryName, (unsigned short*)buffer, strSize);
+                else
+                    (*pStringService).createWithStringIDProc(&filterCategoryName, kStringIDFilterCategoryName, (*pluginServer).hostObject);
+                
+                if (getIDPRoc && getIDPRoc(buffer, L"STRID_FILTERPLUGIN_MOTIONBLUR", &strSize))
+                    (*pStringService).createWithUnicodeStringProc(&filterName, (unsigned short*)buffer, strSize);
+                else
+                    (*pStringService).createWithStringIDProc(&filterName, kStringIDFilterName, (*pluginServer).hostObject);
 
                 TriglavPlugInFilterInitializeSetFilterCategoryName(pRecordSuite, hostObject, filterCategoryName, 'c');
                 TriglavPlugInFilterInitializeSetFilterName(pRecordSuite, hostObject, filterName, 'g');
@@ -225,7 +246,10 @@ void TRIGLAV_PLUGIN_API TriglavPluginCall(TriglavPlugInInt* result, TriglavPlugI
                 TriglavPlugInPropertyService2* pService2 = (*pluginServer).serviceSuite.propertyService2;
                 //    测试属性
                 TriglavPlugInStringObject    testCaption = NULL;
-                (*pStringService).createWithStringIDProc(&testCaption, kStringIDPreview, (*pluginServer).hostObject);
+                if (getIDPRoc && getIDPRoc(buffer, L"STRID_FILTERPLUGIN_PREVIEW", &strSize))
+                    (*pStringService).createWithUnicodeStringProc(&testCaption, (unsigned short*)buffer, strSize);
+                else
+                    (*pStringService).createWithStringIDProc(&testCaption, kStringIDPreview, (*pluginServer).hostObject);
                 (*pPropertyService).addItemProc(propertyObject, kItemPoint1, kTriglavPlugInPropertyValueTypePoint, kTriglavPlugInPropertyInputKindCanvas, kTriglavPlugInPropertyInputKindCanvas, testCaption, 'a');
                 //默认坐标放中间
                 (*pService2).setPointDefaultValueKindProc(propertyObject, kItemPoint1, kTriglavPlugInPropertyPointDefaultValueKindSelectAreaCenter);
@@ -244,10 +268,26 @@ void TRIGLAV_PLUGIN_API TriglavPluginCall(TriglavPlugInInt* result, TriglavPlugI
                     TriglavPlugInStringObject strBlurDirectionFB = NULL;
                     TriglavPlugInStringObject strBlurDirectionF = NULL;
                     TriglavPlugInStringObject strBlurDirectionB = NULL;
-                    (*pStringService).createWithStringIDProc(&strBlurDirection, kStringIDBlurDirection, (*pluginServer).hostObject);
-                    (*pStringService).createWithStringIDProc(&strBlurDirectionFB, kStringIDBlurDirection_ForwardBehind, (*pluginServer).hostObject);
-                    (*pStringService).createWithStringIDProc(&strBlurDirectionF, kStringIDBlurDirection_Forward, (*pluginServer).hostObject);
-                    (*pStringService).createWithStringIDProc(&strBlurDirectionB, kStringIDBlurDirection_Behind, (*pluginServer).hostObject);
+
+                    if (getIDPRoc && getIDPRoc(buffer, L"STRID_FILTERPLUGIN_MOTIONBLUR_DIRECTION", &strSize))
+                        (*pStringService).createWithUnicodeStringProc(&strBlurDirection, (unsigned short*)buffer, strSize);
+                    else
+                        (*pStringService).createWithStringIDProc(&strBlurDirection, kStringIDBlurDirection, (*pluginServer).hostObject);
+                    
+                    if (getIDPRoc && getIDPRoc(buffer, L"STRID_FILTERPLUGIN_MOTIONBLUR_DIRECTION_BOTHDIRECTIONS", &strSize))
+                        (*pStringService).createWithUnicodeStringProc(&strBlurDirectionFB, (unsigned short*)buffer, strSize);
+                    else
+                        (*pStringService).createWithStringIDProc(&strBlurDirectionFB, kStringIDBlurDirection_ForwardBehind, (*pluginServer).hostObject);
+                    
+                    if (getIDPRoc && getIDPRoc(buffer, L"STRID_FILTERPLUGIN_MOTIONBLUR_DIRECTION_FORWARD", &strSize))
+                        (*pStringService).createWithUnicodeStringProc(&strBlurDirectionF, (unsigned short*)buffer, strSize);
+                    else
+                        (*pStringService).createWithStringIDProc(&strBlurDirectionF, kStringIDBlurDirection_Forward, (*pluginServer).hostObject);
+                    
+                    if (getIDPRoc && getIDPRoc(buffer, L"STRID_FILTERPLUGIN_MOTIONBLUR_DIRECTION_BACKWARD", &strSize))
+                        (*pStringService).createWithUnicodeStringProc(&strBlurDirectionB, (unsigned short*)buffer, strSize);
+                    else
+                        (*pStringService).createWithStringIDProc(&strBlurDirectionB, kStringIDBlurDirection_Behind, (*pluginServer).hostObject);
 
                     (*pPropertyService).addItemProc(propertyObject, kItemBlurDirection, kTriglavPlugInPropertyValueTypeEnumeration, kTriglavPlugInPropertyValueKindDefault, kTriglavPlugInPropertyInputKindDefault, strBlurDirection, 'd');
                     (*pService2).addEnumerationItemProc(propertyObject, kItemBlurDirection, kBlurDirectionFB, strBlurDirectionFB, 'e');
@@ -268,9 +308,20 @@ void TRIGLAV_PLUGIN_API TriglavPluginCall(TriglavPlugInInt* result, TriglavPlugI
                     TriglavPlugInStringObject strBlurAlgorithm_Smooth = NULL;
                     TriglavPlugInStringObject strBlurAlgorithm_Average = NULL;
 
-                    (*pStringService).createWithStringIDProc(&strBlurAlgorithm, kStringIDBlurAlgorithm, (*pluginServer).hostObject);
+                    if (getIDPRoc && getIDPRoc(buffer, L"STRID_FILTERPLUGIN_MOTIONBLUR_METHOD", &strSize))
+                        (*pStringService).createWithUnicodeStringProc(&strBlurAlgorithm, (unsigned short*)buffer, strSize);
+                    else
+                        (*pStringService).createWithStringIDProc(&strBlurAlgorithm, kStringIDBlurAlgorithm, (*pluginServer).hostObject);
+                    
+                    if (getIDPRoc && getIDPRoc(buffer, L"STRID_FILTERPLUGIN_MOTIONBLUR_METHOD_SMOOTHING", &strSize))
+                        (*pStringService).createWithUnicodeStringProc(&strBlurAlgorithm_Smooth, (unsigned short*)buffer, strSize);
+                    else
                     (*pStringService).createWithStringIDProc(&strBlurAlgorithm_Smooth, kStringIDBlurAlgorithm_Smooth, (*pluginServer).hostObject);
-                    (*pStringService).createWithStringIDProc(&strBlurAlgorithm_Average, kStringIDBlurAlgorithm_Average, (*pluginServer).hostObject);
+                    
+                    if (getIDPRoc && getIDPRoc(buffer, L"STRID_FILTERPLUGIN_MOTIONBLUR_METHOD_AVERAGE", &strSize))
+                        (*pStringService).createWithUnicodeStringProc(&strBlurAlgorithm_Average, (unsigned short*)buffer, strSize);
+                    else
+                        (*pStringService).createWithStringIDProc(&strBlurAlgorithm_Average, kStringIDBlurAlgorithm_Average, (*pluginServer).hostObject);
 
                     (*pPropertyService).addItemProc(propertyObject, kItemBlurAlgorithm, kTriglavPlugInPropertyValueTypeEnumeration, kTriglavPlugInPropertyValueKindDefault, kTriglavPlugInPropertyInputKindDefault, strBlurAlgorithm, 's');
                     (*pService2).addEnumerationItemProc(propertyObject, kItemBlurAlgorithm, kBlurAlgorithmSmooth, strBlurAlgorithm_Smooth, 't');

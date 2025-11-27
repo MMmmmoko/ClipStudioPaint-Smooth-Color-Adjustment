@@ -24,6 +24,7 @@ public:
 	enum EXETYPE
 	{
 		CSP,
+		CSP_LEARNING,
 		UDMPRO,
 		UDMEX
 	};
@@ -39,6 +40,9 @@ public:
 
 	void SetRandomAddrDisable();
 	bool InjectDll();
+
+	//测试通过Skil.dll或高斯模糊注入避免修改原程序
+	static bool InjectMidDLL();
 
 
 

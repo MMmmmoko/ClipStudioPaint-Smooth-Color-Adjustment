@@ -53,8 +53,11 @@ int64_t TimeLapseExport_hook::Hook_TimeLapseExport(uintptr_t arg0, uintptr_t arg
 
 //不论结果如何，始终要禁用原始长度导出，不然自定义的参数无效
 
-    if(CSPMOD::IsPtrValid(arg1 + 0x918))
-         *(uint32_t*)(arg1 + 0x918) = 1;
+    if (CSPMOD::IsPtrValid(arg1 + 0x918))
+    {
+        *(uint32_t*)(arg1 + 0x918) = 1;
+        *(uint32_t*)(arg0 - 0x20+0x8) = 1;
+    }
     else{
         return orig_TimeLapseExport(arg0, arg1);
     }

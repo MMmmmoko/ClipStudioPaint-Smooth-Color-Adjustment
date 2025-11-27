@@ -7,11 +7,15 @@
 #include<SDL3/SDL.h>
 bool CheckExeHead(const uint8_t* exeFileMem, size_t exeFileSize)
 {
+
     if (exeFileSize < 0x40)
     {
         printf("Not Exe File!");
         return false;
     }
+
+
+    return true;
 
     uint8_t exePEHead[] = {
         0x4D,0x5A,0x90,0x00,    0x03,0x00,0x00,0x00,    0x04,0x00,0x00,0x00,    0xFF,0xFF,0x00,0x00,
@@ -205,7 +209,26 @@ bool DllInject::Patch()
     SetRandomAddrDisable();
 
 
-    if (!InjectDll())return false;
+
+    //测试自动注入
+    //InjectMidDLL();
+
+
+
+
+    //if (_exeType != EXETYPE::CSP)
+    //{
+    //    InjectMidDLL();
+    //}
+    //else
+    //{
+    //    InjectDll();
+
+    //}
+
+
+
+    //if (!InjectDll())return false;
 
 
 
@@ -230,8 +253,10 @@ bool DllInject::Patch()
         //hacker.SetUp(newExeFileMem.data(),newExeFileMem.size(),0);
 		SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "Can not Find .text Section!");
 		SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "Can not patch this version of CSP.");
+		SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "未能正确识别数据段，无法修改此exe文件.");
         return false;
     }
+
 
 
 
@@ -264,17 +289,21 @@ bool DllInject::Patch()
             //SDL_Log("Crack Success");
         } while (false);
     }
-    if (!baseHack)
-    {
-        if (!hacker.DoPluginUnlock())
-        {
-            SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_APPLICATION,"Do Plugin Function Unlock Failed");
-        }
-    }
+    //else if (!baseHack)
+    //{
+    //    if (!hacker.DoPluginUnlock())
+    //    {
+    //        SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_APPLICATION,"Do Plugin Function Unlock Failed");
+    //    }
+    //}
+
+
+
 
     //cps某些共同特征计时器一起改
-    //基础功能修改
-    hacker.DoPatchTimerPoint();
+    //基础功能修改，现在使用不对原文件进行修改的方式来注入，跳过
+    //if(_exeType==EXETYPE::CSP)
+    //    hacker.DoPatchTimerPoint();
 
 
 
@@ -300,55 +329,38 @@ bool DllInject::Patch()
 
 
 
+    //优动漫有比较麻烦的防篡改机制
+    //选择不修改优动漫原文件
+    //观察到优动漫自检主要发生在启动的时候，
+    //自检后才开始加载某些插件
+    //对Plugin/Patint文件夹内部的插件是无条件遍历加载的，不合规才会卸载
+    //所以可以选择在这里进行自动注入
 
 
-
-
-    const char* _outFileName[3] =
-    { "CLIPStudioPaint_Patched.exe","UDMPaintPRO_Patched.exe","UDMPaintEX_Patched.exe" };
-
-
-    const char* outFileName = _outFileName[_exeType];
-    
-    std::ofstream out(outFileName, std::ios::binary | std::ios::trunc);
-    if (!out) {
-        std::cerr << "Error When Write File"<< outFileName <<"\n";
-
-        SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "写文件失败，请尝试右键以管理员身份运行此程序");
-        SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "The program does not have write permission for this folder. Please try running this program as administrator.");
-        return false;
-    }
-
-    out.write(reinterpret_cast<const char*>(newExeFileMem.data()),
-        static_cast<std::streamsize>(newExeFileMem.size()));
-    out.close();
-
-    //写在代码里以减少发布的文件数量
-    //优动漫做正版验证的人直接拉去埋了吧哈哈哈哈哈哈哈哈哈哈哈哈哈，什么傻逼玩意乐死我了哈哈哈哈哈
-    //我草这么会有这么搞笑的东西
-    if (_exeType != EXETYPE::CSP)
+    if (baseHack&&_exeType == EXETYPE::CSP)
     {
-        std::ofstream batFileOut("UDMLaunch.bat");
-        if (!batFileOut) {
-            if(_exeType== EXETYPE::UDMPRO)
-            std::cerr << "start /b UDMPaintPRO.exe" << "UDMLaunch.bat" << "\n";
-            //return false;
+        const char* _outFileName[3] =
+        { "CLIPStudioPaint_Patched.exe","UDMPaintPRO_Patched.exe","UDMPaintEX_Patched.exe" };
+
+
+        const char* outFileName = _outFileName[_exeType];
+
+        std::ofstream out(outFileName, std::ios::binary | std::ios::trunc);
+        if (!out) {
+            std::cerr << "Error When Write File" << outFileName << "\n";
+
+            SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "写文件失败，请尝试右键以管理员身份运行此程序");
+            SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "The program does not have write permission for this folder. Please try running this program as administrator.");
+            return false;
         }
-        else
-        {
-            if (_exeType == EXETYPE::UDMPRO)
-            {
-                batFileOut << "start /b UDMPaintPRO.exe" << std::endl;
-                batFileOut << "start /b UDMPaintPRO_Patched.exe" << std::endl;
-            }
-            else if (_exeType == EXETYPE::UDMEX)
-            {
-                batFileOut << "start /b UDMPaintEX.exe" << std::endl;
-                batFileOut << "start /b UDMPaintEX_Patched.exe" << std::endl;
-            }
-            batFileOut.close();
-        }
+
+        out.write(reinterpret_cast<const char*>(newExeFileMem.data()),
+            static_cast<std::streamsize>(newExeFileMem.size()));
+        out.close();
     }
+
+
+
 
 
 
@@ -377,7 +389,7 @@ bool DllInject::InjectDll()
     for (auto& x : dlllist)
     {
         if (x == dllName)
-            return true;
+            return false;
     }
 
 
@@ -552,5 +564,77 @@ bool DllInject::InjectDll()
 
 
 
+}
+
+bool DllInject::InjectMidDLL()
+{
+    //const char* Skia_Path = "skia.dll";
+    const char* Skia_Path = "PlugIn/PAINT/Gaussblur.dll";
+    FILE* fp = nullptr;
+    errno_t err = fopen_s(&fp, Skia_Path, "rb");
+    if (err != 0 || fp == nullptr)
+    {
+		SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "Open skia.dll File Failed. Skia Injection Aborted.");
+        return false;
+    }
+
+
+    fseek(fp, 0, SEEK_END);
+    long size = ftell(fp);   // 文件大小
+    rewind(fp);
+
+    uint8_t* buffer = (uint8_t*)malloc(size);
+
+
+    fread(buffer, 1, size, fp);
+    fclose(fp);
+
+
+    DllInject skiaInject;
+    skiaInject.SetUpPE(buffer, size, CSP);
+    if (skiaInject.newExeFileMem.empty())
+    {
+        skiaInject.newExeFileMem.reserve(skiaInject._exeFileSize + 1024 * 1024);
+        skiaInject.newExeFileMem.resize(skiaInject._exeFileSize);
+        memcpy(skiaInject.newExeFileMem.data(), skiaInject._exeFileMem, skiaInject._exeFileSize);
+    }
+
+    if(skiaInject.InjectDll())
+
+    {
+        std::string _outFIleName = Skia_Path; 
+        _outFIleName +="_tem";
+        const char* outFileName = _outFIleName.c_str();
+
+        std::ofstream out(outFileName, std::ios::binary | std::ios::trunc);
+        if (!out) {
+            std::cerr << "Error When Write File" << outFileName << "\n";
+
+            SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "写文件失败，请尝试右键以管理员身份运行此程序");
+            SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "The program does not have write permission for this folder. Please try running this program as administrator.");
+            //system("pause");
+            //exit(0);
+            return false;
+        }
+
+        out.write(reinterpret_cast<const char*>(skiaInject.newExeFileMem.data()),
+            static_cast<std::streamsize>(skiaInject.newExeFileMem.size()));
+        out.close();
+
+
+            {
+            std::string _outOriginFIleName = Skia_Path;
+            _outOriginFIleName += "_Origin";
+
+
+                std::rename(Skia_Path, _outOriginFIleName.c_str());
+                std::rename(outFileName, Skia_Path);
+            }
+    }
+
+
+
+    free(buffer);
+    return true;
 }
 

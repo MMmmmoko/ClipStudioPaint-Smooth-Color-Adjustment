@@ -3,6 +3,7 @@
 
 
 
+
 # CSP流畅调色 ClipStudioPaint-Smooth-Color-Adjustment
 
 使用前请务必详细阅读此Readme文件！
@@ -27,7 +28,7 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 ### 优动漫
 
-工具能够识别到优动漫调色相关的代码，所以调色相关的功能可用。**但可能会因为优动漫的防篡改机制而无法启动软件，详阅使用方法中的关于优动漫部分**，测试的版本：3.0.6PRO体验版。
+现在已经支持绝大部分功能，优动漫的缩时摄影无法正确导出较大图像尺寸的视频（能超过1280px一些，但是超过太多了不行，原因不明。），测试的版本：3.0.6PRO体验版、EX版。
 
 ### MacOS
 
@@ -39,32 +40,38 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 ## 使用方法
 
-将下载到的文件CSPMOD.dll和CSPPatchTool.exe移动到CLIPStudioPaint.exe所在的文件夹内（注意是有Paint后缀的，不是CLIPStudio.exe，优动漫是UDMPaintPRO.exe/UDMPaintEX.exe）。双击运行CSPPatchTool.exe，如果成功，此时文件夹内的情况应该如下图所示。
+将下载到的文件CSPMOD.dll和CSPPatchTool.exe移动到CLIPStudioPaint.exe所在的文件夹内（注意是有Paint后缀的，不是CLIPStudio.exe，优动漫是UDMPaintPRO.exe/UDMPaintEX.exe）。双击运行CSPPatchTool.exe，如果成功，此时文件夹内会生成一个json文件，如下图。
 
 <img src="Docs/Images/readme_foldScreenCapture.png"/>
 
-有可能因为没有文件夹内的写入权限而创建文件失败，这种情况对CSPPatchTool.exe右键用管理员身份启动即可。
+有可能出现因为没有文件夹内的写入权限而创建文件失败，这种情况对CSPPatchTool.exe右键用管理员身份启动即可。
 
-成功后你可以给这个新生成的xxxx_Patched.exe文件创建快捷方式到桌面上，然后使用快捷方式启动软件。原版的exe留作备份，不要删除。
-
-进入软件后，调色功能按以往的方式直接使用即可。
-
-缩时摄影会在导出时会再弹出一个对话框让你填写视频大小和时长，这里你可以不再受选项的限制，自己按需导出，导出大于1280像素大小的视频也是可以的，因为本来就录制得很大，只是CSP不让你导出大的。
-
-工具附带的两个模糊插件（*.cpm）放在`C:\Users\***\AppData\Roaming\CELSYSUserData\CELSYS\CLIPStudioModule\PlugIn\PAINT\`
-之前使用了流畅调色的用户也请使用新版本的模糊插件，对算法进行更新，流畅到哭。
+将工具附带的除CSPMOD.dll之外的dll放进当前文件夹内部的
+`PlugIn\PAINT\`
+文件夹中即可完成此工具的安装。
 
 <img src="Docs/Images/readme_pluginfoldScreenCapture.png"/>
 
+### 色调调整&色调调整图层&模糊滤镜
 
-模糊功能在滤镜菜单里，进入滤镜菜单下的“流畅调色”子菜单可以找到。
+进入软件后，调色功能按以往的方式直接使用即可。本辅助工具支持色相明度饱和度、色彩平衡、曲线的预览。
 
-此工具将“帮助”->“初步了解”改为了菜单入口。可以在这里点击或者将其加入命令栏后点击命令栏图标，会出现工具入口。
+本工具提供的模糊滤镜入口在滤镜菜单的“流畅调色”内，支持高斯模糊和移动模糊。
+
+### 缩时摄影
+
+缩时摄影会在导出时会再弹出一个对话框让你填写视频大小和时长，这里你可以不再受选项的限制，自己按需导出，导出大于1280像素大小的视频也是可以的，因为本来就录制得很大，只是CSP不让你导出大的。
+**有些版本缩时摄影选择非“原长”的视频时长时，才可以自定义视频时长**。
+**优动漫无法正确导出较大图像的视频**。
+
+### 工具菜单
+
+此工具将“帮助”->“初步了解”（优动漫为“帮助”->“遇到问题”）改为了菜单入口。可以在这里点击或者将其加入命令栏后点击命令栏图标，会出现本工具的菜单入口。
 
   <img src="Docs/Images/readme_menuEntrance.png"/>
   <img src="Docs/Images/readme_menuEntrance2.png"/>
 
-对于未来可能遇到的使用某个功能导致CSP崩溃的情况，可以在上方入口的“检查功能”里对特定功能进行禁用。
+对于未来可能遇到的使用某个功能导致CSP崩溃的情况，可以在上方入口的“**检查功能**”里对特定功能进行禁用。
 
 ### 应用后期组
 
@@ -78,15 +85,9 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 ***注意！应用后期组是一个不可撤回、不稳定的功能，不论是为了防止结果与期望不同还是防止中途软件崩溃，你都应该在执行前对作品进行保存！**
 ***注意！“后期”图层组下方不应该有其他调色功能的图层（带混合模式的图层或者色调调整图层），这会使执行结果与预期出现明显不同**
 
-### 关于在优动漫中使用
-
-优动漫中仅能使用调色预览功能（测试版本PRO体验版）。
-
-由于优动漫的防纂改机制，修改后无法直接打开*_Patched.exe，请使用CSPPatchTool.exe修改文件成功时连带生成的**UDMLaunch.bat**的文件进行启动。
-
 ## 问题反馈
 
-我不会经常浏览Github，如果有问题需要我尽快答复的话请不要在这里问，我看不到的..可以来b站私信问我https://space.bilibili.com/5808772
+我不会经常浏览Github，如果有问题需要我尽快答复的话请不要在这里问，我可能看不到的..可以来b站私信问我https://space.bilibili.com/5808772
 
 ## 免责声明
 
@@ -103,7 +104,7 @@ CSP流畅调色是一个免费提供的，用于改善CSP功能的辅助工具�
 
 如果CSP官方哪天突然一激灵改善了基础体验问题，请不要忘记我来过。
 
-
+在处理优动漫的启动问题的时候找到了一个不需要修改任何文件的自动注入方案，所以虽然现在程序名为CSPPatchTool（CSP补丁工具）但它没有对原程序进行打补丁...
 
 ## 编译
 

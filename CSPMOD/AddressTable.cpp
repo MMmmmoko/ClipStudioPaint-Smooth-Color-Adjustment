@@ -10,13 +10,19 @@ static AddressTable ins;
 
 bool AddressTable::LoadFromFile()
 {
-
-    ins.addressMap= util::BuildJsonFromFile("CSPAddrTable.json");
+    //以绝对路劲的方式加载json
+    
+    std::string basePath=SDL_GetBasePath();
+    basePath += "CSPAddrTable.json";
+    ins.addressMap= util::BuildJsonFromFile(basePath.c_str());
     if (ins.addressMap.empty())
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"CSPMOD Error","Can not read file: CSPAddressTable.json",nullptr);
         return false;
     }
+
+
+    //return true;
 
 
     //测试启动UDM
@@ -63,6 +69,7 @@ bool AddressTable::LoadFromFile()
         if (verStr == buffer)
         {
             ins.cspVersion = verStr;
+            DoStaticPatch();
             return true;
         }
         else
@@ -80,14 +87,62 @@ bool AddressTable::LoadFromFile()
 
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "CSPMOD Error", "No Version Info in CSPAddressTable.json", nullptr);
     return false;
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+void AddressTable::DoStaticPatch()
+{
+    //TimerPoints
+    
+
+
+    if (ins.addressMap["CspAddressRVA"].isMember("TimerAddrs") && ins.addressMap["CspAddressRVA"]["TimerAddrs"].isArray())
+    {
+        for (auto& x : ins.addressMap["CspAddressRVA"]["TimerAddrs"])
+        {
+            if (x.isUInt64())
+            {
+				void* addr = (void*)(x.asUInt64() + CSPMOD::GetBaseAddr());
+
+                uint8_t cmd_mov_edx_0_nop[6] = { 0xba,0x01,0x00 ,0x00 ,0x00 ,0x90 };
+				CSPMOD::CodePatch(addr, cmd_mov_edx_0_nop, sizeof(cmd_mov_edx_0_nop));
+                //memcpy(_codeMem + i, cmd_mov_edx_0_nop, sizeof(cmd_mov_edx_0_nop));
+            }
+        }
+    }
+
+
+    //UDMPlugin
+    {
+		void* pUDMPluginCheckFunc = GetAddress("UDMPluginUnlockAddr");
+        if (pUDMPluginCheckFunc)
+        {
+            uint8_t cmd_nop[6] = { 0x90,0x90,0x90 ,0x90 ,0x90 ,0x90 };
+			CSPMOD::CodePatch(pUDMPluginCheckFunc, cmd_nop, sizeof(cmd_nop));
+        }
+    }
+
+
+
+
+    //return false;
+}
+
+
+
+
+
+
+
+
+
 
 void* AddressTable::GetAddress(const char* addrName)
 {

@@ -151,11 +151,10 @@ int main()
     }
 
     fread(buffer, 1, size, fp);
-
+    fclose(fp);
 
     ProcessCSP(buffer,size, exetype);
 
-    fclose(fp);
     // buffer 里就是文件内容
     free(buffer);
 

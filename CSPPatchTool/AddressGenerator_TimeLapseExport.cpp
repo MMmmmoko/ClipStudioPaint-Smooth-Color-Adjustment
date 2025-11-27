@@ -37,6 +37,9 @@ void AddressGenerator::PushTimeLapseExportAddr()
 		};
 
 
+
+
+
 		bool success = false;
 		for (size_t i = 0; i < _codeMemSize - sizeof(timeLapseExportFuncFeature); i++)
 		{
@@ -48,6 +51,33 @@ void AddressGenerator::PushTimeLapseExportAddr()
 				break;
 			}
 		}
+		//未找到时，使用函数调用特征
+		if (!success)
+		{
+
+			uint8_t timeLapseExportFuncCallFeature[] = {
+			0x44,0x3B,0xF8,0x75,0x2E,0x0F,0x28,0x44,0x24,BYTEWILDCARD,0x66,0x0F,0x7F,0x45,BYTEWILDCARD,
+			0x66,0x0F,0x73,0xD8,0x08,0x66,0x48,0x0F,0x7E,0xC1,0x48,0x85,0xC9,0x74,
+			0x07,0x8B,0xC6,0xF0,0x0F,0xC1,0x41,0x08,0x48,0x8D,0x55,BYTEWILDCARD,0x49,0x8B,0xCE,
+			0xE8
+			};
+			for (size_t i = 0; i < _codeMemSize - sizeof(timeLapseExportFuncCallFeature); i++)
+			{
+				if (_MatchFeatureCode(_codeMem + i, timeLapseExportFuncCallFeature, sizeof(timeLapseExportFuncCallFeature)))
+				{
+					//此代码最后的E8后即是调用地址
+					uint32_t off = *(uint32_t*)(_codeMem + i + sizeof(timeLapseExportFuncCallFeature));
+					SDL_Log("TimeLapseExport Func Finded.");
+					addrJson["CspAddressRVA"]["TimeLapseExport_Func"] = _VA + i + sizeof(timeLapseExportFuncCallFeature) + 4 + off;
+					success = true;
+					break;
+				}
+			}
+
+
+
+		}
+
 		if (!success)
 			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "TimeLapseExport Func Not Found!");
 	}

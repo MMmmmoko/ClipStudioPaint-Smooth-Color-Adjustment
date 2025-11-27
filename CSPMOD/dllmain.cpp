@@ -3,13 +3,22 @@
 #include<iostream>
 #include"CSPMOD.h"
 #include"CspData.h"
-
+#include"duilib/duilib.h"
 extern "C" __declspec(dllexport) void CELSYS_PleaseOptmizeTheBasicExperience_onegai() {
     printf("CELSYS,Please Optmize the Basic Drawing Experience, onegai.");
 }
 
 extern "C" __declspec(dllexport) void CSPMOD_SetStrData(const char* key,const char* value) {
     CspData::SetStrData(key, value);
+}
+
+extern "C" __declspec(dllexport) bool CSPMOD_GetStrFromID(wchar_t* buffer,const wchar_t* stringID, uint32_t* strSize) {
+    std::wstring str=ui::GlobalManager::Instance().Lang().GetStringViaID(stringID);
+    memcpy(buffer, str.c_str(), str.size()*2);
+    buffer[str.size()] = 0;
+    //*strSize = static_cast<uint32_t>(str.size()+1);
+    *strSize = static_cast<uint32_t>(str.size());
+    return !str.empty();
 }
 
 
@@ -34,9 +43,13 @@ BOOL APIENTRY DllMain( HMODULE hModule,
         //freopen_s(&stream, "CONOUT$", "w", stderr);
         //freopen_s(&stream, "CONIN$", "r", stdin);
 #endif // DEBUG
+        
 
 
         CSPMOD::OnAttachCSP((uintptr_t)hModule);
+
+        //利用CSP和优动漫会无差别加载plugin中插件的特性
+        LoadLibraryA("CSPMOD.dll");
         break;
     }
     case DLL_THREAD_ATTACH:

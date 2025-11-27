@@ -61,7 +61,7 @@ uint3 GTid : SV_GroupThreadID,
     
     cache[GTid.x][GTid.y] = origTex.SampleLevel(sampler_line, float2(_texWidth, _texHeight) * (readPos + float2(0.5,0.5)), 0);
     //cache[GTid.x][GTid.y] = origTex.Load(int3(readPos, 0));
-    
+    //cache[GTid.x][GTid.y].rgb *= cache[GTid.x][GTid.y].a;
     
 
     GroupMemoryBarrierWithGroupSync();
@@ -86,6 +86,10 @@ uint3 GTid : SV_GroupThreadID,
         resultColor += curColor;
     }
      
+    if (resultColor.a > 0)
+    {
+        resultColor.xyz /= resultColor.a;
+    }
     
     midTex[readPos] = resultColor;
 

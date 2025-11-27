@@ -35,12 +35,17 @@ class AddressTable
 public:
 	static bool LoadFromFile();
 
+
 	static void* GetAddress(const char* addrName);
 	std::vector<int> GetOffsetList(const char* offsetName);
 	std::string_view GetCSPVersion() { return cspVersion; };
 	
 
 private:
+	static void DoStaticPatch();//PatchTool中的实现迁移到CSPMOD中时，在这里patch部分原在tool中修改的代码
+
+
+
 
 	Json::Value addressMap;
 	std::string cspVersion;

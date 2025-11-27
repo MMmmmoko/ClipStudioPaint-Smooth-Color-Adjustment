@@ -21,6 +21,11 @@
 void CSPMOD::OnAttachCSP( uintptr_t moduleHandle)
 {
 
+	//abort();
+	//SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "CSPMOD Error", "No Version Info in CSPAddressTable.json", nullptr);
+
+
+
 	//获取基址
 	baseAttr = (uintptr_t)GetModuleHandle(NULL);
 	_moduleHandle = moduleHandle;

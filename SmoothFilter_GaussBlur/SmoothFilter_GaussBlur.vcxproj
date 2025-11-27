@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetExt>.cpm</TargetExt>
+    <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -195,6 +195,11 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SmoothFilter_GaussBlur.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CSPMOD\CSPMOD.vcxproj">
+      <Project>{2f4fed68-6e3e-4ae7-a101-12a8f5b5b0da}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

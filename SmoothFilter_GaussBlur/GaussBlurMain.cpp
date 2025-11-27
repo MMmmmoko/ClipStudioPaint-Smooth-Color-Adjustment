@@ -17,8 +17,15 @@ static	const int kStringIDFilterName = 102;//滤镜插件名
 static    const int kStringIDItemBlurRadius = 103;//模糊半径
 static	const int kStringIDPreview = 104;//预览
 
-static const char* uuidOfThisPlugin = "1E8B8396-201B-49D2-9AAC-33E5B76DA8AE";
+//static const char* uuidOfThisPlugin = "1E8B8396-201B-49D2-9AAC-33E5B76DA8AE";
+// 
+// 
+// 
+//static const char* uuidOfThisPlugin = "A3A3E621-55BA-4880-A3BA-C75B927A0844";
+//含有这个id的插件会被识别为官方插件，尚不知在什么接口设置这个uuid
 
+
+static const char* uuidOfThisPlugin = "FFD22A25-ABB3-4fdf-A6F2-596CC0E24BEF";
 
 struct	HSVFilterInfo
 {
@@ -182,6 +189,16 @@ void TRIGLAV_PLUGIN_API TriglavPluginCall(TriglavPlugInInt* result, TriglavPlugI
 		}
 		else if (selector == kTriglavPlugInSelectorFilterInitialize)
 		{
+			auto handle = GetModuleHandle(L"CSPMOD.dll");
+			typedef bool(*GetStrFromID)(wchar_t* buffer, const wchar_t* stringID, uint32_t* strSize);
+			GetStrFromID getIDPRoc = nullptr;
+			if (handle)
+			{
+				getIDPRoc = (GetStrFromID)GetProcAddress(handle, "CSPMOD_GetStrFromID");
+			}
+
+
+
 
 			//	フィルタの初期化
 			//滤镜初始化
@@ -198,8 +215,28 @@ void TRIGLAV_PLUGIN_API TriglavPluginCall(TriglavPlugInInt* result, TriglavPlugI
 				//滤镜组名和滤镜名
 				TriglavPlugInStringObject	filterCategoryName = NULL;
 				TriglavPlugInStringObject	filterName = NULL;
-				(*pStringService).createWithStringIDProc(&filterCategoryName, kStringIDFilterCategoryName, (*pluginServer).hostObject);
-				(*pStringService).createWithStringIDProc(&filterName, kStringIDFilterName, (*pluginServer).hostObject);
+
+
+				wchar_t buffer[100];
+				uint32_t strSize = 0;
+				if (getIDPRoc)
+				{
+					if(getIDPRoc(buffer, L"STRID_FILTERPLUGIN_CATEGORYNAME", &strSize))
+						(*pStringService).createWithUnicodeStringProc(&filterCategoryName, (unsigned short*)buffer, strSize);
+					
+					if(getIDPRoc(buffer, L"STRID_FILTERPLUGIN_GAUSSBLUR", &strSize))
+						(*pStringService).createWithUnicodeStringProc(&filterName, (unsigned short*)buffer, strSize);
+				}
+				
+				{
+					if(!filterCategoryName)
+						(*pStringService).createWithStringIDProc(&filterCategoryName, kStringIDFilterCategoryName, (*pluginServer).hostObject);
+					if (!filterName)
+						(*pStringService).createWithStringIDProc(&filterName, kStringIDFilterName, (*pluginServer).hostObject);
+				}
+
+
+
 
 				TriglavPlugInFilterInitializeSetFilterCategoryName(pRecordSuite, hostObject, filterCategoryName, 'c');
 				TriglavPlugInFilterInitializeSetFilterName(pRecordSuite, hostObject, filterName, 'g');
@@ -228,7 +265,12 @@ void TRIGLAV_PLUGIN_API TriglavPluginCall(TriglavPlugInInt* result, TriglavPlugI
 				//这里生成色相滑块//如果插件和csp原始代码相同的话，应该能用现成的曲线
 				//模糊半径
 				TriglavPlugInStringObject	blurRadiusCaption = NULL;
-				(*pStringService).createWithStringIDProc(&blurRadiusCaption, kStringIDItemBlurRadius, (*pluginServer).hostObject);
+				
+				if (getIDPRoc&& getIDPRoc(buffer, L"STRID_FILTERPLUGIN_GAUSSBLUR_RADIUS", &strSize))
+					(*pStringService).createWithUnicodeStringProc(&blurRadiusCaption, (unsigned short*)buffer, strSize);
+				else
+					(*pStringService).createWithStringIDProc(&blurRadiusCaption, kStringIDItemBlurRadius, (*pluginServer).hostObject);
+
 				(*pPropertyService).addItemProc(propertyObject, kItemBlurRadius, kTriglavPlugInPropertyValueTypeDecimal, kTriglavPlugInPropertyValueKindDefault, kTriglavPlugInPropertyInputKindDefault, blurRadiusCaption, 'b');
 				(*pPropertyService).setDecimalValueProc(propertyObject, kItemBlurRadius, 0);
 				(*pPropertyService).setDecimalDefaultValueProc(propertyObject, kItemBlurRadius, 6);
@@ -238,7 +280,11 @@ void TRIGLAV_PLUGIN_API TriglavPluginCall(TriglavPlugInInt* result, TriglavPlugI
 
 
 				TriglavPlugInStringObject    blurPreviewCaption = NULL;
-				(*pStringService).createWithStringIDProc(&blurPreviewCaption, kStringIDPreview, (*pluginServer).hostObject);
+				if(getIDPRoc&& getIDPRoc(buffer, L"STRID_FILTERPLUGIN_PREVIEW", &strSize))
+					(*pStringService).createWithUnicodeStringProc(&blurPreviewCaption, (unsigned short*)buffer, strSize);
+				else
+					(*pStringService).createWithStringIDProc(&blurPreviewCaption, kStringIDPreview, (*pluginServer).hostObject);
+
 				(*pPropertyService).addItemProc(propertyObject, kItemPreview, kTriglavPlugInPropertyValueTypeBoolean, kTriglavPlugInPropertyValueKindDefault, kTriglavPlugInPropertyInputKindDefault, blurPreviewCaption, 'p');
 				(*pPropertyService).setBooleanValueProc(propertyObject, kItemPreview, true);
 				(*pPropertyService).setBooleanDefaultValueProc(propertyObject, kItemPreview, true);

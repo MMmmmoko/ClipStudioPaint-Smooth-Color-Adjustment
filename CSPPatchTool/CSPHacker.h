@@ -16,6 +16,9 @@ public:
 
 
 
+	//bool DoJumpUDMKeyCheck();//解决优动漫启动问题
+
+
 private:
 	bool _FindCheckDataFunc();
 	bool _FindCheckLicense();

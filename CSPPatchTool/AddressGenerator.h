@@ -24,6 +24,10 @@ public:
 	void PushLayerObjectAddr();
 
 
+	void PushTimerPointAddr();
+	void PushUDMPluginUnlockAddr();
+
+
 
 
 
