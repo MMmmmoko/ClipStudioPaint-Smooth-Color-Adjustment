@@ -51,6 +51,19 @@ void AddressGenerator::_PushToneCurveAddr()
 ,0x48 ,0x8D ,0xAC ,0x24 ,0x78 ,0xEF ,0xFF ,0xFF
 ,0xB8 ,0x88 ,0x11 ,0x00 ,0x00
 ,0xE8,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD
+
+
+//40 ,55
+//,53
+//,56
+//,57
+//,41 ,54
+//,41 ,55
+//,41 ,56
+//,41 ,57
+//,48 ,8D ,AC ,24 ,78 ,EF ,FF ,FF
+//,B8 ,88 ,11 ,00 ,00
+//,E8,??, ??,??,??
 		};
 	
 		bool success = false;
@@ -120,15 +133,34 @@ void AddressGenerator::_PushToneCurveAddr()
 	//update
 	{
 		uint8_t tonecCurveUpdateFuncFeature[] = {
+
+
+
+
+//4.2.0能用这个方式找到目标函数，但是只会在鼠标抬起的时候被调用
+			//位置没问题，曲线对话框函数位置变了
 0x48 ,0x89 ,0x5C ,0x24 ,0x08
 ,0x48 ,0x89 ,0x74 ,0x24 ,0x10
 ,0x57
-,0xB8 ,0xA0 ,0x10 ,0x00 ,0x00
+//,0xB8 ,0xA0 ,0x10 ,0x00 ,0x00
+,0xB8 ,BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD
 ,0xE8, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD, BYTEWILDCARD
 ,0x48 ,0x2B ,0xE0
 ,0x48 ,0x8B ,0xF2
 ,0x48 ,0x8B ,0xF9
 ,0x48 ,0x8B ,0xCA
+
+
+//这是4.1.4之前的特特征，4.2.0特征出现了变化
+//48 ,89 ,5C ,24 ,08
+//,48 ,89 ,74 ,24 ,10
+//,57
+//,B8 ,A0 ,10 ,00 ,00
+//,E8, ??, ??, ??, ??
+//,48 ,2B ,E0
+//,48 ,8B ,F2
+//,48 ,8B ,F9
+//,48 ,8B ,CA
 		};
 	
 		bool success = false;

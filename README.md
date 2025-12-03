@@ -26,6 +26,8 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 **对于某些来源的学习版不可用**
 
+**4.2.0版本有部分功能缺失，如无必要请勿更新。**
+
 ### 优动漫
 
 现在已经支持绝大部分功能，优动漫的缩时摄影无法正确导出较大图像尺寸的视频（能超过1280px一些，但是超过太多了不行，原因不明。），测试的版本：3.0.6PRO体验版、EX版。
