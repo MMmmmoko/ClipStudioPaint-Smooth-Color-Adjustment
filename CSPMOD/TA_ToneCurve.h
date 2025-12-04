@@ -49,8 +49,8 @@ private:
 
 	struct CurvePointList
 	{
-		double* pStart;
-		double* pEnd;
+		double* pStart=nullptr;
+		double* pEnd = nullptr;
 	};
 	static CurvePointList _GetCurrentPanelPointList();
 
@@ -60,6 +60,7 @@ private:
 
 	static inline uintptr_t pPreview;
 	static inline uintptr_t pCurrentPanel;
+	static inline intptr_t pCurrentPanel_off;
 	static inline uintptr_t pRGB_Data;//前四字节标识数字，然后四字节位置，每8字节一个双浮点数，没两个双浮点数标识一个坐标
 	static inline uintptr_t pR_Data;
 	static inline uintptr_t pG_Data;

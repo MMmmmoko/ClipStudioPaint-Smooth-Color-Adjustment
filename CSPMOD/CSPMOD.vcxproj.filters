@@ -158,9 +158,6 @@
     <ClCompile Include="CSPHelper.cpp">
       <Filter>FunctionExpansion</Filter>
     </ClCompile>
-    <ClCompile Include="ScriptAction_ApplyEffects.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="DUI\Dialog\CheckFunction_Dlg.cpp">
       <Filter>Dui\Dialog</Filter>
     </ClCompile>
@@ -172,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="DUI\Dialog\About_Dlg.cpp">
       <Filter>Dui\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptAction_ApplyEffects.cpp">
+      <Filter>FunctionExpansion</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

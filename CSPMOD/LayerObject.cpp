@@ -66,7 +66,7 @@ bool LayerObject::ApplyEffectAvailable()
 		&& layer_mergeDownFuncAddr && layer_mergeDownPatchAddr && layer_mergeSelectFuncAddr
 		&& layer_createLayerFuncAddr
 		&& layer_getMenuFuncParam2FuncAddr && layer_releaseMenuFuncParam2FuncAddr
-		&& layer_getMenuFuncParam3FuncAddr && layer_releaseMenuFuncParam3FuncAddr
+		//&& layer_getMenuFuncParam3FuncAddr && layer_releaseMenuFuncParam3FuncAddr
 		);
 
 }
@@ -501,11 +501,13 @@ void LayerObject::MergeDown()
 
 
 	//SetSelect();
-	uintptr_t param3[200];
-	_FUNC_1F1 _funcGetParam3 = (_FUNC_1F1)(layer_getMenuFuncParam3FuncAddr);
-	_FUNC_1F1 _funcReleaseParam3 = (_FUNC_1F1)(layer_releaseMenuFuncParam3FuncAddr);
+	//4.2.0后使用第三个参数会出问题（也有可能是地址没有找对
+	// 传入0时不会出问题，干脆不适用param3
+	//uintptr_t param3[200];
+	//_FUNC_1F1 _funcGetParam3 = (_FUNC_1F1)(layer_getMenuFuncParam3FuncAddr);
+	//_FUNC_1F1 _funcReleaseParam3 = (_FUNC_1F1)(layer_releaseMenuFuncParam3FuncAddr);
 	
-	_funcGetParam3(param3);
+	//_funcGetParam3(param3);
 
 	_FUNC_1F3 _func = (_FUNC_1F3)(layer_mergeDownFuncAddr);
 	uintptr_t param[2];
@@ -517,9 +519,9 @@ void LayerObject::MergeDown()
 	param[0] = ptr;
 	param[1] = *(uintptr_t*)(param[0] + 0x30);
 
-	_func(param,(void*)1, param3);//会在下方有蒙版的时候报错？
+	_func(param,(void*)1, 0);//会在下方有蒙版的时候报错？
 
-	_funcReleaseParam3(param3);
+	//_funcReleaseParam3(param3);
 
 
 	//复原代码

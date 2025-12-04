@@ -186,7 +186,13 @@ void AddressGenerator::PushLayerObjectAddr()
 
 
 	}
+
+
+#if 0
+
 	//获取菜单参数3
+	//菜单参数3的数值这里也一并获取
+	uint32_t _param3MagicAddr = 0;
 	{
 		uint8_t layerObjectGetMenuParam3FuncFeature[] = {
 0x40,0x53,0x48,0x83,0xEC,0x20,
@@ -198,6 +204,16 @@ void AddressGenerator::PushLayerObjectAddr()
 0xC3,0xCC,0x48,0x89,0x5C,0x24,0x08,0x57,0x48,
 0x83,0xEC,0x20,0x48,0x8B,0x59,0x08,0x48,0x8B,
 0xF9,0x48,0x85,0xDB
+
+ //40, 53, 48, 83, EC, 20,
+ //48, 8D, 05,??, ??,??,??,
+ //48, 8B, D9, 48, 89, 01, 48, 83, C1, 08,
+ //E8,??, ??,??,??,
+ //33, C0, 48, 89, 43, 38, 48, 89, 43,
+ //40, 48, 8B, C3, 48, 83, C4, 20, 5B,
+ //C3, CC, 48, 89, 5C, 24, 08, 57, 48,
+ //83, EC, 20, 48, 8B, 59, 08, 48, 8B,
+ //F9, 48, 85, DB
 		};
 	
 		bool success = false;
@@ -207,6 +223,9 @@ void AddressGenerator::PushLayerObjectAddr()
 			{
 				SDL_Log("LayerObject GetFuncParam3 Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_GetMenuFuncParam3_Func"] = _VA + i ;
+
+				_param3MagicAddr = *(uint32_t*)(_codeMem + i + 9)+i+9+4;
+
 				success = true;
 				break;
 			}
@@ -217,10 +236,7 @@ void AddressGenerator::PushLayerObjectAddr()
 	//释放菜单参数3
 	{
 		uint8_t layerObjectReleaseMenuParam3FuncFeature[] = {
-		0xFF,0x15,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,//6
-		0xCC,0xCC,0xCC,0xCC,0xCC,//5
-		0xCC,0xCC,0xCC,0xCC,0xCC,//5
-		0xCC,0xCC,0xCC,0xCC,//4
+
 		0x48,0x89,0x5C,0x24,0x10,0x57,0x48,0x83,0xEC,0x20,
 		0x48,0x8D,0x05,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,
 		0x48,0x8B,0xF9,0x48,0x89,0x01,0x48,0x8B,0x59,0x40,
@@ -233,12 +249,37 @@ void AddressGenerator::PushLayerObjectAddr()
 		0x48,0x8D,0x4F,0x08,0x48,0x8B,0x5C,0x24,0x38,0x48,
 		0x83,0xC4,0x20,0x5F
 		};
+
+
+		//函数头部特征，4.2.0之后 此特征不可用
+		//发现其缺省的那个地址可以直接从获取参数三的函数内部得到
+		//uint8_t layerObjectReleaseMenuParam3FuncFeature[] = {
+		// FF, 15,??, ??,??,??,
+		// CC, CC, CC, CC, CC,
+		// CC, CC, CC, CC, CC,
+		// CC, CC, CC, CC,
+		// 48, 89, 5C, 24, 10, 57, 48, 83, EC, 20,
+		// 48, 8D, 05,??, ??,??,??,
+		// 48, 8B, F9, 48, 89, 01, 48, 8B, 59, 40,
+		// 48, 85, DB, 74, 37, 48, 89, 74, 24, 30,
+		// BE, FF, FF, FF, FF, 8B, C6, F0, 0F, C1,
+		// 43, 08, 83, F8, 01, 75, 1C, 48, 8B, 03,
+		// 48, 8B, CB, FF, 50, 08, F0, 0F, C1, 73,
+		// 0C, 83, FE, 01, 75, 09, 48, 8B, 03, 48,
+		// 8B, CB, FF, 50, 10, 48, 8B, 74, 24, 30,
+		// 48, 8D, 4F, 08, 48, 8B, 5C, 24, 38, 48,
+		// 83, C4, 20, 5F
+		//};
 	
 		bool success = false;
 		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectReleaseMenuParam3FuncFeature); i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectReleaseMenuParam3FuncFeature, sizeof(layerObjectReleaseMenuParam3FuncFeature)))
 			{
+				//检查特诊地址
+				uint32_t targetAddr = *(uint32_t*)(_codeMem + i + 13) + i + 13 + 4;
+				if (targetAddr != _param3MagicAddr)continue;
+
 				SDL_Log("LayerObject ReleaseFuncParam3 Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_ReleaseMenuFuncParam3_Func"] = _VA + i + 20;
 				success = true;
@@ -249,6 +290,8 @@ void AddressGenerator::PushLayerObjectAddr()
 			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject ReleaseMenuFuncParam3 Func Not Found!");
 	}
 
+
+#endif // 0
 
 	//图层上移1层
 	{

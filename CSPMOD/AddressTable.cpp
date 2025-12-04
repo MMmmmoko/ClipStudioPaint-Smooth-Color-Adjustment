@@ -128,7 +128,19 @@ void AddressTable::DoStaticPatch()
 			CSPMOD::CodePatch(pUDMPluginCheckFunc, cmd_nop, sizeof(cmd_nop));
         }
     }
+    if (ins.addressMap["CspAddressRVA"].isMember("UDMPluginUnlockAddrVec") && ins.addressMap["CspAddressRVA"]["UDMPluginUnlockAddrVec"].isArray())
+    {
+        for (auto& x : ins.addressMap["CspAddressRVA"]["UDMPluginUnlockAddrVec"])
+        {
+            if (x.isUInt64())
+            {
+                void* addr = (void*)(x.asUInt64() + CSPMOD::GetBaseAddr());
 
+                uint8_t cmd_nop[6] = { 0x90,0x90,0x90 ,0x90 ,0x90 ,0x90 };
+                CSPMOD::CodePatch(addr, cmd_nop, sizeof(cmd_nop));
+            }
+        }
+    }
 
 
 

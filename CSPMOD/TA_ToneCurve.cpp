@@ -76,6 +76,7 @@ int64_t TA_ToneCurve::Hook_ToneCurveDialog(uintptr_t arg1, uintptr_t arg2, uintp
 	baseAddr = spCurFunc;
 	pPreview = spCurFunc - 0xb48;
 	pCurrentPanel = spCurFunc - 0xb20;
+	pCurrentPanel_off = 0;
 	pRGB_Data = spCurFunc - 0xa80;
 	pR_Data = spCurFunc - 0xa80 + 0x208;
 	pG_Data = spCurFunc - 0xa80 + 0x208 + 0x208;
@@ -113,12 +114,13 @@ int64_t TA_ToneCurve::Hook_ToneCurveLayerDialog(uintptr_t arg1, uintptr_t arg2, 
 	baseAddr = spCurFunc;
 	pPreview = 0;
 	pCurrentPanel = spCurFunc - 0x1cf0;
-	pRGB_Data = spCurFunc - 0x10f8;
+	pRGB_Data = spCurFunc - 0x10f8 ;
 	pR_Data = spCurFunc - 0x10f8 + 0x82;
 	pG_Data = spCurFunc - 0x10f8 + 0x82 + 0x82;
 	pR_Data = spCurFunc - 0x10f8 + 0x82 + 0x82 + 0x82;
 
-
+	//刷新off数值
+	_GetCurrentPanelPointList();
 
 
 	uint8_t cmd_mov_rax_1_return[7 + 5] = {
@@ -146,6 +148,9 @@ int64_t TA_ToneCurve::Hook_ToneCurveLayerDialog(uintptr_t arg1, uintptr_t arg2, 
 	paramOfBeforeDraw0 = 0;
 	paramOfBeforeDraw1 = 0;
 
+
+
+
 	return result;
 }
 
@@ -166,6 +171,10 @@ int64_t TA_ToneCurve::Hook_ToneCurveParamChange(uintptr_t arg1, uintptr_t arg2, 
 	if (!ajustWorking && !layerWorking)
 		return result;
 
+
+
+
+
 	//计划16ms采样一次
 	static uint64_t startTimer=SDL_GetTicks();
 	uint64_t curTimer = SDL_GetTicks();
@@ -176,7 +185,7 @@ int64_t TA_ToneCurve::Hook_ToneCurveParamChange(uintptr_t arg1, uintptr_t arg2, 
 
 
 	uint32_t curPanel;
-	if (!CSPMOD::TryGetValue(pCurrentPanel, &curPanel))return result;
+	if (!CSPMOD::TryGetValue(pCurrentPanel+pCurrentPanel_off, &curPanel))return result;
 
 
 
@@ -196,6 +205,9 @@ int64_t TA_ToneCurve::Hook_ToneCurveParamChange(uintptr_t arg1, uintptr_t arg2, 
 
 		CurvePointList pointlist = _GetCurrentPanelPointList();
 		uint32_t pointCount = static_cast<uint32_t>(((uintptr_t)pointlist.pEnd - (uintptr_t)pointlist.pStart) / 16);
+
+
+
 
 		if(!CSPMOD::IsPtrValid(pointData))return result;
 		*(uint32_t*)pointData = pointCount;
@@ -265,6 +277,9 @@ int64_t TA_ToneCurve::Hook_ToneCurveParamChange(uintptr_t arg1, uintptr_t arg2, 
 		CurvePointList pointlist = _GetCurrentPanelPointList();
 
 		uint16_t pointCount = static_cast<uint16_t>(((uintptr_t)pointlist.pEnd - (uintptr_t)pointlist.pStart) / 16);
+		if (0 == pointCount)return result;
+
+
 		pointData[0] = pointCount;
 		for (int i = 0; i < pointCount; i++)
 		{
@@ -329,23 +344,42 @@ int64_t TA_ToneCurve::Hook_ToneCurveBeforeDraw(uintptr_t arg1, uintptr_t arg2)
 
 TA_ToneCurve::CurvePointList TA_ToneCurve::_GetCurrentPanelPointList()
 {
+
+
+
+	//堆栈法寻找目标地址时出现了问题，这里回归基址直接寻找的方式
+
+
+
+
+
+
+
+
+
+
+
+
+
 	//[栈底(baseAddr)-0xb08]+0x280]+0x1b0]+0x10]+0x8]+0x28]+0x8]
 
 
-#define SAFEGETVALUE(x) if(CSPMOD::IsPtrValid(x))value = *(uintptr_t*)(x);else return CurvePointList()
+//#define SAFEGETVALUE(x) if(CSPMOD::IsPtrValid(x))value = *(uintptr_t*)(x);else return CurvePointList()
+#define SAFEGETVALUE(x) if(CSPMOD::IsPtrValid(x))value = *(uintptr_t*)(x);else break
 if (ajustWorking)
 {
 
-	uintptr_t value;
-
-	SAFEGETVALUE(baseAddr - 0xb08);
-	SAFEGETVALUE(value + 0x280);
-	SAFEGETVALUE(value + 0x1b0);
-	SAFEGETVALUE(value + 0x10);
-	SAFEGETVALUE(value + 0x8);
-	SAFEGETVALUE(value + 0x28);
-	SAFEGETVALUE(value + 0x8);
-
+	uintptr_t value=0;
+	do
+	{
+		SAFEGETVALUE(baseAddr - 0xb08);
+		SAFEGETVALUE(value + 0x280);
+		SAFEGETVALUE(value + 0x1b0);
+		SAFEGETVALUE(value + 0x10);
+		SAFEGETVALUE(value + 0x8);
+		SAFEGETVALUE(value + 0x28);
+		SAFEGETVALUE(value + 0x8);
+	} while (false);
 	if (CSPMOD::IsPtrValid(value))return *(CurvePointList*)value;
 	else return CurvePointList();
 }
@@ -356,18 +390,50 @@ if (ajustWorking)
 if (layerWorking)
 {
 
-	uintptr_t value;
+	uintptr_t value=0;
+	do
+	{
 	SAFEGETVALUE(baseAddr - 0x1CD8);
+	//SAFEGETVALUE(baseAddr - 0x1CE8);//发生了某个变化使0x1CD8->0x1CE8，应该考虑用特征去计算这个值
 	SAFEGETVALUE(value + 0x280);
 	SAFEGETVALUE(value + 0x1b0);
 	SAFEGETVALUE(value + 0x10);
 	SAFEGETVALUE(value + 0x8);
 	SAFEGETVALUE(value + 0x28);
 	SAFEGETVALUE(value + 0x8);
-
+	} while (false);
 
 	if (CSPMOD::IsPtrValid(value))return *(CurvePointList*)value;
-	else return CurvePointList();
+	else
+	{
+		value=0;
+		do
+		{
+			SAFEGETVALUE(baseAddr - 0x1CE8);//发生了某个变化使0x1CD8->0x1CE8，应该考虑用特征去计算这个值
+			SAFEGETVALUE(value + 0x280);
+			SAFEGETVALUE(value + 0x1b0);
+			SAFEGETVALUE(value + 0x10);
+			SAFEGETVALUE(value + 0x8);
+			SAFEGETVALUE(value + 0x28);
+			SAFEGETVALUE(value + 0x8);
+			pCurrentPanel_off = -0x10;
+			//对curpanel进行修正
+			//static bool hasFix = false;
+			//if (!hasFix)
+			//{
+			//	hasFix = true;
+			//	pCurrentPanel += 0x10;
+			//}
+
+
+		} while (false);
+		if (CSPMOD::IsPtrValid(value))return *(CurvePointList*)value;
+
+
+
+
+
+	}return CurvePointList();
 }
 
 

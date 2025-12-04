@@ -43,6 +43,12 @@ void AddressGenerator::_PushColorBalanceAddr()
 			,0x29 ,0xB4 ,0x24 ,0x20 ,0x02 ,0x00 ,0x00 ,0x48 ,0x8B ,0x05 ,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD
 			,0x48 ,0x33 ,0xC4 ,0x48 ,0x89 ,0x85 ,0x10 ,0x01 ,0x00 ,0x00 ,0x4D ,0x8B ,0xF8 ,0x48 ,0x8B ,0xFA ,0x48 ,0x8B ,0xF1
 		};
+		//uint8_t colorBalanceLayerDialogFuncFeature[] = {
+		//	48 ,89 ,5C ,24 ,20 ,55 ,56 ,57 ,41 ,54 ,41 ,55 ,41 ,56 ,41 ,57
+		//	,48 ,8D ,AC ,24 ,D0 ,FE ,FF ,FF ,48 ,81 ,EC ,30 ,02 ,00 ,00 ,0F 
+		//	,29 ,B4 ,24 ,20 ,02 ,00 ,00 ,48 ,8B ,05 ,??, ??,??,??
+		//	,48 ,33 ,C4 ,48 ,89 ,85 ,10 ,01 ,00 ,00 ,4D ,8B ,F8 ,48 ,8B ,FA ,48 ,8B ,F1
+		//};
 
 
 		bool success = false;

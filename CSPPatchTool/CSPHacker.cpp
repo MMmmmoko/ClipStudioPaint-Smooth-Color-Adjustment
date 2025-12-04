@@ -2,6 +2,7 @@
 
 
 #include <iostream>
+#include "DllInject.h"
 
 
 
@@ -301,22 +302,64 @@ bool CSPHacker::DoBaseHack()
 
 bool CSPHacker::DoJumpStartWindowHack()
 {
+    //CSP4.2.0之后改成了A才跳过启动窗口
     //有个条件跳跃函数，把入参从0改成9
-    uint8_t jumpFeature[] = {
-    0xC7 ,0x44 ,0x24 ,0x34 ,0x00 ,0x00 ,0x00 ,0x00 ,0x48 ,0x8D ,0x05 ,0xCC ,0xCC,0xCC,0xCC, 0x48 ,0x89 
-    ,0x44 ,0x24 ,0x28 ,0x48 ,0x8D ,0x54 ,0x24 ,0x28 ,0x48 ,0x8D ,0x4C ,0x24 ,0x40,0xE8,0xCC ,0xCC,0xCC,0xCC ,0x8B ,0xD3 ,0x48 ,0x8D ,0x4C ,0x24 ,0x40
-// C7 ,44 ,24 ,34 ,00 ,00 ,00 ,00 ,48 ,8D ,05 ,?? ,??,??,??, 48 ,89 
-    //,44 ,24 ,28 ,48 ,8D ,54 ,24 ,28 ,48 ,8D ,4C ,24 ,40,E8,?? ,??,??,?? ,8B ,D3 ,48 ,8D ,4C ,24 ,40
+//    uint8_t jumpFeature[] = {
+//    0xC7 ,0x44 ,0x24 ,0x34 ,0x00 ,0x00 ,0x00 ,0x00 ,0x48 ,0x8D ,0x05 ,0xCC ,0xCC,0xCC,0xCC, 0x48 ,0x89 
+//    ,0x44 ,0x24 ,0x28 ,0x48 ,0x8D ,0x54 ,0x24 ,0x28 ,0x48 ,0x8D ,0x4C ,0x24 ,0x40,0xE8,0xCC ,0xCC,0xCC,0xCC ,0x8B ,0xD3 ,0x48 ,0x8D ,0x4C ,0x24 ,0x40
+//// C7 ,44 ,24 ,34 ,00 ,00 ,00 ,00 ,48 ,8D ,05 ,?? ,??,??,??, 48 ,89 
+//    //,44 ,24 ,28 ,48 ,8D ,54 ,24 ,28 ,48 ,8D ,4C ,24 ,40,E8,?? ,??,??,?? ,8B ,D3 ,48 ,8D ,4C ,24 ,40
+//    };
+
+    
+    //先获取跳转函数
+    uint8_t jumpFuncFeature[] = {
+        0x48,0x89,0x5C,0x24,0x20,0x57,0x48,0x81,0xEC,0x00,0x01,0x00,0x00,
+        0x48,0x8B,0x05,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,0x48,0x33,0xC4,
+        0x48,0x89,0x84,0x24,0xF0,0x00,0x00,0x00,0x8B,0xDA,0x48,0x8B,
+        0xF9,0x44,0x89,0x44,0x24,0x20,0x48,0x8D,0x4C,0x24,0x40,
+        0xE8,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,0x90,0xC7,0x44,0x24,0x34,0x00,0x00,0x00,0x00
     };
 
+    //然后匹配如下特征的代码段以获取目标函数地址
+    //00007FF7DDB073B3 | E8 B8813D03 | call clipstudiopaint420.7FF7E0EDF570 |
+    //    00007FF7DDB073B8 | EB 13 | jmp clipstudiopaint420.7FF7DDB073CD |
+    //    00007FF7DDB073BA | E8 21843D03 | call clipstudiopaint420.7FF7E0EDF7E0 |
+    //    00007FF7DDB073BF | 45:8BC4 | mov r8d, r12d |
+    //    00007FF7DDB073C2 | 41 : 8BD7 | mov edx, r15d |
+    //    00007FF7DDB073C5 | 48 : 8BC8 | mov rcx, rax |
+    //    00007FF7DDB073C8 | E8 E3823D03 | call <clipstudiopaint420.默认启动入口> |
 
-    for (size_t i = 0; i < _codeMemSize - sizeof(jumpFeature); i++)
+
+    uint8_t startWindowCodeFeature[] = {
+0xE8,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,
+0xEB,0x13,
+0xE8,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,
+0x45,0x8B,0xC4,
+0x41,0x8B,0xD7,
+0x48,0x8B,0xC8,
+0xE8,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD
+    };
+
+    for (uint32_t i = 0; i < _codeMemSize - sizeof(jumpFuncFeature); i++)
     {
-        if (_MatchFeatureCode(_codeMem + i, jumpFeature, sizeof(jumpFeature)))
+        if (_MatchFeatureCode(_codeMem + i, jumpFuncFeature, sizeof(jumpFuncFeature)))
         {
-            *(_codeMem + i + 4) = 9;
+            
+            //然后匹配调用特征
+            for (uint32_t j = 0; j < _codeMemSize - sizeof(startWindowCodeFeature); j++)
+            {
+                if (_MatchFeatureCode(_codeMem + j, startWindowCodeFeature, sizeof(startWindowCodeFeature)))
+                {
+                    uint32_t targetFuncAddr = *(uint32_t*)(_codeMem + j + 1) + j + 5;
+                    //将最后一个CALL目标地址改为targetFuncAddr
+                    *(uint32_t*)(_codeMem + j + 5 + 2 + 5 + 3 + 3 + 3 + 1) = 
+                        targetFuncAddr - (j+5+2+5+3+3+3+5);
 
-            return true;
+
+                    return true;
+                }
+            }
         }
     }
 
@@ -326,18 +369,22 @@ bool CSPHacker::DoJumpStartWindowHack()
 bool CSPHacker::DoJumpHideTrialText()
 {
     uint8_t jumpFeature[] = {
-        0x7E ,0x57
-        ,0x48 ,0x8D ,0x8D ,0x58 ,0x02 ,0x00 ,0x00
-        ,0xE8 ,0xCC ,0xCC ,0xCC ,0xCC
-        ,0x85 ,0xC0
-        ,0x7E ,0x34
-        ,0x48 ,0x8D ,0x15 ,0xCC ,0xCC ,0xCC ,0xCC
-        ,0x48 ,0x8D ,0x8D ,0x50 ,0x05 ,0x00 ,0x00
-        ,0xE8 ,0xCC ,0xCC ,0xCC ,0xCC
-        ,0x90
-        ,0x48 ,0x8D ,0x95 ,0x50 ,0x05 ,0x00 ,0x00
-        ,0x48 ,0x8D ,0x8D ,0x58 ,0x02 ,0x00 ,0x00
-        ,0xE8 ,0xCC ,0xCC ,0xCC ,0xCC
+        0x7E ,0x57//2
+        ,0x48 ,0x8D ,0x8D ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD//7
+        ,0xE8 ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD//5
+        ,0x85 ,0xC0//2
+        ,0x7E ,0x34//2
+        ,0x48 ,0x8D ,0x15 ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD//7
+        ,0x48 ,0x8D ,0x8D ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD//7
+        ,0xE8 ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD//5
+        ,0x90//1
+        ,0x48 ,0x8D ,0x95 ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD//7
+        ,0x48 ,0x8D ,0x8D ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD//7
+        ,0xE8 ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD//5
+
+
+
+
         //特征码取太长了 削点
         //,0x90
         //,0x48 ,0x8D ,0x8D ,0x50 ,0x05 ,0x00 ,0x00
@@ -346,12 +393,37 @@ bool CSPHacker::DoJumpHideTrialText()
         //,0x48 ,0x8D ,0x8D ,0x58 ,0x02 ,0x00 ,0x00
         //,0xE8 ,0xCC ,0xCC ,0xCC ,0xCC
         //,0x48 ,0x8D ,0x95 ,0x58 ,0x02 ,0x00 ,0x00
+
+
+        //4.1.4之前的特征
+       //7E ,57
+       // ,48 ,8D ,8D ,58 ,02 ,00 ,00
+       // ,E8 ,?? ,?? ,?? ,??
+       // ,85 ,C0
+       // ,7E ,34
+       // ,48 ,8D ,15 ,?? ,?? ,?? ,??
+       // ,48 ,8D ,8D ,50 ,05 ,00 ,00
+       // ,E8 ,?? ,?? ,?? ,??
+       // ,90
+       // ,48 ,8D ,95 ,50 ,05 ,00 ,00
+       // ,48 ,8D ,8D ,58 ,02 ,00 ,00
+       // ,E8 ,?? ,?? ,?? ,??
     };
 
-    for (size_t i = 0; i < _codeMemSize - sizeof(jumpFeature); i++)
+    for (uint32_t i = 0; i < _codeMemSize - sizeof(jumpFeature); i++)
     {
         if (_MatchFeatureCode(_codeMem + i, jumpFeature, sizeof(jumpFeature)))
         {
+            //检查rbp+X数值是否相等以辅助判断
+            uint32_t value1 = *(uint32_t*)(_codeMem+i+2+3);
+            uint32_t value2 = *(uint32_t*)(_codeMem+i+2+7+5+2+2+7+7+5+1+7+3);
+            if (value1 != value2)continue;
+            value1 = *(uint32_t*)(_codeMem + i + 2 + 7+5+2+2+7+3);
+            value2 = *(uint32_t*)(_codeMem + i + 2 + 7+5+2+2+7+7+5+1+3);
+            if (value1 != value2)continue;
+
+
+
             *(_codeMem + i) = 0xEB;
 
             return true;
@@ -514,12 +586,37 @@ bool CSPHacker::_FindCheckDataFunc()
 
 bool CSPHacker::_FindCheckLicense()
 {
+    //特征在4.2.0后发生了变化
+    //现在转为调用特征匹配
+    // 
+    //00007FF68BF19833 | E8 780D1B03 | call <clipstudiopaint.valueof(1450209B8)> |
+    //    00007FF68BF19838 | 48:898424 E84E0000 | mov qword ptr ss : [rsp + 4EE8] , rax | rax : EntryPoint
+    //    00007FF68BF19840 | 48 : 83BC24 E84E0000 00 | cmp qword ptr ss : [rsp + 4EE8] , 0 |
+    //    00007FF68BF19849 | 0F84 A2000000 | je clipstudiopaint.7FF68BF198F1 |
+    //    00007FF68BF1984F | E8 5C0D1B03 | call <clipstudiopaint.valueof(1450209B8)> |
+    //    00007FF68BF19854 | 48 : 898424 F04E0000 | mov qword ptr ss : [rsp + 4EF0] , rax | rax : EntryPoint
+    //    00007FF68BF1985C | 48 : 8B8C24 F04E0000 | mov rcx, qword ptr ss : [rsp + 4EF0] |
+    //    00007FF68BF19864 | E8 67451B03 | call <clipstudiopaint.CheckLicense> |
+
+    //取这样一个特征并检查调用的函数地址、rsp+X是否相等
+
+
+
     uint8_t checkLicenseFeture[] = {
-    0x48 ,0x89 ,0x5C ,0x24 ,0x10
-    ,0x48 ,0x89 ,0x6C ,0x24 ,0x18
-        ,0x56 ,0x57 ,0x41 ,0x56 ,0x48
-        ,0x83 ,0xEC ,0x30 ,0x48 ,0x8B ,0xE9 ,0x48 ,0x8B ,0x49 ,0x20
-        ,0x48 ,0x8B ,0x01 ,0xFF ,0x50 ,0x38 ,0x85 ,0xC0 ,0x0F ,0x84 ,0xC2 ,0x00 ,0x00 ,0x00
+0xE8,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD,//5
+0x48,0x89,0x84,0x24,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD,//8
+0x48,0x83,0xBC,0x24,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD,0x00,//9
+0x0F,0x84,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD,//6
+0xE8,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD,//5
+0x48,0x89,0x84,0x24,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD,//8
+0x48,0x8B,0x8C,0x24,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD,//8
+0xE8,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD ,BYTEWILDCARD //5
+
+
+
+
+
+//4.1.4及以前的函数头部特征
     //48 ,89 ,5C ,24 ,10
     //,48 ,89 ,6C ,24 ,18
     //    ,56 ,57 ,41 ,56 ,48
@@ -527,11 +624,28 @@ bool CSPHacker::_FindCheckLicense()
     //    ,48 ,8B ,01 ,FF ,50 ,38 ,85 ,C0 ,0F ,84 ,C2 ,00 ,00 ,00
     };
 
-    for (size_t i = 0; i < _codeMemSize - sizeof(checkLicenseFeture); i++)
+    for (uint32_t i = 0; i < _codeMemSize - sizeof(checkLicenseFeture); i++)
     {
         if (_MatchFeatureCode(_codeMem + i, checkLicenseFeture, sizeof(checkLicenseFeture)))
         {
-            pos_CheckLicense = i;
+
+            //检查两次CALL的地址是否相等
+            uint32_t value1=*(uint32_t*)(_codeMem + i + 1)+i+5;
+            uint32_t value2 = *(uint32_t*)(_codeMem + i + 5 + 8 + 9 + 6 + 1)+i+5+8+9+6+5;
+            if (value1 != value2)continue;
+            //检查第一组rsp+X是否相等
+            value1 = *(uint32_t*)(_codeMem + i + 5+4);
+            value2 = *(uint32_t*)(_codeMem + i + 5+8+4);
+            if (value1 != value2)continue;
+            //检查第二组rsp+X是否相等
+            value1 = *(uint32_t*)(_codeMem + i + 5 + 8+9+6+5+4);
+            value2 = *(uint32_t*)(_codeMem + i + 5 + 8 + 9+6+5+8+4);
+            if (value1 != value2)continue;
+
+
+
+
+            pos_CheckLicense = *(uint32_t*)(_codeMem + i + 5 + 8 + 9 + 6 + 5 + 8+8+1)+i+5+8+9+6+5+8+8+5;
             return true;
         }
     }

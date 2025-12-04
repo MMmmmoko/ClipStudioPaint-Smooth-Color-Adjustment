@@ -97,7 +97,7 @@ void UIMainThread::OnInit()
 
 
     resParam.languageFileName = L"schinese.ini";
-    resParam.languageFileName = L"japanese.ini";
+    //resParam.languageFileName = L"japanese.ini";
     //resParam.languageFileName = L"english.ini";
     //resParam.languageFileName = langstr;
 

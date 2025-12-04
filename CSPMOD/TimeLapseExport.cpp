@@ -55,8 +55,8 @@ int64_t TimeLapseExport_hook::Hook_TimeLapseExport(uintptr_t arg0, uintptr_t arg
 
     if (CSPMOD::IsPtrValid(arg1 + 0x918))
     {
-        *(uint32_t*)(arg1 + 0x918) = 1;
-        *(uint32_t*)(arg0 - 0x20+0x8) = 1;
+        //*(uint32_t*)(arg1 + 0x918) = 1;
+        //*(uint32_t*)(arg0 - 0x20+0x8) = 1;
     }
     else{
         return orig_TimeLapseExport(arg0, arg1);

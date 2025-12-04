@@ -38,8 +38,38 @@ void AddressGenerator::_PushToneCurveAddr()
 			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurve Dialog Func Not Found!");
 	}
 	{
-		//图层对话框
+		//420版本后对话框调用位置有变动，这里改用函数外部调用特征
+		
+
 		uint8_t tonecCurveLayerDialogFuncFeature[] = {
+		0x0F,0x28,0x85,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,//7
+		0x66,0x0F,0x7F,0x85,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,//8
+		0x66,0x0F,0x73,0xD8,0x08,0x66,0x48,0x0F,0x7E,0xC1,//10
+		0x48,0x85,0xC9,0x74,0x0A,0xB8,0x01,0x00,0x00,0x00,//10
+		0xF0,0x0F,0xC1,0x41,0x08,//5
+		0x4C,0x8D,0x8D,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,//7
+		0x4C,0x8D,0x85,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,//7
+		0x48,0x8D,0x95,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,//7
+		0x48,0x8D,0x8D,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,//7
+		0xE8,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,//函数调用的位置
+		0x44,0x8B,0xF8,0xB9,0x48,0x10,0x00,0x00
+
+		//0F,28,85,??, ??,??,??,
+		//66,0F,7F,85, ? ? , ? ? , ? ? , ? ? ,
+		//66,0F,73,D8,08,66,48,0F,7E,C1,
+		//48,85,C9,74,0A,B8,01,00,00,00,
+		//F0,0F,C1,41,08,
+		//4C,8D,8D, ? ? , ? ? , ? ? , ? ? ,
+		//4C,8D,85, ? ? , ? ? , ? ? , ? ? ,
+		//48,8D,95, ? ? , ? ? , ? ? , ? ? ,
+		//48,8D,8D, ? ? , ? ? , ? ? , ? ? ,
+		//E8, ? ? , ? ? , ? ? , ? ? ,
+		//44,8B,F8,B9,48,10,00,00
+		};
+
+
+		//这里是原特征
+		uint8_t tonecCurveLayerDialogFuncFeature_OLD[] = {
 0x40 ,0x55
 ,0x53
 ,0x56
@@ -71,14 +101,31 @@ void AddressGenerator::_PushToneCurveAddr()
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveLayerDialogFuncFeature, sizeof(tonecCurveLayerDialogFuncFeature)))
 			{
+				uint32_t off = *(uint32_t*)(_codeMem + i + 
+					+7+8+10+10+5+7+7+7+7+1);
 				SDL_Log("ToneCurveLayer Dialog Func Finded.");
-				addrJson["CspAddressRVA"]["ToneCurveLayer_Dialog_Func"] = _VA + i;
+				addrJson["CspAddressRVA"]["ToneCurveLayer_Dialog_Func"] = _VA + i
+					+7 + 8 + 10 + 10 + 5 + 7 + 7 + 7 + 7 + 5+ off;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer Dialog Func Not Found!");
+		{
+			//未成功时使用原特征
+			for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveLayerDialogFuncFeature_OLD); i++)
+			{
+				if (_MatchFeatureCode(_codeMem + i, tonecCurveLayerDialogFuncFeature_OLD, sizeof(tonecCurveLayerDialogFuncFeature_OLD)))
+				{
+					SDL_Log("ToneCurveLayer Dialog Func Finded.（BACKEND ADDR）");
+					addrJson["CspAddressRVA"]["ToneCurveLayer_Dialog_Func"] = _VA + i;
+					success = true;
+					break;
+				}
+			}
+			if (!success)
+				SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer Dialog Func Not Found!");
+		}
 	}
 	//参数回调
 	{
