@@ -8,7 +8,7 @@
 
 #include"DUI/Dialog/CheckFunction_Dlg.h"
 #include"DUI/Dialog/About_Dlg.h"
-
+#include"ScriptAction_ApplyEffects.h"
 void CSPHelper::Init()
 {
 	void* funcAddr= AddressTable::GetAddress("CSPHelper_Entrance");
@@ -61,6 +61,8 @@ void CSPHelper::OnClickEntrance()
     {
         int32_t curW =helperMenu_applyEffects->EstimateSize(sizeMax).cx.GetInt32();
         if (curW > maxW)maxW = curW;
+        if (!ScriptAction_ApplyEffects::IsEnabled())
+            helperMenu_applyEffects->SetEnabled(false);
     }
     if (helperMenu_checkFunctions)
     {

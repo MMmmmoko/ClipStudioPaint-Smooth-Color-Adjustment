@@ -12,7 +12,7 @@
 	
 	<MenuListBox class="menu" bkcolor="#CSPColor_PanelBG">
 		<MenuItem class="helperMenuElement" name="helperMenu_applyEffects" width="auto">
-			<Label class="helperMenuText"  text_id="STRID_HELPERMENU_APPLYEFFECTS" mouse_enabled="false" keyboard_enabled="false"/>
+			<Label class="helperMenuText"  text_id="STRID_HELPERMENU_APPLYEFFECTS" disabled_text_color="#CSPColor_Separator"  mouse_enabled="false" keyboard_enabled="false"/>
 		</MenuItem>
 		<MenuItem class="helperMenuElement" name="helperMenu_checkFunctions" width="auto">
 			<Label class="helperMenuText"  text_id="STRID_HELPERMENU_CHECKFUNCTIONS" mouse_enabled="false" keyboard_enabled="false"/>

@@ -17,15 +17,14 @@ static	const int kStringIDFilterName = 102;//滤镜插件名
 static    const int kStringIDItemBlurRadius = 103;//模糊半径
 static	const int kStringIDPreview = 104;//预览
 
-//static const char* uuidOfThisPlugin = "1E8B8396-201B-49D2-9AAC-33E5B76DA8AE";
+static const char* uuidOfThisPlugin = "1E8B8396-201B-49D2-9AAC-33E5B76DA8AE";
 // 
 // 
 // 
 //static const char* uuidOfThisPlugin = "A3A3E621-55BA-4880-A3BA-C75B927A0844";
 //含有这个id的插件会被识别为官方插件，尚不知在什么接口设置这个uuid
-
-
-static const char* uuidOfThisPlugin = "FFD22A25-ABB3-4fdf-A6F2-596CC0E24BEF";
+// 
+//static const char* uuidOfThisPlugin = "FFD22A25-ABB3-4fdf-A6F2-596CC0E24BEF";
 
 struct	HSVFilterInfo
 {
