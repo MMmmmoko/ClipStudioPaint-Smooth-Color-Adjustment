@@ -54,7 +54,7 @@ void MotionBlur::Init(TriglavPlugInServer* _runPluginServer)
 
 
     //根据选区创建矩形
-    TriglavPlugInRect selectAreaRect;
+    //TriglavPlugInRect selectAreaRect;
     if (selectAreaOffscreen == NULL)
     {
         selectAreaRect.left = 0;
@@ -296,8 +296,8 @@ void MotionBlur::Render(float targetX, float targetY, bool preview, kBlurDirecti
 
 
 
-    TriglavPlugInRect selectAreaRect;
-    TriglavPlugInFilterRunGetSelectAreaRect(pRecordSuite, &selectAreaRect, hostObject);
+    //TriglavPlugInRect selectAreaRect;
+    //TriglavPlugInFilterRunGetSelectAreaRect(pRecordSuite, &selectAreaRect, hostObject);
 
     //这个好像是画布坐标而不是离屏坐标
     TriglavPlugInPoint targetPos;

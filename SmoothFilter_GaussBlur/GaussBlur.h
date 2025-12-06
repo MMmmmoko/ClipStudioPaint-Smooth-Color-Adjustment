@@ -33,6 +33,7 @@ private:
 	bool needSkip = false;
 	TriglavPlugInServer* runPluginServer;
 	TriglavPlugInBitmapObject renderBitmap = NULL;
+	TriglavPlugInRect selectAreaRect;
 
 	Texture originTexture;
 	Texture selectAreaTexture;

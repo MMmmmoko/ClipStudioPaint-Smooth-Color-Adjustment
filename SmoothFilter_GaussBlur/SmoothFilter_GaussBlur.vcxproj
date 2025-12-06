@@ -124,7 +124,7 @@
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "G:\Projects\CSPMOD\CSPMOD\x64\Debug\SmoothFilter_GaussBlur.dll" "C:\Users\10737\AppData\Roaming\CELSYSUserData\CELSYS\CLIPStudioModule\PlugIn\PAINT\SmoothFilter_GaussBlur.cpm"</Command>
+      <Command>copy /Y "G:\Projects\CSPMOD\CSPMOD\x64\Debug\SmoothFilter_GaussBlur.dll" "C:\Software\CLIP STUDIO 1.5\CLIP STUDIO PAINT\PlugIn\PAINT\SmoothFilter_GaussBlur.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

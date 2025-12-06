@@ -59,7 +59,7 @@ void GaussBlur::Init(TriglavPlugInServer* _runPluginServer)
 
 
     //根据选区创建矩形
-    TriglavPlugInRect selectAreaRect;
+    //TriglavPlugInRect selectAreaRect;
     if (selectAreaOffscreen == NULL)
     {
         selectAreaRect.left = 0;
@@ -237,6 +237,7 @@ void GaussBlur::Render(float blurRadius)
     TriglavPlugInPoint zero;
     zero.x = 0;
     zero.y = 0;
+    //runPluginServer->serviceSuite.bitmapService->getAddressProc((void**)&data, renderBitmap, &zero);
     runPluginServer->serviceSuite.bitmapService->getAddressProc((void**)&data, renderBitmap, &zero);
     if (!data)
         return;
@@ -296,8 +297,8 @@ void GaussBlur::Render(float blurRadius)
 
 
 
-    TriglavPlugInRect selectAreaRect;
-    TriglavPlugInFilterRunGetSelectAreaRect(pRecordSuite, &selectAreaRect, hostObject);
+    //TriglavPlugInRect selectAreaRect;
+    //TriglavPlugInFilterRunGetSelectAreaRect(pRecordSuite, &selectAreaRect, hostObject);
 
     //这个好像是画布坐标而不是离屏坐标
     TriglavPlugInPoint targetPos;
@@ -306,8 +307,20 @@ void GaussBlur::Render(float blurRadius)
     targetPos.x = selectAreaRect.left;
     targetPos.y = selectAreaRect.top;
 
+
+    //TriglavPlugInRect targetRect;
+    //pOffscreenService->getRectProc(&targetRect, destOffscreen);
+    ////targetPos.x = selectAreaRect.left - targetRect.left;
+    ////targetPos.y = selectAreaRect.top - targetRect.top;
+    //targetPos.x =-targetRect.left;
+    //targetPos.y = -targetRect.top;
+
+    
+
+
     runPluginServer->serviceSuite.offscreenService->setBitmapProc
     (destOffscreen, &targetPos, renderBitmap, &zero, originTexture.GetSizeW(), originTexture.GetSizeH(), kTriglavPlugInOffscreenCopyModeNormal);
+    //(destOffscreen, hasSelectArea ? &targetPos:&zero, renderBitmap, &zero, originTexture.GetSizeW(), originTexture.GetSizeH(), kTriglavPlugInOffscreenCopyModeNormal);
 
 
     //    std::cout<<"destOffscreen:"<<destOffscreen<<",SourceOffscreen:"<<sourceOffscreen<<",Right:"<<selectAreaRect.right<<",Bottom:"<<selectAreaRect.bottom<<std::endl;
