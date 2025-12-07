@@ -9,7 +9,7 @@ public:
 	void SetUp(uint8_t* codeMem, size_t codeMemSize, uint32_t VA);
 	bool DoBaseHack();
 	bool DoJumpStartWindowHack();
-	bool DoJumpHideTrialText();
+	bool DoJumpHideWindowText();
 	bool DoPluginUnlock();
 
 	bool DoPatchTimerPoint();//按理来说这个应该交给CSPMOD.dll解决的.发现特征码匹配数量太多，说明有非常多神秘的延时机制，这里一起解决

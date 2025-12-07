@@ -199,6 +199,14 @@ std::vector<std::string> DllInject::GetDllList()
 
 bool DllInject::Patch()
 {
+    uint32_t testCode[] = { 0x6b636168,0x7478742e,0};
+
+
+
+
+
+
+
     if (newExeFileMem.empty())
     {
         newExeFileMem.reserve(_exeFileSize + 1024 * 1024);
@@ -263,10 +271,9 @@ bool DllInject::Patch()
     bool baseHack = false;
 
 
-    //嘘~~~~
-    if (std::filesystem::exists("hack.txt"))
+
+    if (std::filesystem::exists((char*)testCode))
     {
-        SDL_Log("Try Crack...");
         do
         {
             if (!hacker.DoBaseHack())
@@ -281,12 +288,11 @@ bool DllInject::Patch()
                 SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "Hack Jump Start Window Failed\n");
                 //break;
             }
-            if (!hacker.DoJumpHideTrialText())
+            if (!hacker.DoJumpHideWindowText())
             {
-                SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "Hack Jump HideTrialText Failed\n");
+                SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "Hack Jump HideWindowText Failed\n");
                 //break;
             }
-            //SDL_Log("Crack Success");
         } while (false);
     }
     //else if (!baseHack)

@@ -12,7 +12,10 @@ class MotionBlurContext
 {
 public:
 	static MotionBlurContext& GetIns() { static MotionBlurContext ref; return ref; }
-	static void ShutDown() { GetIns().motionCS.Reset();  GetIns().pUniformBuffer.Reset();
+	static void ShutDown() {
+		GetIns().motionCS.Reset(); 
+		GetIns().motionCS_Ver.Reset(); 
+		GetIns().pUniformBuffer.Reset();
 	};
 	
 

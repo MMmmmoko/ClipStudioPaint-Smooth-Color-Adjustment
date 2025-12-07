@@ -41,11 +41,10 @@ void CSPHacker::SetUp(uint8_t* codeMem, size_t codeMemSize, uint32_t VA)
 
 
 
-//CSP的正版检测目前看来像是一段宏插进代码的，而不是写在函数内的。
+//CSP的lic检测目前看来像是一段宏插进代码的，而不是写在函数内的。
 //其有如下特征
 
 
-//注：代码来自CSP4.0.3
 //00000001403AE6B9 | E8 52941B03 | call <clipstudiopaint.checkData> |
 // 
 // 
@@ -73,7 +72,7 @@ void CSPHacker::SetUp(uint8_t* codeMem, size_t codeMemSize, uint32_t VA)
 // 
 //00000001403AE6D1 | 48 : 8BC8 | mov rcx, rax |
 // 
-//00000001403AE6D4 | E8 F7F61203 | call <clipstudiopaint.重要正版检测函数？> |
+//00000001403AE6D4 | E8 F7F61203 | call <clipstudiopaint.checklic> |
 //00000001403AE6D9 | 85C0 | test eax, eax |
 // 
 // 
@@ -366,7 +365,7 @@ bool CSPHacker::DoJumpStartWindowHack()
     return false;
 }
 
-bool CSPHacker::DoJumpHideTrialText()
+bool CSPHacker::DoJumpHideWindowText()
 {
     uint8_t jumpFeature[] = {
         0x7E ,0x57//2
