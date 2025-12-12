@@ -4,6 +4,7 @@
 
 
 
+
 # CSP流畅调色 ClipStudioPaint-Smooth-Color-Adjustment
 
 使用前请务必详细阅读此Readme文件！
@@ -87,6 +88,10 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 ***注意！应用后期组是一个不可撤回、不稳定的功能，不论是为了防止结果与期望不同还是防止中途软件崩溃，你都应该在执行前对作品进行保存！**
 ***注意！“后期”图层组下方不应该有其他调色功能的图层（带混合模式的图层或者色调调整图层），这会使执行结果与预期出现明显不同**
+
+## 移除插件
+
+现在插件不会对任何CSP文件进行修改，所以放了什么东西进官方文件夹里就删掉什么就好了。注意在较新的版本中我将3个需要放进`Plugin\PAINT\`文件夹中的.dll文件在压缩包中也直接按路径放置好了，这样安装的时候直接将整个解压出的内容全部放进官方文件夹就好不需要再手动打开`Plugin\PAINT\`文件夹。但删除时别直接删官方的`Plugin\PAINT\`文件夹，在里面手动删掉我提供的AAload.dll和所有SmoothFilter_*.dll就OK了。
 
 ## 问题反馈
 

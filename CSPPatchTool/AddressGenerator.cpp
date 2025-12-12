@@ -156,7 +156,11 @@ void AddressGenerator::GenerateOutputFile()
 {
     if (!addrJson.empty())
     {
-        util::SaveJsonToFile(addrJson,"CSPAddrTable.json");
+        if (!util::SaveJsonToFile(addrJson, "CSPAddrTable.json"))
+        {
+            SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "写文件失败，请尝试右键以管理员身份运行此程序");
+            SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "The program does not have write permission for this folder. Please try running this program as administrator.");
+        }
     }
 
 

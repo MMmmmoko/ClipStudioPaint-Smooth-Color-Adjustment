@@ -12,7 +12,7 @@ void CSPHacker::SetUp(uint8_t* codeMem, size_t codeMemSize, uint32_t VA)
     { _codeMem = codeMem; _codeMemSize = codeMemSize; _VA=VA; }
 
     _FindCheckDataFunc();
-    _FindCheckLicense();
+    _FindCheckLic();
 
 
     if (0 == pos_CheckData)
@@ -583,7 +583,7 @@ bool CSPHacker::_FindCheckDataFunc()
     return false;
 }
 
-bool CSPHacker::_FindCheckLicense()
+bool CSPHacker::_FindCheckLic()
 {
     //特征在4.2.0后发生了变化
     //现在转为调用特征匹配
@@ -595,7 +595,7 @@ bool CSPHacker::_FindCheckLicense()
     //    00007FF68BF1984F | E8 5C0D1B03 | call <clipstudiopaint.valueof(1450209B8)> |
     //    00007FF68BF19854 | 48 : 898424 F04E0000 | mov qword ptr ss : [rsp + 4EF0] , rax | rax : EntryPoint
     //    00007FF68BF1985C | 48 : 8B8C24 F04E0000 | mov rcx, qword ptr ss : [rsp + 4EF0] |
-    //    00007FF68BF19864 | E8 67451B03 | call <clipstudiopaint.CheckLicense> |
+    //    00007FF68BF19864 | E8 67451B03 | call <clipstudiopaint.CheckLic> |
 
     //取这样一个特征并检查调用的函数地址、rsp+X是否相等
 

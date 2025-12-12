@@ -21,7 +21,7 @@ public:
 
 private:
 	bool _FindCheckDataFunc();
-	bool _FindCheckLicense();
+	bool _FindCheckLic();
 	bool _MatchCallChekData(size_t pos);
 	bool _MatchCallValueOf1450209b8(size_t pos);
 	bool _MatchCallCheckLicense(size_t pos);
