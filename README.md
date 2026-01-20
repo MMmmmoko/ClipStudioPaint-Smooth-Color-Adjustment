@@ -56,6 +56,8 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 <img src="Docs/Images/readme_pluginfoldScreenCapture.png"/>
 
+**注意！不要使用第三方文件浏览器进行操作！可能会导致路径问题！**
+
 ### 色调调整&色调调整图层&模糊滤镜
 
 进入软件后，调色功能按以往的方式直接使用即可。本辅助工具支持色相明度饱和度、色彩平衡、曲线的预览。

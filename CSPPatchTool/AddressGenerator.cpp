@@ -137,6 +137,42 @@ bool AddressGenerator::PushCspVersion()
             }
         }
     }
+    //4.0版本寻找UDM版本号码
+    {
+        //wchar_t str1[] = L"PAINT\0\0\0\0ProductVersion";
+        wchar_t str1[] = L"ProductVersion";
+        wchar_t str2[] = L"VarFileInfo";
+
+
+
+        for (size_t i = 0; i < _parent->newExeFileMem.size() - sizeof(str1); i++)
+        {
+            if (_MatchFeatureCode(_parent->newExeFileMem.data() + i, (uint8_t*)str1, sizeof(str1)))
+            {
+                //匹配成功后在后方小段字节内寻找VarFileInfo
+                //成功则视为有效
+                for (size_t j = i+sizeof(str1); j < _parent->newExeFileMem.size() - sizeof(str2)
+                    && j < i + sizeof(str1)+32; j++)
+                {
+                    if (_MatchFeatureCode(_parent->newExeFileMem.data() + j, (uint8_t*)str2, sizeof(str2)))
+                    {
+                        wchar_t* getPos = (wchar_t*)(_parent->newExeFileMem.data() + i + sizeof(str1));
+                        char buffer[256];
+                        size_t receiveSize;
+                        auto err = wcstombs_s(&receiveSize, buffer, getPos, sizeof(buffer));
+                        addrJson["CspVersion"] = buffer;
+                        addrJson["IsUDM"] = true;
+                        addrJson["CspAddressRVA"]["CspVersion"] = _parent->FOA2RVA(i) + sizeof(str1);
+
+
+                        printf("UDM Version: %s\n", buffer);
+
+                        return true;
+                    }
+                }
+            }
+        }
+    }
 
 
 
