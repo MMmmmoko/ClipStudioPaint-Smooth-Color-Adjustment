@@ -19,6 +19,13 @@ void AddressGenerator::PushLayerObjectAddr()
 	0x48,0x8B,0xD9,0x74,0x36,0xE8,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,
 	0x8B,0xC8,0xE8,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,
 	0x85,0xC0,0x75,0x2E,0x48,0x8B,0xCB
+
+
+	//	40,53,48,83,EC,20,
+	//48,83,3D,??, ??,??,??,00,
+	//48,8B,D9,74,36,E8, ? ? , ? ? , ? ? , ? ? ,
+	//8B,C8,E8, ? ? , ? ? , ? ? , ? ? ,
+	//85,C0,75,2E,48,8B,CB
 		};
 
 
@@ -102,27 +109,28 @@ void AddressGenerator::PushLayerObjectAddr()
 
 
 	//图层设置可见性
-	{
+	//实际代码中没有用到 且在新版本中提示找不到目标函数，这段舍弃掉先
 
-		uint8_t layerObjectSetVisibleFuncFeature[] = {
-			0x48,0x89,0x5C,0x24,0x10,0x48,0x89,0x4C,0x24,0x08,0x55,0x56,0x57,0x41,0x54,0x41,0x55,0x41,0x56,0x41,0x57,0x48,0x8B,0xEC,0x48,0x83,0xEC,0x70,0x4D,0x8B,0xE0,0x44,0x8B,0xEA,0x4C,0x8B,0xF1,0x48,0x8B,0x09,0x48,0x85,0xC9,0x75,0x3D
-		};
-		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectSetVisibleFuncFeature); i++)
-		{
-			if (_MatchFeatureCode(_codeMem + i, layerObjectSetVisibleFuncFeature, sizeof(layerObjectSetVisibleFuncFeature)))
-			{
-				SDL_Log("LayerObject SetVisible Func Finded.");
-				addrJson["CspAddressRVA"]["LayerObject_SetVisible_Func"] = _VA + i;
-				success = true;
-				break;
-			}
-		}
-		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject SetVisible Func Not Found!");
+	//{
 
-	}
+	//	uint8_t layerObjectSetVisibleFuncFeature[] = {
+	//		0x48,0x89,0x5C,0x24,0x10,0x48,0x89,0x4C,0x24,0x08,0x55,0x56,0x57,0x41,0x54,0x41,0x55,0x41,0x56,0x41,0x57,0x48,0x8B,0xEC,0x48,0x83,0xEC,0x70,0x4D,0x8B,0xE0,0x44,0x8B,0xEA,0x4C,0x8B,0xF1,0x48,0x8B,0x09,0x48,0x85,0xC9,0x75,0x3D
+	//	};
+	//	bool success = false;
+	//	for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectSetVisibleFuncFeature); i++)
+	//	{
+	//		if (_MatchFeatureCode(_codeMem + i, layerObjectSetVisibleFuncFeature, sizeof(layerObjectSetVisibleFuncFeature)))
+	//		{
+	//			SDL_Log("LayerObject SetVisible Func Finded.");
+	//			addrJson["CspAddressRVA"]["LayerObject_SetVisible_Func"] = _VA + i;
+	//			success = true;
+	//			break;
+	//		}
+	//	}
+	//	if (!success)
+	//		SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject SetVisible Func Not Found!");
 
+	//}
 
 
 	//获取菜单参数2

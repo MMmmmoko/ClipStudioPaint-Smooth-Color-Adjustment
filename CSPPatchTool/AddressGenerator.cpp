@@ -34,6 +34,36 @@ bool AddressGenerator::PushAddressData()
 
 
 
+void AddressGenerator::RunAsBaseAddrScanner()
+{
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 bool AddressGenerator::_MatchFeatureCode(uint8_t* dest, uint8_t* fetureCode, size_t codeSize)
 {
     for (size_t i = 0; i < codeSize; i++)

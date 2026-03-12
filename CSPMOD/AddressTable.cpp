@@ -182,3 +182,8 @@ std::vector<int> AddressTable::GetOffsetList(const char* offsetName)
     }
     return result;
 }
+
+std::string_view AddressTable::GetCSPVersion()
+{
+    return ins.cspVersion;
+}

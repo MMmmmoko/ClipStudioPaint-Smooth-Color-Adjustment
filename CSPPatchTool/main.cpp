@@ -17,6 +17,8 @@ void ProcessCSP(uint8_t* mem,size_t size,DllInject::EXETYPE exeType)
     cspExeInject.Patch();
 }
 
+
+
 void SetUpLogFunc()
 {
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -100,6 +102,9 @@ void SetUpLogFunc()
 
 int main()
 {
+
+
+
     SetUpLogFunc();
 	const char* CSP_Path = "CLIPStudioPaint.exe";
     const char* UDM_Path = "UDMPaintPRO.exe";

@@ -23,9 +23,20 @@ void TA_ToneCurve::Init()
 	void* _updatFuncAddr = AddressTable::GetAddress("ToneCurve_UpdatFunc");
 
 
+
+
+
+
+
+	RealBaseAddr = AddressTable::GetAddress("ToneCurve_BaseAddr");
+
+
+
+
+
 	if (pToneCurveDialogFunc && pToneCurveDialogFunc_Layer && pToneCurveBeforeDrawFunc && pToneCurveOnParamChangeFunc
 		&& pToneCurvePatchAddr1&& pToneCurvePatchAddr2&& pToneCurvePatchAddr3 && pToneCurvePatchAddr4
-		&& _updatFuncAddr
+		&& _updatFuncAddr&& RealBaseAddr
 		)
 	{
 		isAvailable = true;
@@ -72,17 +83,46 @@ int64_t TA_ToneCurve::Hook_ToneCurveDialog(uintptr_t arg1, uintptr_t arg2, uintp
 	uintptr_t spCurFunc = CSPMOD::GetRsp();//147cd8
 
 	//根据栈顶获取一系列地址
+	
 
-	baseAddr = spCurFunc;
-	pPreview = spCurFunc - 0xb48;
-	pCurrentPanel = spCurFunc - 0xb20;
-	pCurrentPanel_off = 0;
-	pRGB_Data = spCurFunc - 0xa80;
-	pR_Data = spCurFunc - 0xa80 + 0x208;
-	pG_Data = spCurFunc - 0xa80 + 0x208 + 0x208;
-	pR_Data = spCurFunc - 0xa80 + 0x208 + 0x208 + 0x208;
+	//差异化!CSP5.0之后地址有变化
+
+	std::string version = AddressTable::GetCSPVersion().data();
+	if (std::atoi(version.substr(0, version.find('.')).c_str()) >= 5)//5.0.0以上版本
+	{
+		//arg1 - 0xEA0;
+		//arg2 - 0xF78;
+		//arg3 - 0x3490;
+		baseAddr = spCurFunc;
+		//pPreview = spCurFunc - 0xb48;
+		pCurrentPanel = spCurFunc - 0xb20;
+		pCurrentPanel_off = 0;
+		pRGB_Data = spCurFunc - 0xa80;
+		pR_Data = spCurFunc - 0xa80 + 0x208;
+		pG_Data = spCurFunc - 0xa80 + 0x208 + 0x208;
+		pR_Data = spCurFunc - 0xa80 + 0x208 + 0x208 + 0x208;
+	}
+	else
+	{
+		baseAddr = spCurFunc;
+		//pPreview = spCurFunc - 0xb48;
+		pCurrentPanel = spCurFunc - 0xb20;
+		pCurrentPanel_off = 0;
+		pRGB_Data = spCurFunc - 0xa80;
+		pR_Data = spCurFunc - 0xa80 + 0x208;
+		pG_Data = spCurFunc - 0xa80 + 0x208 + 0x208;
+		pR_Data = spCurFunc - 0xa80 + 0x208 + 0x208 + 0x208;
+	}
 
 
+
+
+
+
+
+
+
+	//SDL_Log("arg1:%p,arg2:%p,arg3:%p,preview %p.", arg1, arg2,arg3, pPreview);
 
 	ajustWorking = true;
 	auto result = orig_ToneCurveDialog(arg1, arg2, arg3);
@@ -110,14 +150,19 @@ int64_t TA_ToneCurve::Hook_ToneCurveLayerDialog(uintptr_t arg1, uintptr_t arg2, 
 	//获取栈顶
 	uintptr_t spCurFunc = CSPMOD::GetRsp();//0x148018;
 
-	//根据栈顶获取一系列地址
-	baseAddr = spCurFunc;
-	pPreview = 0;
-	pCurrentPanel = spCurFunc - 0x1cf0;
-	pRGB_Data = spCurFunc - 0x10f8 ;
-	pR_Data = spCurFunc - 0x10f8 + 0x82;
-	pG_Data = spCurFunc - 0x10f8 + 0x82 + 0x82;
-	pR_Data = spCurFunc - 0x10f8 + 0x82 + 0x82 + 0x82;
+
+
+	{
+		//根据栈顶获取一系列地址
+		baseAddr = spCurFunc;
+		//pPreview = 0;
+		pCurrentPanel = spCurFunc - 0x1cf0;
+		pRGB_Data = spCurFunc - 0x10f8;
+		pR_Data = spCurFunc - 0x10f8 + 0x82;
+		pG_Data = spCurFunc - 0x10f8 + 0x82 + 0x82;
+		pR_Data = spCurFunc - 0x10f8 + 0x82 + 0x82 + 0x82;
+	}
+
 
 	//刷新off数值
 	_GetCurrentPanelPointList();
@@ -184,22 +229,21 @@ int64_t TA_ToneCurve::Hook_ToneCurveParamChange(uintptr_t arg1, uintptr_t arg2, 
 
 
 
-	uint32_t curPanel;
-	if (!CSPMOD::TryGetValue(pCurrentPanel+pCurrentPanel_off, &curPanel))return result;
-
-
-
 
 	if (ajustWorking)
 	{
 		bool isPreview;
-		if (!CSPMOD::TryGetValue(pPreview, &isPreview))return result;
+		if (!_TryGetIsPreview(&isPreview))return result;
 
 		if (!isPreview)
 			return result;
 
+		if (!_TryGetPRGBData(&pRGB_Data))
+			return result;
 
-
+		//SDL_Log("RGB %llu,%f,%f",*(uint32_t*)pRGB_Data, *(double*)(pRGB_Data+8), *(double*)(pRGB_Data + 16));
+		uint32_t curPanel;
+		if (!_TryGetCurrentPanel(&curPanel))return result;
 		uintptr_t pointData = pRGB_Data + 0x208 * curPanel;
 		//数据复制到栈区
 
@@ -268,6 +312,9 @@ int64_t TA_ToneCurve::Hook_ToneCurveParamChange(uintptr_t arg1, uintptr_t arg2, 
 		//return result;
 
 
+
+	uint32_t curPanel;
+	if (!CSPMOD::TryGetValue(pCurrentPanel+pCurrentPanel_off, &curPanel))return result;
 
 
 
@@ -369,6 +416,44 @@ TA_ToneCurve::CurvePointList TA_ToneCurve::_GetCurrentPanelPointList()
 if (ajustWorking)
 {
 
+
+
+	{
+		uintptr_t value = 0;
+		do
+		{
+			value = *(uintptr_t*)(RealBaseAddr);
+			SAFEGETVALUE(value + 0xA0);
+			SAFEGETVALUE(value + 0x280);
+			SAFEGETVALUE(value + 0x1B0);
+			SAFEGETVALUE(value + 0x10);
+			SAFEGETVALUE(value + 0x8);
+			SAFEGETVALUE(value + 0x28);
+			SAFEGETVALUE(value + 0x8);
+		} while (false);
+		if (CSPMOD::IsPtrValid(value))return *(CurvePointList*)value;
+		else return CurvePointList();
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	uintptr_t value=0;
 	do
 	{
@@ -380,6 +465,9 @@ if (ajustWorking)
 		SAFEGETVALUE(value + 0x28);
 		SAFEGETVALUE(value + 0x8);
 	} while (false);
+
+	
+
 	if (CSPMOD::IsPtrValid(value))return *(CurvePointList*)value;
 	else return CurvePointList();
 }
@@ -427,6 +515,8 @@ if (layerWorking)
 
 
 		} while (false);
+
+
 		if (CSPMOD::IsPtrValid(value))return *(CurvePointList*)value;
 
 
@@ -438,4 +528,42 @@ if (layerWorking)
 
 
 return CurvePointList();
+}
+
+bool TA_ToneCurve::_TryGetIsPreview(bool* outResult)
+{
+	*outResult = false;
+
+
+	//末端偏移60 90 150 1B0 1D0 278
+
+	uintptr_t pPreview = *(uintptr_t*)(RealBaseAddr);
+	if (!CSPMOD::IsPtrValid(pPreview + 0x60))return false;
+	*outResult = *(bool*)(pPreview + 0x60);
+
+	return true;
+}
+
+bool TA_ToneCurve::_TryGetPRGBData(uintptr_t* outPRGBData)
+{
+	*outPRGBData = 0;
+
+	uintptr_t pPreview = *(uintptr_t*)(RealBaseAddr);
+	uintptr_t off;
+	if (ajustWorking)off = 0x128;
+	else if (layerWorking)SDL_assert(false&&"todo");
+	else return false;
+
+	if (!CSPMOD::IsPtrValid(pPreview + off))return false;
+	*outPRGBData = (pPreview + off);
+
+	return true;
+}
+
+bool TA_ToneCurve::_TryGetCurrentPanel(uint32_t* outCurrentPanel)
+{
+	uintptr_t pPreview = *(uintptr_t*)(RealBaseAddr);
+	if (!CSPMOD::IsPtrValid(pPreview + 0x88))return false;
+	*outCurrentPanel = *(uint32_t*)(pPreview + 0x88);
+	return true;
 }

@@ -38,6 +38,15 @@ public:
 	void GenerateOutputFile();
 
 
+
+
+
+
+
+	//以基址扫描器运行
+	void RunAsBaseAddrScanner();
+
+
 private:
 	static bool _MatchFeatureCode(uint8_t* dest, uint8_t* fetureCode, size_t codeSize);
 

@@ -43,7 +43,11 @@ void LayerObject::Init()
     layerBaseAddr = AddressTable::GetAddress("LayerObject_Base");
 	layer_selectThisLayerFuncAddr = AddressTable::GetAddress("LayerObject_SelectThisLayer_Func");
 	layer_duplicateFuncAddr = AddressTable::GetAddress("LayerObject_Duplicate_Func");
+
+	//注意，这个设置可见的函数在是未使用的 且CSP5.0后没找到
 	layer_setVisibleFuncAddr = AddressTable::GetAddress("LayerObject_SetVisible_Func");
+
+
 	layer_moveUpFuncAddr = AddressTable::GetAddress("LayerObject_MoveUp_Func");
 	layer_moveDownFuncAddr = AddressTable::GetAddress("LayerObject_MoveDown_Func");
 	layer_mergeDownFuncAddr = AddressTable::GetAddress("LayerObject_MergeDown_Func");

@@ -42,6 +42,8 @@ private:
 
 	static inline void* updatFuncAddr = nullptr;
 
+	static inline void* RealBaseAddr = nullptr;
+
 
 
 
@@ -53,12 +55,15 @@ private:
 		double* pEnd = nullptr;
 	};
 	static CurvePointList _GetCurrentPanelPointList();
+	static bool _TryGetIsPreview(bool* outResult);
+	static bool _TryGetPRGBData(uintptr_t* outPRGBData);
+	static bool _TryGetCurrentPanel(uint32_t* outCurrentPanel);
 
 	static inline bool inited = false;
 
 	static inline uintptr_t baseAddr;
 
-	static inline uintptr_t pPreview;
+	//static inline uintptr_t pPreview;
 	static inline uintptr_t pCurrentPanel;
 	static inline intptr_t pCurrentPanel_off;
 	static inline uintptr_t pRGB_Data;//前四字节标识数字，然后四字节位置，每8字节一个双浮点数，没两个双浮点数标识一个坐标

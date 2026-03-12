@@ -38,7 +38,7 @@ public:
 
 	static void* GetAddress(const char* addrName);
 	std::vector<int> GetOffsetList(const char* offsetName);
-	std::string_view GetCSPVersion() { return cspVersion; };
+	static std::string_view GetCSPVersion();
 	
 
 private:

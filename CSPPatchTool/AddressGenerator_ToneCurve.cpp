@@ -6,32 +6,116 @@ void AddressGenerator::_PushToneCurveAddr()
 {
 	SDL_Log("Start Find ToneCurve Addresses...");
 	{
-		//对话框
-		uint8_t tonecCurveDialogFuncFeature[] = {
-			0x48 ,0x89 ,0x5C ,0x24 ,0x20
-,0x55
-,0x56
-,0x57
-,0x41 ,0x54
-,0x41 ,0x55
-,0x41 ,0x56
-,0x41 ,0x57
-,0x48 ,0x8D ,0xAC ,0x24 ,0xA0 ,0xF3 ,0xFF ,0xFF
-,0x48 ,0x81 ,0xEC ,0x60 ,0x0D ,0x00 ,0x00
-,0x48 ,0x8B ,0x05 ,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD
-,0x48 ,0x33 ,0xC4
-,0x48 ,0x89 ,0x85 ,0x50 ,0x0C ,0x00 ,0x00
-		};
+		//曲线对话框
+
+		//转用调用特征
+		uint8_t tonecCurveDialogFuncFeature1[] = {
+0x44,0x8B,0xCE,0x4C,0x8D,0x85,0xB0,0x2C,0x00,0x00,//10
+0x48,0x8B,0xD0,0x48,0x8D,0x8D,0x80,0x00,0x00,0x00,//10
+0xE8,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD };
+		uint8_t tonecCurveDialogFuncFeature2[] = {
+0x4C,0x8D,0x85,0x00,0x26,0x00,0x00,0x48,0x8B,0xD0,//10
+0x48,0x8D,0x4D,0x10,//4
+0xE8,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD};
+		uint8_t tonecCurveDialogFuncFeatureOld[] = {
+						0x48 ,0x89 ,0x5C ,0x24 ,0x20
+			,0x55
+			,0x56
+			,0x57
+			,0x41 ,0x54
+			,0x41 ,0x55
+			,0x41 ,0x56
+			,0x41 ,0x57
+			,0x48 ,0x8D ,0xAC ,0x24 ,0xA0 ,0xF3 ,0xFF ,0xFF
+			,0x48 ,0x81 ,0xEC ,0x60 ,0x0D ,0x00 ,0x00
+			,0x48 ,0x8B ,0x05 ,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD
+			,0x48 ,0x33 ,0xC4
+			,0x48 ,0x89 ,0x85 ,0x50 ,0x0C ,0x00 ,0x00
+
+
+			,0x4D,0x8B,0xE8
+			,0x4C,0x8B,0xFA
+			,0x4C,0x8B,0xF1
+			,0x48,0x89,0x4D,0x10
+			,0x48,0x89,0x55,0x18
+			,0x48,0x8B,0x09
+			,0x48,0x85,0xC9
+			};
+
+
+
+
+
+
+
+
+//在4.2.2版本这个特征能搜索到两个结果，第一个结果正好是曲线对话框所以4.2.2有效
+//但是5.0.0只能搜到一个结果且这个结果并不是曲线对话框
+//			48 ,89 ,5C ,24 ,20
+//,55
+//,56
+//,57
+//,41 ,54
+//,41 ,55
+//,41 ,56
+//,41 ,57
+//,48 ,8D ,AC ,24 ,A0 ,F3 ,FF ,FF
+//,48 ,81 ,EC ,60 ,0D ,00 ,00
+//,48 ,8B ,05 ,??, ??,??,??
+//,48 ,33 ,C4
+//,48 ,89 ,85 ,50 ,0C ,00 ,00
+
+
+//,4D,8B,E8
+//,4C,8B,FA
+//,4C,8B,F1
+//,48,89,4D,10
+//,48,89,55,18
+//,48,8B,09
+//,48,85,C9
+
 	
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveDialogFuncFeature); i++)
+		for (uint32_t i = 0; i < _codeMemSize - sizeof(tonecCurveDialogFuncFeature1); i++)
 		{
-			if (_MatchFeatureCode(_codeMem + i, tonecCurveDialogFuncFeature, sizeof(tonecCurveDialogFuncFeature)))
+			if (_MatchFeatureCode(_codeMem + i, tonecCurveDialogFuncFeature1, sizeof(tonecCurveDialogFuncFeature1)))
 			{
+				int32_t off = *(int32_t*)(_codeMem + i +
+					+10+10+1);
 				SDL_Log("ToneCurve Dialog Func Finded.");
-				addrJson["CspAddressRVA"]["ToneCurve_Dialog_Func"] = _VA + i;
+				addrJson["CspAddressRVA"]["ToneCurve_Dialog_Func"] = _VA + i+10+10+5+off;
 				success = true;
 				break;
+			}
+		}
+
+		if (!success)
+		{
+			for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveDialogFuncFeature2); i++)
+			{
+				if (_MatchFeatureCode(_codeMem + i, tonecCurveDialogFuncFeature2, sizeof(tonecCurveDialogFuncFeature2)))
+				{
+					int32_t off = *(int32_t*)(_codeMem + i +
+						+10 + 4 + 1);
+					SDL_Log("ToneCurve Dialog Func Finded.");
+					addrJson["CspAddressRVA"]["ToneCurve_Dialog_Func"] = _VA + i + 10 + 4 + 5 + off;
+					success = true;
+					break;
+				}
+			}
+		}
+
+		if (!success)
+		{
+			for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveDialogFuncFeatureOld); i++)
+			{
+				if (_MatchFeatureCode(_codeMem + i, tonecCurveDialogFuncFeatureOld, sizeof(tonecCurveDialogFuncFeatureOld)))
+				{
+					SDL_Log("ToneCurve Dialog Func Finded.");
+					addrJson["CspAddressRVA"]["ToneCurve_Dialog_Func"] = _VA + i;
+					success = true;
+					break;
+				}
 			}
 		}
 		if (!success)
@@ -332,7 +416,37 @@ void AddressGenerator::_PushToneCurveAddr()
 
 
 
+	{
 
+		//曲线对话框中预览的基址
+		//CE 于4.2.2版本中显示为 .exe+05178fd0
+		uint8_t tonecCurvePreviewBaseAddrFeature[] = {
+
+				0x48,0x89,0x03,0x49,0x89,0x6E,0x18,0x49,0x89,0x6E,
+				0x20,0x41,0xC7,0x46,0x2C,0x01,0x00,0x00,0x00,0x41,
+				0x89,0x7E,0x28,0x85,0xF6,0x75,0x2C,0x4C,0x3B,0x35,
+				BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD,
+				0x74,0x23
+		};
+
+
+
+
+		bool success = false;
+		for (uint32_t i = 0; i < _codeMemSize - sizeof(tonecCurvePreviewBaseAddrFeature); i++)
+		{
+			if (_MatchFeatureCode(_codeMem + i, tonecCurvePreviewBaseAddrFeature, sizeof(tonecCurvePreviewBaseAddrFeature)))
+			{
+				SDL_Log("ToneCurve Preview BaseAddr Finded."); 
+				uint32_t addrOff = *(uint32_t*)(_codeMem + i + 30);
+				addrJson["CspAddressRVA"]["ToneCurve_BaseAddr"] = _VA + i+30+4+ addrOff;
+				success = true;
+				break;
+			}
+		}
+		if (!success)
+			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurve BaseAddr Not Found!");
+	}
 
 
 

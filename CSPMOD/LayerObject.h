@@ -72,7 +72,7 @@ private:
 	static inline void* layerBaseAddr = 0;
 	static inline void* layer_selectThisLayerFuncAddr = 0;
 	static inline void* layer_duplicateFuncAddr = 0;
-	static inline void* layer_setVisibleFuncAddr = 0;
+	static inline void* layer_setVisibleFuncAddr = 0;//注意，这个设置可见的函数在是未使用的 且CSP5.0后没找到
 	static inline void* layer_moveUpFuncAddr = 0;
 	static inline void* layer_moveDownFuncAddr = 0;
 	static inline void* layer_mergeDownFuncAddr = 0;
