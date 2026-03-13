@@ -11,7 +11,8 @@ public:
 	static bool IsEnabled() { return isEnabled; };
 private:
 
-	static int64_t Hook_ToneCurveDialog(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3);
+	//static int64_t Hook_ToneCurveDialog(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3);
+	static int64_t Hook_ToneCurveDialog(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4);
 	static int64_t Hook_ToneCurveLayerDialog(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4);
 	static int64_t Hook_ToneCurveParamChange(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3);
 	static int64_t Hook_ToneCurveBeforeDraw(uintptr_t arg1, uintptr_t arg2);
@@ -28,7 +29,8 @@ private:
 
 
 
-	static inline int64_t(*orig_ToneCurveDialog)(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3) = NULL;
+	//static inline int64_t(*orig_ToneCurveDialog)(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3) = NULL;
+	static inline int64_t(*orig_ToneCurveDialog)(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3,uintptr_t arg4) = NULL;
 	static inline int64_t(*orig_ToneCurveLayerDialog)(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4) = NULL;
 	static inline int64_t(*orig_ToneCurveParamChange)(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3) = NULL;
 	static inline int64_t(*orig_ToneCurveBeforeDraw)(uintptr_t arg1, uintptr_t arg2) = NULL;

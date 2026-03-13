@@ -74,9 +74,9 @@ void TA_ToneCurve::Disable()
 		isEnabled = false;
 	}
 }
-int64_t TA_ToneCurve::Hook_ToneCurveDialog(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3)
+int64_t TA_ToneCurve::Hook_ToneCurveDialog(uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4)
 {
-	if(!isEnabled)return orig_ToneCurveDialog(arg1, arg2, arg3);
+	if(!isEnabled)return orig_ToneCurveDialog(arg1, arg2, arg3, arg4);
 
 
 
@@ -125,7 +125,7 @@ int64_t TA_ToneCurve::Hook_ToneCurveDialog(uintptr_t arg1, uintptr_t arg2, uintp
 	//SDL_Log("arg1:%p,arg2:%p,arg3:%p,preview %p.", arg1, arg2,arg3, pPreview);
 
 	ajustWorking = true;
-	auto result = orig_ToneCurveDialog(arg1, arg2, arg3);
+	auto result = orig_ToneCurveDialog(arg1, arg2, arg3,arg4);
 	ajustWorking = false;
 
 	paramOfBeforeDraw0 = 0;
