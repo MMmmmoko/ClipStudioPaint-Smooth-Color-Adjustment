@@ -1,6 +1,4 @@
 #include"AddressGenerator.h"
-#include"DllInject.h"
-#include<SDL3/SDL.h>
 
 
 
@@ -8,7 +6,7 @@
 
 void AddressGenerator::_PushColorBalanceAddr()
 {
-	SDL_Log("Start Find ColorBalance Addresses...");
+	Log("Start Find ColorBalance Addresses...");
 	{
 		//色彩平衡创建对话框
 		uint8_t colorBalanceDialogFuncFeature[] = {
@@ -20,18 +18,18 @@ void AddressGenerator::_PushColorBalanceAddr()
 		};
 
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(colorBalanceDialogFuncFeature); i++)
+		for (size_t i = 0; i + sizeof(colorBalanceDialogFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, colorBalanceDialogFuncFeature, sizeof(colorBalanceDialogFuncFeature)))
 			{
-				SDL_Log("ColorBalance Dialog Func Finded.");
+				Log("ColorBalance Dialog Func Finded.");
 				addrJson["CspAddressRVA"]["ColorBalance_Dialog_Func"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ColorBalance Dialog Func Not Found!");
+			LogError( "ColorBalance Dialog Func Not Found!");
 	}
 
 
@@ -52,18 +50,18 @@ void AddressGenerator::_PushColorBalanceAddr()
 
 
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(colorBalanceLayerDialogFuncFeature); i++)
+		for (size_t i = 0; i + sizeof(colorBalanceLayerDialogFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, colorBalanceLayerDialogFuncFeature, sizeof(colorBalanceLayerDialogFuncFeature)))
 			{
-				SDL_Log("ColorBalanceLayer Dialog Func Finded.");
+				Log("ColorBalanceLayer Dialog Func Finded.");
 				addrJson["CspAddressRVA"]["ColorBalanceLayer_Dialog_Func"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ColorBalanceLayer Dialog Func Not Found!");
+			LogError( "ColorBalanceLayer Dialog Func Not Found!");
 	}
 
 	{
@@ -97,18 +95,18 @@ void AddressGenerator::_PushColorBalanceAddr()
 
 
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(colorBalanceBeforeDrawFuncFeature); i++)
+		for (size_t i = 0; i + sizeof(colorBalanceBeforeDrawFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, colorBalanceBeforeDrawFuncFeature, sizeof(colorBalanceBeforeDrawFuncFeature)))
 			{
-				SDL_Log("ColorBalanceLayer BeforeDraw Func Finded.");
+				Log("ColorBalanceLayer BeforeDraw Func Finded.");
 				addrJson["CspAddressRVA"]["ColorBalance_BeforeDraw_Func"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ColorBalanceLayer BeforeDraw Func Not Found!");
+			LogError( "ColorBalanceLayer BeforeDraw Func Not Found!");
 	}
 
 	{
@@ -133,18 +131,18 @@ void AddressGenerator::_PushColorBalanceAddr()
 
 
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(colorBalanceOnParamChangeFuncFeature); i++)
+		for (size_t i = 0; i + sizeof(colorBalanceOnParamChangeFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, colorBalanceOnParamChangeFuncFeature, sizeof(colorBalanceOnParamChangeFuncFeature)))
 			{
-				SDL_Log("ColorBalanceLayer OnParamChange Func Finded.");
+				Log("ColorBalanceLayer OnParamChange Func Finded.");
 				addrJson["CspAddressRVA"]["ColorBalance_OnParamChange_Func"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ColorBalanceLayer OnParamChange Func Not Found!");
+			LogError( "ColorBalanceLayer OnParamChange Func Not Found!");
 	}
 
 		
@@ -167,18 +165,18 @@ void AddressGenerator::_PushColorBalanceAddr()
 
 
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(colorBalanceTimer1Feature); i++)
+		for (size_t i = 0; i + sizeof(colorBalanceTimer1Feature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, colorBalanceTimer1Feature, sizeof(colorBalanceTimer1Feature)))
 			{
-				SDL_Log("ColorBalanceLayer Timer1 Finded.");
+				Log("ColorBalanceLayer Timer1 Finded.");
 				addrJson["CspAddressRVA"]["ColorBalance_SkipTimer1"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ColorBalanceLayer Timer1 Not Found!");
+			LogError( "ColorBalanceLayer Timer1 Not Found!");
 	}
 #endif
 	{
@@ -197,18 +195,18 @@ void AddressGenerator::_PushColorBalanceAddr()
 
 
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(colorBalanceTimer2Feature); i++)
+		for (size_t i = 0; i + sizeof(colorBalanceTimer2Feature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, colorBalanceTimer2Feature, sizeof(colorBalanceTimer2Feature)))
 			{
-				SDL_Log("ColorBalanceLayer Timer2 Finded.");
+				Log("ColorBalanceLayer Timer2 Finded.");
 				addrJson["CspAddressRVA"]["ColorBalance_SkipTimer2"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ColorBalanceLayer Timer2 Not Found!");
+			LogError( "ColorBalanceLayer Timer2 Not Found!");
 	}
 
 

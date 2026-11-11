@@ -1,10 +1,8 @@
 #include"AddressGenerator.h"
-#include"DllInject.h"
-#include<SDL3/SDL.h>
 
 void AddressGenerator::PushCSPHelperAddr()
 {
-	SDL_Log("Start Find CSP Helper Entrance Addresses...");
+	Log("Start Find CSP Helper Entrance Addresses...");
 	{
 		uint8_t entranceFeature[] = {
 		0x48,0x89,0x5C,0x24,0x10,0x48,0x89,0x74,0x24,0x18,0x55,0x57,0x41,
@@ -37,11 +35,11 @@ void AddressGenerator::PushCSPHelperAddr()
 
 		};
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(entranceFeature); i++)
+		for (size_t i = 0; i + sizeof(entranceFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, entranceFeature, sizeof(entranceFeature)))
 			{
-				SDL_Log("CSPHelper Entrance Finded.");
+				Log("CSPHelper Entrance Finded.");
 				addrJson["CspAddressRVA"]["CSPHelper_Entrance"] = _VA + i;
 				success = true;
 				break;
@@ -49,11 +47,11 @@ void AddressGenerator::PushCSPHelperAddr()
 		}
 		if (!success)
 		{
-			for (size_t i = 0; i < _codeMemSize - sizeof(entranceFeature_UDM); i++)
+			for (size_t i = 0; i + sizeof(entranceFeature_UDM) <= _codeMemSize; i++)
 			{
 				if (_MatchFeatureCode(_codeMem + i, entranceFeature_UDM, sizeof(entranceFeature_UDM)))
 				{
-					SDL_Log("CSPHelper Entrance Finded.");
+					Log("CSPHelper Entrance Finded.");
 					addrJson["CspAddressRVA"]["CSPHelper_Entrance"] = _VA + i;
 					success = true;
 					break;
@@ -62,7 +60,7 @@ void AddressGenerator::PushCSPHelperAddr()
 		}
 
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSPHelper Entrance Not Found!");
+			LogError( "CSPHelper Entrance Not Found!");
 
 	}
 

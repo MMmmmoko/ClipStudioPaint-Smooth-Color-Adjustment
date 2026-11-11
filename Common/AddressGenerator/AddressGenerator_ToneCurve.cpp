@@ -1,10 +1,8 @@
 #include"AddressGenerator.h"
-#include"DllInject.h"
-#include<SDL3/SDL.h>
 
 void AddressGenerator::_PushToneCurveAddr()
 {
-	SDL_Log("Start Find ToneCurve Addresses...");
+	Log("Start Find ToneCurve Addresses...");
 	{
 		//曲线对话框
 
@@ -83,13 +81,13 @@ void AddressGenerator::_PushToneCurveAddr()
 
 	
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(tonecCurveDialogFuncFeature1); i++)
+		for (uint32_t i = 0; i + sizeof(tonecCurveDialogFuncFeature1) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveDialogFuncFeature1, sizeof(tonecCurveDialogFuncFeature1)))
 			{
 				int32_t off = *(int32_t*)(_codeMem + i +
 					+10+10+1);
-				SDL_Log("ToneCurve Dialog Func Finded.");
+				Log("ToneCurve Dialog Func Finded.");
 				addrJson["CspAddressRVA"]["ToneCurve_Dialog_Func"] = _VA + i+10+10+5+off;
 				success = true;
 				break;
@@ -98,13 +96,13 @@ void AddressGenerator::_PushToneCurveAddr()
 
 		if (!success)
 		{
-			for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveDialogFuncFeature2); i++)
+			for (size_t i = 0; i + sizeof(tonecCurveDialogFuncFeature2) <= _codeMemSize; i++)
 			{
 				if (_MatchFeatureCode(_codeMem + i, tonecCurveDialogFuncFeature2, sizeof(tonecCurveDialogFuncFeature2)))
 				{
 					int32_t off = *(int32_t*)(_codeMem + i +
 						+10 + 4 + 1);
-					SDL_Log("ToneCurve Dialog Func Finded.");
+					Log("ToneCurve Dialog Func Finded.");
 					addrJson["CspAddressRVA"]["ToneCurve_Dialog_Func"] = _VA + i + 10 + 4 + 5 + off;
 					success = true;
 					break;
@@ -114,11 +112,11 @@ void AddressGenerator::_PushToneCurveAddr()
 
 		if (!success)
 		{
-			for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveDialogFuncFeatureOld); i++)
+			for (size_t i = 0; i + sizeof(tonecCurveDialogFuncFeatureOld) <= _codeMemSize; i++)
 			{
 				if (_MatchFeatureCode(_codeMem + i, tonecCurveDialogFuncFeatureOld, sizeof(tonecCurveDialogFuncFeatureOld)))
 				{
-					SDL_Log("ToneCurve Dialog Func Finded.");
+					Log("ToneCurve Dialog Func Finded.");
 					addrJson["CspAddressRVA"]["ToneCurve_Dialog_Func"] = _VA + i;
 					success = true;
 					break;
@@ -126,7 +124,7 @@ void AddressGenerator::_PushToneCurveAddr()
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurve Dialog Func Not Found!");
+			LogError( "ToneCurve Dialog Func Not Found!");
 	}
 	{
 		//420版本后对话框调用位置有变动，这里改用函数外部调用特征
@@ -188,13 +186,13 @@ void AddressGenerator::_PushToneCurveAddr()
 		};
 	
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveLayerDialogFuncFeature); i++)
+		for (size_t i = 0; i + sizeof(tonecCurveLayerDialogFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveLayerDialogFuncFeature, sizeof(tonecCurveLayerDialogFuncFeature)))
 			{
 				uint32_t off = *(uint32_t*)(_codeMem + i + 
 					+7+8+10+10+5+7+7+7+7+1);
-				SDL_Log("ToneCurveLayer Dialog Func Finded.");
+				Log("ToneCurveLayer Dialog Func Finded.");
 				addrJson["CspAddressRVA"]["ToneCurveLayer_Dialog_Func"] = _VA + i
 					+7 + 8 + 10 + 10 + 5 + 7 + 7 + 7 + 7 + 5+ off;
 				success = true;
@@ -204,18 +202,18 @@ void AddressGenerator::_PushToneCurveAddr()
 		if (!success)
 		{
 			//未成功时使用原特征
-			for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveLayerDialogFuncFeature_OLD); i++)
+			for (size_t i = 0; i + sizeof(tonecCurveLayerDialogFuncFeature_OLD) <= _codeMemSize; i++)
 			{
 				if (_MatchFeatureCode(_codeMem + i, tonecCurveLayerDialogFuncFeature_OLD, sizeof(tonecCurveLayerDialogFuncFeature_OLD)))
 				{
-					SDL_Log("ToneCurveLayer Dialog Func Finded.（BACKEND ADDR）");
+					Log("ToneCurveLayer Dialog Func Finded.（BACKEND ADDR）");
 					addrJson["CspAddressRVA"]["ToneCurveLayer_Dialog_Func"] = _VA + i;
 					success = true;
 					break;
 				}
 			}
 			if (!success)
-				SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer Dialog Func Not Found!");
+				LogError( "ToneCurveLayer Dialog Func Not Found!");
 		}
 	}
 	//参数回调
@@ -225,18 +223,18 @@ void AddressGenerator::_PushToneCurveAddr()
 		};
 	
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveParamChangeFuncFeature); i++)
+		for (size_t i = 0; i + sizeof(tonecCurveParamChangeFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveParamChangeFuncFeature, sizeof(tonecCurveParamChangeFuncFeature)))
 			{
-				SDL_Log("ToneCurve OnParamChange Func Finded.");
+				Log("ToneCurve OnParamChange Func Finded.");
 				addrJson["CspAddressRVA"]["ToneCurve_OnParamChange_Func"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer OnParamChange Func Not Found!");
+			LogError( "ToneCurveLayer OnParamChange Func Not Found!");
 	}
 
 
@@ -254,18 +252,18 @@ void AddressGenerator::_PushToneCurveAddr()
 		};
 	
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveBeforeDrawFuncFeature); i++)
+		for (size_t i = 0; i + sizeof(tonecCurveBeforeDrawFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveBeforeDrawFuncFeature, sizeof(tonecCurveBeforeDrawFuncFeature)))
 			{
-				SDL_Log("ToneCurve BeforeDraw Func Finded.");
+				Log("ToneCurve BeforeDraw Func Finded.");
 				addrJson["CspAddressRVA"]["ToneCurve_BeforeDraw_Func"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer BeforeDraw Func Not Found!");
+			LogError( "ToneCurveLayer BeforeDraw Func Not Found!");
 	}
 
 	//update
@@ -302,18 +300,18 @@ void AddressGenerator::_PushToneCurveAddr()
 		};
 	
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveUpdateFuncFeature); i++)
+		for (size_t i = 0; i + sizeof(tonecCurveUpdateFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveUpdateFuncFeature, sizeof(tonecCurveUpdateFuncFeature)))
 			{
-				SDL_Log("ToneCurve Update Func Finded.");
+				Log("ToneCurve Update Func Finded.");
 				addrJson["CspAddressRVA"]["ToneCurve_UpdatFunc"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer Update Func Not Found!");
+			LogError( "ToneCurveLayer Update Func Not Found!");
 	}
 
 
@@ -333,18 +331,18 @@ void AddressGenerator::_PushToneCurveAddr()
 		};
 	
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveCodePatch1Feature); i++)
+		for (size_t i = 0; i + sizeof(tonecCurveCodePatch1Feature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveCodePatch1Feature, sizeof(tonecCurveCodePatch1Feature)))
 			{
-				SDL_Log("ToneCurve PatchPoint1 Finded.");
+				Log("ToneCurve PatchPoint1 Finded.");
 				addrJson["CspAddressRVA"]["ToneCurve_PatchAddr1"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer PatchPoint1 Not Found!");
+			LogError( "ToneCurveLayer PatchPoint1 Not Found!");
 	}
 	{
 		uint8_t tonecCurveCodePatch2Feature[] = {
@@ -356,18 +354,18 @@ void AddressGenerator::_PushToneCurveAddr()
 		};
 	
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveCodePatch2Feature); i++)
+		for (size_t i = 0; i + sizeof(tonecCurveCodePatch2Feature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveCodePatch2Feature, sizeof(tonecCurveCodePatch2Feature)))
 			{
-				SDL_Log("ToneCurve PatchPoint2 Finded.");
+				Log("ToneCurve PatchPoint2 Finded.");
 				addrJson["CspAddressRVA"]["ToneCurve_PatchAddr2"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer PatchPoint2 Not Found!");
+			LogError( "ToneCurveLayer PatchPoint2 Not Found!");
 	}
 	{
 		uint8_t tonecCurveCodePatch3Feature[] = {
@@ -381,18 +379,18 @@ void AddressGenerator::_PushToneCurveAddr()
 		};
 	
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveCodePatch3Feature); i++)
+		for (size_t i = 0; i + sizeof(tonecCurveCodePatch3Feature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveCodePatch3Feature, sizeof(tonecCurveCodePatch3Feature)))
 			{
-				SDL_Log("ToneCurve PatchPoint3 Finded.");
+				Log("ToneCurve PatchPoint3 Finded.");
 				addrJson["CspAddressRVA"]["ToneCurve_PatchAddr3"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer PatchPoint3 Not Found!");
+			LogError( "ToneCurveLayer PatchPoint3 Not Found!");
 	}
 	{
 		uint8_t tonecCurveCodePatch4Feature[] = {
@@ -406,18 +404,18 @@ void AddressGenerator::_PushToneCurveAddr()
 		};
 	
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(tonecCurveCodePatch4Feature); i++)
+		for (size_t i = 0; i + sizeof(tonecCurveCodePatch4Feature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurveCodePatch4Feature, sizeof(tonecCurveCodePatch4Feature)))
 			{
-				SDL_Log("ToneCurve PatchPoint4 Finded.");
+				Log("ToneCurve PatchPoint4 Finded.");
 				addrJson["CspAddressRVA"]["ToneCurve_PatchAddr4"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurveLayer PatchPoint4 Not Found!");
+			LogError( "ToneCurveLayer PatchPoint4 Not Found!");
 	}
 
 
@@ -440,11 +438,11 @@ void AddressGenerator::_PushToneCurveAddr()
 
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(tonecCurvePreviewBaseAddrFeature); i++)
+		for (uint32_t i = 0; i + sizeof(tonecCurvePreviewBaseAddrFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, tonecCurvePreviewBaseAddrFeature, sizeof(tonecCurvePreviewBaseAddrFeature)))
 			{
-				SDL_Log("ToneCurve Preview BaseAddr Finded."); 
+				Log("ToneCurve Preview BaseAddr Finded."); 
 				uint32_t addrOff = *(uint32_t*)(_codeMem + i + 30);
 				addrJson["CspAddressRVA"]["ToneCurve_BaseAddr"] = _VA + i+30+4+ addrOff;
 				success = true;
@@ -452,7 +450,7 @@ void AddressGenerator::_PushToneCurveAddr()
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "ToneCurve BaseAddr Not Found!");
+			LogError( "ToneCurve BaseAddr Not Found!");
 	}
 
 

@@ -1,11 +1,9 @@
 #include"AddressGenerator.h"
-#include"DllInject.h"
-#include<SDL3/SDL.h>
 
 
 void AddressGenerator::PushTimeLapseExportAddr()
 {
-	SDL_Log("Start Find TimeLapseExport Addresses...");
+	Log("Start Find TimeLapseExport Addresses...");
 	{
 
 		uint8_t timeLapseExportFuncFeature[] = {
@@ -41,11 +39,11 @@ void AddressGenerator::PushTimeLapseExportAddr()
 
 
 		bool success = false;
-		for (size_t i = 0; i < _codeMemSize - sizeof(timeLapseExportFuncFeature); i++)
+		for (size_t i = 0; i + sizeof(timeLapseExportFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, timeLapseExportFuncFeature, sizeof(timeLapseExportFuncFeature)))
 			{
-				SDL_Log("TimeLapseExport Func Finded.");
+				Log("TimeLapseExport Func Finded.");
 				addrJson["CspAddressRVA"]["TimeLapseExport_Func"] = _VA + i;
 				success = true;
 				break;
@@ -61,13 +59,13 @@ void AddressGenerator::PushTimeLapseExportAddr()
 			0x07,0x8B,0xC6,0xF0,0x0F,0xC1,0x41,0x08,0x48,0x8D,0x55,BYTEWILDCARD,0x49,0x8B,0xCE,
 			0xE8
 			};
-			for (size_t i = 0; i < _codeMemSize - sizeof(timeLapseExportFuncCallFeature); i++)
+			for (size_t i = 0; i + sizeof(timeLapseExportFuncCallFeature) <= _codeMemSize; i++)
 			{
 				if (_MatchFeatureCode(_codeMem + i, timeLapseExportFuncCallFeature, sizeof(timeLapseExportFuncCallFeature)))
 				{
 					//此代码最后的E8后即是调用地址
 					uint32_t off = *(uint32_t*)(_codeMem + i + sizeof(timeLapseExportFuncCallFeature));
-					SDL_Log("TimeLapseExport Func Finded.");
+					Log("TimeLapseExport Func Finded.");
 					addrJson["CspAddressRVA"]["TimeLapseExport_Func"] = _VA + i + sizeof(timeLapseExportFuncCallFeature) + 4 + off;
 					success = true;
 					break;
@@ -79,6 +77,6 @@ void AddressGenerator::PushTimeLapseExportAddr()
 		}
 
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "TimeLapseExport Func Not Found!");
+			LogError( "TimeLapseExport Func Not Found!");
 	}
 }

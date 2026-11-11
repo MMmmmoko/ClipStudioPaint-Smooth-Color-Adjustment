@@ -1,12 +1,10 @@
 #include"AddressGenerator.h"
-#include"DllInject.h"
-#include<SDL3/SDL.h>
 
 
 
 void AddressGenerator::_PushHsvAddr()
 {
-	SDL_Log("Start Find HSV Addresses...");
+	Log("Start Find HSV Addresses...");
 
 	//?? ?? ?? ?? ?? ?? 83 BB E8 00 00 00 00 74 1B C7 83 E8 00 00 00 00 00 00 00 48 8D 8B F8 00 00 00 BA E8 03 00 00 E8 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B D0
 	uint8_t hsvSkipFeature[] =
@@ -20,18 +18,18 @@ void AddressGenerator::_PushHsvAddr()
 
 
 	bool success = false;
-    for (size_t i = 0; i < _codeMemSize - sizeof(hsvSkipFeature); i++)
+    for (size_t i = 0; i + sizeof(hsvSkipFeature) <= _codeMemSize; i++)
     {
         if (_MatchFeatureCode(_codeMem + i, hsvSkipFeature, sizeof(hsvSkipFeature)))
         {
-			SDL_Log("HSV Skip Addr Finded.");
+			Log("HSV Skip Addr Finded.");
 			addrJson["CspAddressRVA"]["HSV_SkipTimer"]=_VA+i;
 			success = true;
             break;
         }
     }
 	if(!success)
-		SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR,"HSV Skip Addr Not Found!");
+		LogError("HSV Skip Addr Not Found!");
 
 
 

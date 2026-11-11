@@ -18,7 +18,6 @@ struct PESectiuonHead
 
 class DllInject
 {
-	friend class AddressGenerator;
 public:
 
 	enum EXETYPE

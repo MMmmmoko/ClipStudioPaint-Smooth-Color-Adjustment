@@ -19,6 +19,8 @@ typedef std::string _CatString;
     F(FunctionEnable,HSV,bool,true)        \
     F(FunctionEnable,ColorBalance,bool,true)         \
     F(FunctionEnable,ToneCurve,bool,true) \
+    F(FunctionEnable,LevelsPreview,bool,true) \
+    F(FunctionEnable,FreeTransformPreview,bool,true) \
     F(FunctionEnable,TimeLapseExport,bool,true) \
     F(FunctionEnable,Script_ApplyEffects,bool,true) \
     F(FunctionEnable,HideNavigatorViewIndicator,bool,false) \

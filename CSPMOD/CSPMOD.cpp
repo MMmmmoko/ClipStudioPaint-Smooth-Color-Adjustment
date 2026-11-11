@@ -1,8 +1,10 @@
-#include<Windows.h>
+﻿#include<Windows.h>
 
 
 #include "CSPMOD.h"
 #include"AddressTable.h"
+#include"FreeTransform.h"
+#include"LevelsPreview.h"
 
 #include"TA_HSV.h"
 #include"TA_ColorBalance.h"
@@ -31,6 +33,9 @@ void CSPMOD::OnAttachCSP( uintptr_t moduleHandle)
 	_moduleHandle = moduleHandle;
 
 
+    if (!AddressTable::LoadOrBuild())
+        return;
+
 	bool initResult=SDL_Init(SDL_INIT_VIDEO);
 	ASSERT(initResult &&"SDL Video Init Failed!");
 
@@ -54,23 +59,15 @@ void CSPMOD::OnAttachCSP( uintptr_t moduleHandle)
 	}
 
 
-	//检查版本
-	if (!AddressTable::LoadFromFile())
-	{
-		return;
-	}
-
-
-
-
-
 	CSPHelper::Init();
 	CspData::Init();
 	TA_HSV::Init();
 	TA_ColorBalance::Init();
 	TA_ToneCurve::Init();
+	LevelsPreview::Install();
 	TimeLapseExport_hook::Init();
 	LayerObject::Init();
+	FreeTransform::Install();
 
 
 	//加载设置项
@@ -153,63 +150,27 @@ static void* resolve_indirect(uint8_t* addr) {
 
 
 // 使用libudis86计算指令长度
-size_t get_instruction_length(void* address, size_t minLength) {
-
-	DWORD oldProtect;
-	//VirtualProtect((void*)((uintptr_t)targetFuncAddr-5), saveCodeByteCount+10, PAGE_EXECUTE_READWRITE, &oldProtect);
-	VirtualProtect((void*)((uintptr_t)address - 0), 32, PAGE_EXECUTE_READWRITE, &oldProtect);
-
-	ud_t ud_obj;
-	ud_init(&ud_obj);
-	ud_set_mode(&ud_obj, 64);
-	ud_set_syntax(&ud_obj, UD_SYN_INTEL);
-	ud_set_input_buffer(&ud_obj, (uint8_t*)address, 32); // 读取足够长度
-
-
-
-	size_t offset = 0;
-
-	//char buf[256];
-	while (offset < minLength)
-	{
-		ud_disassemble(&ud_obj);
-		size_t len = ud_insn_len(&ud_obj);
-		offset += len;
-	}
-
-
-	VirtualProtect((void*)((uintptr_t)address - 0), 32, oldProtect, &oldProtect);
-
-	return offset;
-}
-
-static void _GenHookParam(void* targetFuncAddrIn, void** realAddr, size_t* cmdLen, CSPMOD::_HOOKREG reg)
+static size_t GetInstructionLength(const void* address, size_t minLength)
 {
-	//由于编译器优化，memcpy可能会读出jmp表，但是VS中跳转目标函数显示的正常反汇编
-	//其实是没有问题的，因为vs跳转目标函数的汇编或者机器码的时候，也读的这里，
-	//只是它帮我跳转了，观察到跳转后内存和反汇编窗口显示的地址是和targetFuncAddrIn不一致的。
-	//有点神秘
+    if (!address)
+        return 0;
 
-	DWORD oldProtect;
-	VirtualProtect(targetFuncAddrIn, 32, PAGE_EXECUTE_READWRITE, &oldProtect);
-	void* _realAddr = targetFuncAddrIn;
-	if (is_jmp_rel32((uint8_t*)targetFuncAddrIn))
-	{
-		_realAddr = resolve_rel32((uint8_t*)targetFuncAddrIn);
-	}
-	if (is_jmp_rip((uint8_t*)targetFuncAddrIn))
-	{
-		_realAddr = resolve_indirect((uint8_t*)targetFuncAddrIn);
-	}
-	*realAddr = _realAddr;
-	//然后在_realAddr上计算命令长度
+    ud_t decoder;
+    ud_init(&decoder);
+    ud_set_mode(&decoder, 64);
+    ud_set_syntax(&decoder, UD_SYN_INTEL);
+    ud_set_input_buffer(&decoder, static_cast<const uint8_t*>(address), 32);
 
-
-	*cmdLen = get_instruction_length(_realAddr, reg >= CSPMOD::_HOOKREG::_HOOKREG_R8 ? 13 : 12);
-	//*cmdLen = get_instruction_length(_realAddr, 12);
-	VirtualProtect(targetFuncAddrIn, 32, oldProtect, &oldProtect);
+    size_t length = 0;
+    while (length < minLength)
+    {
+        const size_t instruction = ud_disassemble(&decoder);
+        if (!instruction || ud_insn_mnemonic(&decoder) == UD_Iinvalid)
+            return 0;
+        length += instruction;
+    }
+    return length;
 }
-
 
 typedef uint8_t _2byteCode[2];
 typedef uint8_t _3byteCode[3];
@@ -251,78 +212,49 @@ static _3byteCode JmpCode[CSPMOD::_HOOKREG_COUNT] = {
 
 bool CSPMOD::Hook(void* targetFuncAddr, void* myFunc, void** out_origfunc, _HOOKREG reg)
 {
-	//计算指令长度
-	void* trueAddr;
-	size_t saveCodeByteCount;
-	_GenHookParam(targetFuncAddr, &trueAddr, &saveCodeByteCount, reg);
-	targetFuncAddr = trueAddr;
-	{
+    if (!targetFuncAddr || !myFunc || !out_origfunc || reg < 0 || reg >= _HOOKREG_COUNT)
+        return false;
 
-		int minCode = (reg >= _HOOKREG::_HOOKREG_R8 ? 13 : 12);
+    auto* target = static_cast<uint8_t*>(targetFuncAddr);
+    if (is_jmp_rel32(target))
+        target = static_cast<uint8_t*>(resolve_rel32(target));
+    else if (is_jmp_rip(target))
+        target = static_cast<uint8_t*>(resolve_indirect(target));
 
-		if(/*saveCodeByteCount < minCode ||*/ saveCodeByteCount > 48)return false;
+    const size_t jumpSize = reg >= _HOOKREG_R8 ? 13 : 12;
+    const size_t savedSize = GetInstructionLength(target, jumpSize);
+    uint8_t replacement[48];
+    if (savedSize < jumpSize || savedSize > sizeof(replacement))
+        return false;
 
-		//saveCodeByteCount = max(saveCodeByteCount, minCode);
+    const auto writeJump = [reg, jumpSize](uint8_t* code, const void* destination) {
+        memcpy(code, MovCode[reg], 2);
+        memcpy(code + 2, &destination, sizeof(destination));
+        memcpy(code + 10, JmpCode[reg], jumpSize - 10);
+    };
 
-		//根据一定字节数备份目标函数起始部分字节
-		DWORD oldProtect;
-		//VirtualProtect((void*)((uintptr_t)targetFuncAddr-5), saveCodeByteCount+10, PAGE_EXECUTE_READWRITE, &oldProtect);
-		VirtualProtect((void*)((uintptr_t)targetFuncAddr - 0), saveCodeByteCount, PAGE_EXECUTE_READWRITE, &oldProtect);
+    auto* trampoline = static_cast<uint8_t*>(VirtualAlloc(nullptr, savedSize + jumpSize,
+        MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE));
+    if (!trampoline)
+        return false;
+    memcpy(trampoline, target, savedSize);
+    writeJump(trampoline + savedSize, target + savedSize);
 
+    DWORD oldProtection = 0;
+    if (!VirtualProtect(trampoline, savedSize + jumpSize, PAGE_EXECUTE_READ, &oldProtection) ||
+        !FlushInstructionCache(GetCurrentProcess(), trampoline, savedSize + jumpSize) ||
+        !VirtualProtect(target, savedSize, PAGE_EXECUTE_READWRITE, &oldProtection))
+    {
+        VirtualFree(trampoline, 0, MEM_RELEASE);
+        return false;
+    }
 
-		//修改目标函数起始指令
-
-
-		//mov rax, address
-		//jmp rax
-		uint8_t NewCode[48];
-
-		//NewCode[0] = 0x48; NewCode[1] = 0xB8;
-
-		*(uint16_t*)NewCode = *(uint16_t*)(MovCode[reg]);
-
-
-		*(uintptr_t*)(NewCode + 2) = (uintptr_t)myFunc;
-
-
-
-		NewCode[10] = JmpCode[reg][0];
-		NewCode[11] = JmpCode[reg][1];
-		if (reg >= _HOOKREG::_HOOKREG_R8)
-			NewCode[12] = JmpCode[reg][2];
-
-
-		//暂不打算复原，所以不保存指针
-		uint8_t* NewFunc = new uint8_t[saveCodeByteCount + 13];
-		memcpy(NewFunc, targetFuncAddr, saveCodeByteCount);
-
-
-
-		*(uint16_t*)(NewFunc + saveCodeByteCount) = *(uint16_t*)(MovCode[reg]);
-		//NewFunc[saveCodeByteCount] = 0x48; NewFunc[saveCodeByteCount + 1] = 0xB8;
-		*(uintptr_t*)(NewFunc + saveCodeByteCount + 2) = (uintptr_t)targetFuncAddr + saveCodeByteCount;
-		NewFunc[saveCodeByteCount + 10] = JmpCode[reg][0];
-		NewFunc[saveCodeByteCount + 11] = JmpCode[reg][1];
-		if (reg >= _HOOKREG::_HOOKREG_R8)
-			NewFunc[saveCodeByteCount + 12] = JmpCode[reg][2];
-
-
-		*out_origfunc = (void*)NewFunc;
-
-
-		for (int i = minCode; i < saveCodeByteCount; i++)
-			NewCode[i] = 0x90;//nop
-		//memcpy(targetFuncAddr, NewCode, saveCodeByteCount);
-		memcpy((void*)((uintptr_t)targetFuncAddr - 0), NewCode, saveCodeByteCount);
-
-
-
-
-		//VirtualProtect((void*)((uintptr_t)targetFuncAddr - 5), saveCodeByteCount + 10, oldProtect, &oldProtect);
-		VirtualProtect(targetFuncAddr, saveCodeByteCount, oldProtect, &oldProtect);
-
-		//给out_origfunc执行权限
-		VirtualProtect(*out_origfunc, saveCodeByteCount + 13, PAGE_EXECUTE_READWRITE, &oldProtect);
-	}
-	return true;
+    writeJump(replacement, myFunc);
+    memset(replacement + jumpSize, 0x90, savedSize - jumpSize);
+    *out_origfunc = trampoline;
+    memcpy(target, replacement, savedSize);
+    FlushInstructionCache(GetCurrentProcess(), target, savedSize);
+    DWORD ignored = 0;
+    VirtualProtect(target, savedSize, oldProtection, &ignored);
+    return true;
 }

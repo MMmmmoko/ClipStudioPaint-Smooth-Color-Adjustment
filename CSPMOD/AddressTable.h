@@ -1,53 +1,21 @@
 #pragma once
 
-
-
-
-#include<vector>
-#include"json/json.h"
-
-
-
-//struct PointerMap
-//{
-//	void* baseAddr;
-//	std::vector<int> offset;
-//
-//	<template T>
-//		T& GetValue() {};
-//};
-
-
-
-//基地址跨版本定位:
-//代码段寻找对基地址的引用
-//对引用进行特征码定位
-// 
-//可以依次对对每个偏移值也进行特征码定位吗？
-
+#include "json/json.h"
+#include <string_view>
+#include <vector>
 
 class AddressTable
 {
-
-	
-
-	
 public:
-	static bool LoadFromFile();
-
-
-	static void* GetAddress(const char* addrName);
-	std::vector<int> GetOffsetList(const char* offsetName);
-	static std::string_view GetCSPVersion();
-	
+    static bool LoadOrBuild();
+    static void* GetAddress(const char* addrName);
+    std::vector<int> GetOffsetList(const char* offsetName);
+    static std::string_view GetCSPVersion();
 
 private:
-	static void DoStaticPatch();//PatchTool中的实现迁移到CSPMOD中时，在这里patch部分原在tool中修改的代码
+    static void DoStaticPatch();
 
-
-
-
-	Json::Value addressMap;
-	std::string cspVersion;
-
+    Json::Value addressMap;
+    std::string cspVersion;
+    size_t imageSize = 0;
 };

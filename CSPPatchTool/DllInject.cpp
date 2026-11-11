@@ -3,7 +3,6 @@
 #include<filesystem>
 #include"CSPHacker.h"
 #include "DllInject.h"
-#include"AddressGenerator.h"
 #include<SDL3/SDL.h>
 bool CheckExeHead(const uint8_t* exeFileMem, size_t exeFileSize)
 {
@@ -247,7 +246,6 @@ bool DllInject::Patch(bool isLinuxPlatform)
 
 
     CSPHacker hacker;
-    AddressGenerator addrGenerator;
     //获取代码段
     size_t sumData = 0;
 
@@ -318,27 +316,8 @@ bool DllInject::Patch(bool isLinuxPlatform)
 
 
 
-    SDL_Log("Generating Address Table..");
-    addrGenerator.SetUp(this);
-    if (!addrGenerator.PushAddressData())
-    {
-        return false;
-    }
-
-
-
-
-
-
-    addrGenerator.GenerateOutputFile();
-    //return true;
-    //printf("Generating Address Table Success!");
-
-
-    //为了防止修改数据后影响了数据地址检索，linux相关的修改放在地址生成之后再进行
     if (isLinuxPlatform)
     {
-        //addrGenerator.PatchTimerPointAddr();
         hacker.DoPatchTimerPoint();
     }
 

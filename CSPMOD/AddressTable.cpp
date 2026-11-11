@@ -1,108 +1,302 @@
 #include "pch.h"
 #include "AddressTable.h"
-#include"CSPMOD.h"
-#include"json/json.h"
+#include "CSPMOD.h"
+#include "FreeTransformLocator.h"
+#include "LevelsPreview.h"
+#include "../Common/AddressGenerator/AddressGenerator.h"
 
-#include"Util/Util.h"
-#include<SDL3/SDL.h>
+#include <bcrypt.h>
+#include <winver.h>
+#include <array>
+#include <algorithm>
+#include <limits>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
+#include <utility>
 
-static AddressTable ins;
+#pragma comment(lib, "bcrypt.lib")
+#pragma comment(lib, "version.lib")
 
-bool AddressTable::LoadFromFile()
+namespace
 {
-    //以绝对路劲的方式加载json
-    
-    std::string basePath=SDL_GetBasePath();
-    basePath += "CSPAddrTable.json";
-    ins.addressMap= util::BuildJsonFromFile(basePath.c_str());
-    if (ins.addressMap.empty())
+constexpr unsigned tableSchema = 15;
+constexpr auto tableName = L"CSPAddrTable.json";
+constexpr auto logName = L"CSPAddrTable.build.log";
+
+std::filesystem::path ExecutablePath()
+{
+    std::wstring path(32768, L'\0');
+    const DWORD length = GetModuleFileNameW(nullptr, path.data(), static_cast<DWORD>(path.size()));
+    if (!length || length >= path.size())
+        return {};
+    path.resize(length);
+    return path;
+}
+
+std::string ProductVersion(const std::filesystem::path& path)
+{
+    DWORD ignored = 0;
+    const DWORD length = GetFileVersionInfoSizeW(path.c_str(), &ignored);
+    if (!length)
+        return {};
+
+    std::vector<uint8_t> data(length);
+    void* value = nullptr;
+    UINT valueLength = 0;
+    if (!GetFileVersionInfoW(path.c_str(), 0, length, data.data()) ||
+        !VerQueryValueW(data.data(), L"\\", &value, &valueLength) ||
+        valueLength < sizeof(VS_FIXEDFILEINFO))
+        return {};
+
+    const auto& info = *static_cast<const VS_FIXEDFILEINFO*>(value);
+    if (info.dwSignature != VS_FFI_SIGNATURE)
+        return {};
+
+    std::string version = std::to_string(HIWORD(info.dwProductVersionMS)) + "." +
+        std::to_string(LOWORD(info.dwProductVersionMS)) + "." +
+        std::to_string(HIWORD(info.dwProductVersionLS));
+    if (LOWORD(info.dwProductVersionLS))
+        version += "." + std::to_string(LOWORD(info.dwProductVersionLS));
+    return version;
+}
+
+std::string ExecutableDigest(const std::filesystem::path& path)
+{
+    const HANDLE file = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_DELETE,
+        nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (file == INVALID_HANDLE_VALUE)
+        return {};
+    LARGE_INTEGER size{};
+    HANDLE mapping = nullptr;
+    if (GetFileSizeEx(file, &size) && size.QuadPart > 0 && size.QuadPart <= (std::numeric_limits<ULONG>::max)())
+        mapping = CreateFileMappingW(file, nullptr, PAGE_READONLY, 0, 0, nullptr);
+    CloseHandle(file);
+    if (!mapping)
+        return {};
+
+    auto* bytes = static_cast<uint8_t*>(MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, 0));
+    CloseHandle(mapping);
+    if (!bytes)
+        return {};
+
+    std::array<uint8_t, 32> hash{};
+    BCRYPT_ALG_HANDLE algorithm = nullptr;
+    bool hashed = false;
+    if (BCryptOpenAlgorithmProvider(&algorithm, BCRYPT_SHA256_ALGORITHM, nullptr, 0) >= 0)
     {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"CSPMOD Error","Can not read file: CSPAddressTable.json",nullptr);
+        hashed = BCryptHash(algorithm, nullptr, 0, bytes, static_cast<ULONG>(size.QuadPart),
+            hash.data(), static_cast<ULONG>(hash.size())) >= 0;
+        BCryptCloseAlgorithmProvider(algorithm, 0);
+    }
+    UnmapViewOfFile(bytes);
+    if (!hashed)
+        return {};
+
+    constexpr char hex[] = "0123456789abcdef";
+    std::string digest;
+    digest.reserve(hash.size() * 2);
+    for (const auto byte : hash)
+    {
+        digest += hex[byte >> 4];
+        digest += hex[byte & 15];
+    }
+    return digest;
+}
+
+const IMAGE_SECTION_HEADER* FindSection(const IMAGE_NT_HEADERS64& nt,
+    const char (&name)[IMAGE_SIZEOF_SHORT_NAME], DWORD requiredFlags)
+{
+    const auto* sections = IMAGE_FIRST_SECTION(&nt);
+    for (unsigned i = 0; i < nt.FileHeader.NumberOfSections; ++i)
+    {
+        const auto& section = sections[i];
+        if (memcmp(section.Name, name, IMAGE_SIZEOF_SHORT_NAME) == 0 &&
+            (section.Characteristics & requiredFlags) == requiredFlags)
+            return &section;
+    }
+    return nullptr;
+}
+
+Json::Value ReadTable(const std::filesystem::path& path)
+{
+    std::ifstream file(path, std::ios::binary);
+    Json::Value table;
+    if (file)
+    {
+        Json::CharReaderBuilder reader;
+        if (!Json::parseFromStream(reader, file, &table, nullptr))
+            table = Json::Value{};
+    }
+    return table;
+}
+
+bool WriteTable(const std::filesystem::path& path, const Json::Value& table)
+{
+    auto temporary = path;
+    temporary += L"." + std::to_wstring(GetCurrentProcessId()) + L".tmp";
+    std::ofstream file(temporary, std::ios::binary | std::ios::trunc);
+    if (!file)
         return false;
-    }
+    Json::StreamWriterBuilder writer;
+    file << Json::writeString(writer, table);
+    file.close();
+    if (file && MoveFileExW(temporary.c_str(), path.c_str(), MOVEFILE_REPLACE_EXISTING))
+        return true;
 
-
-    //return true;
-
-
-    //测试启动UDM
-    bool isUDM = (ins.addressMap.isMember("IsUDM") && ins.addressMap["IsUDM"].isBool() && ins.addressMap["IsUDM"].asBool());
-    if (isUDM)
-    {
-        //WinExec("UDMPaintPRO.exe",SW_HIDE);
-        //WinExec("UDMPaintEX.exe", SW_HIDE);
-
-    }
-
-
-#ifdef _DEBUG
-    if (!isUDM)
-    {
-        //优动漫和控制台窗口有冲突，仅对CSP启用控制台窗口
-        AllocConsole(); // 创建控制台窗口
-        // 重定向标准输出到控制台
-        FILE* stream;
-        freopen_s(&stream, "CONOUT$", "w", stdout);
-        freopen_s(&stream, "CONOUT$", "w", stderr);
-        freopen_s(&stream, "CONIN$", "r", stdin);
-
-
-        SDL_LogOutputFunction logf = [](void* userdata, int category, SDL_LogPriority priority, const char* message) {
-            printf(message);
-            printf("\n");
-            };
-        SDL_SetLogOutputFunction(logf,nullptr);
-    }
-#endif
-   
-
-    //读取版本
-    
-    if (ins.addressMap.isMember("CspVersion") && ins.addressMap["CspVersion"].isString()
-        && ins.addressMap.isMember("CspAddressRVA")
-        && ins.addressMap["CspAddressRVA"].isMember("CspVersion")&& ins.addressMap["CspAddressRVA"]["CspVersion"].isUInt64()
-        )
-    {
-        std::string verStr= ins.addressMap["CspVersion"].asString();
-        wchar_t* strptr =(wchar_t*) (ins.addressMap["CspAddressRVA"]["CspVersion"].asUInt64()+ CSPMOD::GetBaseAddr());
-
-
-        
-
-        char buffer[256];
-        size_t receiveSize;
-        auto err = wcstombs_s(&receiveSize, buffer, strptr, sizeof(buffer));
-        buffer[255] = 0;
-        if (verStr == buffer)
-        {
-            ins.cspVersion = verStr;
-            DoStaticPatch();
-            return true;
-        }
-        else
-        {
-            char outbuffer[512];
-            SDL_snprintf(outbuffer, sizeof(outbuffer), "AddrTable Version Mismatch:CSP: %s, CSPAddrTable.json: %s", buffer, verStr.c_str());
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "CSPMOD Error", "AddrTable Version Mismatch: CSPAddressTable.json", nullptr);
-            return false;
-        }
-    }
-    
-
-
-
-
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "CSPMOD Error", "No Version Info in CSPAddressTable.json", nullptr);
+    DeleteFileW(temporary.c_str());
     return false;
 }
 
+bool ValidEntry(const Json::Value& entry, size_t size)
+{
+    const auto validRva = [size](const Json::Value& value) {
+        return value.isUInt64() && value.asUInt64() > 0 && value.asUInt64() < size;
+    };
+    if (entry.isArray())
+        return std::all_of(entry.begin(), entry.end(), validRva);
+    return validRva(entry);
+}
 
+bool MatchesTable(const Json::Value& table, const std::string& version, const std::string& digest,
+    size_t imageSize, const Json::Value& verifiedFeatures)
+{
+    if (!table.isObject() || digest.empty() || !table["SchemaVersion"].isUInt() ||
+        table["SchemaVersion"].asUInt() != tableSchema || table["CspVersion"] != Json::Value(version) ||
+        table["ExecutableSHA256"] != Json::Value(digest))
+        return false;
 
+    const auto& entries = table["CspAddressRVA"];
+    if (!entries.isObject())
+        return false;
 
+    for (const auto& name : entries.getMemberNames())
+        if (!ValidEntry(entries[name], imageSize) ||
+            ((name.compare(0, 14, "FreeTransform_") == 0 || name.compare(0, 14, "LevelsPreview_") == 0) &&
+                !verifiedFeatures.isMember(name)))
+            return false;
+    for (const auto& name : verifiedFeatures.getMemberNames())
+        if (!entries[name].isUInt() || entries[name].asUInt() != verifiedFeatures[name].asUInt())
+            return false;
+    return true;
+}
+}
 
+static AddressTable ins;
 
+bool AddressTable::LoadOrBuild()
+{
+    const auto path = ExecutablePath();
+    const auto* image = reinterpret_cast<const uint8_t*>(CSPMOD::GetBaseAddr());
+    const auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(image);
+    if (!image || dos->e_magic != IMAGE_DOS_SIGNATURE || dos->e_lfanew <= 0)
+        return false;
 
+    const auto* nt = reinterpret_cast<const IMAGE_NT_HEADERS64*>(image + dos->e_lfanew);
+    if (nt->Signature != IMAGE_NT_SIGNATURE || nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+        return false;
 
+    const auto* text = FindSection(*nt, ".text\0\0", IMAGE_SCN_MEM_EXECUTE);
+    const auto* data = FindSection(*nt, ".data\0\0", IMAGE_SCN_MEM_WRITE);
+    ins.imageSize = nt->OptionalHeader.SizeOfImage;
+    if (!text || text->VirtualAddress >= ins.imageSize)
+        return false;
+    const size_t textSize = (std::min)({static_cast<size_t>(text->Misc.VirtualSize),
+        static_cast<size_t>(text->SizeOfRawData), ins.imageSize - text->VirtualAddress});
+
+    ins.cspVersion = ProductVersion(path);
+    if (ins.cspVersion.empty())
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: executable product version unavailable.");
+        return false;
+    }
+
+    const auto tablePath = path.parent_path() / tableName;
+    const std::string digest = ExecutableDigest(path);
+    const auto filename = path.filename().wstring();
+    const bool isUDM = _wcsnicmp(filename.c_str(), L"UDMPaint", 8) == 0;
+
+    std::ostringstream featureLog;
+    Json::Value verifiedFeatures(Json::objectValue);
+    const auto& unwind = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
+    const bool freeTransformReady = isUDM || FreeTransform::Locate(image, static_cast<uint32_t>(ins.imageSize),
+        text->VirtualAddress, static_cast<uint32_t>(textSize), unwind.VirtualAddress, unwind.Size,
+        verifiedFeatures, featureLog);
+    const bool levelsReady = isUDM || LevelsPreview::Locate(image, static_cast<uint32_t>(ins.imageSize),
+        text->VirtualAddress, static_cast<uint32_t>(textSize), unwind.VirtualAddress, unwind.Size,
+        data ? data->VirtualAddress : 0, data ? data->Misc.VirtualSize : 0, verifiedFeatures, featureLog);
+
+    std::filesystem::path fallback;
+    if (char* preferencePath = SDL_GetPrefPath("CSPMOD", "AddressTable"))
+    {
+        fallback = std::filesystem::u8path(preferencePath);
+        SDL_free(preferencePath);
+    }
+    const auto fallbackTable = fallback.empty() || digest.empty() ? std::filesystem::path{} :
+        fallback / ("CSPAddrTable-" + digest + ".json");
+
+    auto table = ReadTable(tablePath);
+    bool matches = MatchesTable(table, ins.cspVersion, digest, ins.imageSize, verifiedFeatures);
+    if (!matches && !fallbackTable.empty())
+    {
+        table = ReadTable(fallbackTable);
+        matches = MatchesTable(table, ins.cspVersion, digest, ins.imageSize, verifiedFeatures);
+    }
+    if (matches)
+    {
+        ins.addressMap = std::move(table);
+        SDL_Log("Address table: loaded for version %s.", ins.cspVersion.c_str());
+    }
+    else
+    {
+        std::ofstream log(path.parent_path() / logName, std::ios::app);
+        if (!log && !fallback.empty())
+        {
+            const auto fallbackLog = fallback / logName;
+            log.clear();
+            log.open(fallbackLog, std::ios::app);
+            if (log)
+                SDL_Log("Address table log: %s", fallbackLog.u8string().c_str());
+        }
+
+        log << "\nAddress table rebuild for " << path.filename().u8string()
+            << " version " << ins.cspVersion << " SHA-256 " << digest << '\n';
+        SDL_Log("Address table: rebuilding for version %s.", ins.cspVersion.c_str());
+        AddressGenerator generator;
+        generator.SetUpCode(image + text->VirtualAddress, textSize, text->VirtualAddress, &log);
+        table = generator.Build(ins.cspVersion, isUDM);
+        auto& entries = table["CspAddressRVA"];
+        for (const auto& name : verifiedFeatures.getMemberNames())
+            entries[name] = verifiedFeatures[name];
+        log << featureLog.str();
+        if (!freeTransformReady || !levelsReady)
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "%s", featureLog.str().c_str());
+
+        for (const auto& name : entries.getMemberNames())
+        {
+            if (!ValidEntry(entries[name], ins.imageSize))
+            {
+                log << "ERROR: " << name << " points outside the executable image.\n";
+                SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: invalid feature %s.", name.c_str());
+                entries.removeMember(name);
+            }
+        }
+
+        table["SchemaVersion"] = tableSchema;
+        table["ExecutableSHA256"] = digest;
+        if (digest.empty() || (!WriteTable(tablePath, table) &&
+            (fallbackTable.empty() || !WriteTable(fallbackTable, table))))
+        {
+            log << "Cache could not be saved. The rebuilt table is available for this process.\n";
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: cache unavailable, using the rebuilt table in memory.");
+        }
+        log << "Located " << entries.size() << " address entries.\n";
+        ins.addressMap = std::move(table);
+    }
+
+    DoStaticPatch();
+    return true;
+}
 
 void AddressTable::DoStaticPatch()
 {
@@ -114,9 +308,9 @@ void AddressTable::DoStaticPatch()
     {
         for (auto& x : ins.addressMap["CspAddressRVA"]["TimerAddrs"])
         {
-            if (x.isUInt64())
+            if (x.isUInt64() && x.asUInt64() > 0 && x.asUInt64() <= ins.imageSize - 6)
             {
-				void* addr = (void*)(x.asUInt64() + CSPMOD::GetBaseAddr());
+                void* addr = reinterpret_cast<void*>(CSPMOD::GetBaseAddr() + x.asUInt64());
 
                 uint8_t cmd_mov_edx_0_nop[6] = { 0xba,0x01,0x00 ,0x00 ,0x00 ,0x90 };
 				CSPMOD::CodePatch(addr, cmd_mov_edx_0_nop, sizeof(cmd_mov_edx_0_nop));
@@ -166,10 +360,10 @@ void AddressTable::DoStaticPatch()
 void* AddressTable::GetAddress(const char* addrName)
 {
 
-    if (ins.addressMap["CspAddressRVA"].isMember(addrName) && ins.addressMap["CspAddressRVA"][addrName].isUInt64())
-    {
-        return (void*)(ins.addressMap["CspAddressRVA"][addrName].asUInt64()+ CSPMOD::GetBaseAddr());
-    }
+    const auto& entries = std::as_const(ins.addressMap)["CspAddressRVA"];
+    const auto& value = entries[addrName];
+    if (value.isUInt64() && value.asUInt64() > 0 && value.asUInt64() < ins.imageSize)
+        return reinterpret_cast<void*>(CSPMOD::GetBaseAddr() + value.asUInt64());
 
     return nullptr;
 }

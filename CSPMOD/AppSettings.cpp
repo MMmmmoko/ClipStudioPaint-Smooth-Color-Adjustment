@@ -10,6 +10,8 @@
 #include"TA_HSV.h"
 #include"TA_ColorBalance.h"
 #include"TA_ToneCurve.h"
+#include"LevelsPreview.h"
+#include"FreeTransform.h"
 #include"TimeLapseExport.h"
 #include"ScriptAction_ApplyEffects.h"
 
@@ -121,6 +123,8 @@ else \
 	_FunctionEnableHSV?TA_HSV::Enable(): TA_HSV::Disable();
 	_FunctionEnableColorBalance ? TA_ColorBalance::Enable(): TA_ColorBalance::Disable();
 	_FunctionEnableToneCurve ? TA_ToneCurve::Enable(): TA_ToneCurve::Disable();
+	LevelsPreview::SetEnabled(_FunctionEnableLevelsPreview);
+	FreeTransform::SetEnabled(_FunctionEnableFreeTransformPreview);
 	_FunctionEnableTimeLapseExport ? TimeLapseExport_hook::Enable(): TimeLapseExport_hook::Disable();
 	_FunctionEnableScript_ApplyEffects ? ScriptAction_ApplyEffects::Enable() : ScriptAction_ApplyEffects::Disable();
 
@@ -333,6 +337,18 @@ void AppSettings::_OnFunctionEnableToneCurveChange(const bool& value)
 		value ? TA_ToneCurve::Enable() : TA_ToneCurve::Disable();
 		Save();
 	}
+}
+
+void AppSettings::_OnFunctionEnableLevelsPreviewChange(const bool& value)
+{
+	LevelsPreview::SetEnabled(value);
+	Save();
+}
+
+void AppSettings::_OnFunctionEnableFreeTransformPreviewChange(const bool& value)
+{
+	FreeTransform::SetEnabled(value);
+	Save();
 }
 
 void AppSettings::_OnFunctionEnableTimeLapseExportChange(const bool& value)

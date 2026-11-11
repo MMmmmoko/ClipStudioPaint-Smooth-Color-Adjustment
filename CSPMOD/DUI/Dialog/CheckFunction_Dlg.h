@@ -42,6 +42,8 @@ private:
     ui::CheckBox* checkBox_hsv;
     ui::CheckBox* checkBox_colorbalance;
     ui::CheckBox* checkBox_tonecurve;
+    ui::CheckBox* checkBox_levels = nullptr;
+    ui::CheckBox* checkBox_freetransform = nullptr;
     ui::CheckBox* checkBox_plugin_gaussblur;
     ui::CheckBox* checkBox_plugin_motionblur;
     ui::CheckBox* checkBox_timelapseexport;

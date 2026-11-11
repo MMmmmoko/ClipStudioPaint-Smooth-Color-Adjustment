@@ -1,13 +1,11 @@
 #include"AddressGenerator.h"
-#include"DllInject.h"
-#include<SDL3/SDL.h>
 
 
 
 void AddressGenerator::PushLayerObjectAddr()
 {
 	//图层操作所需要的指针
-	SDL_Log("Start Find LayerObject Addresses...");
+	Log("Start Find LayerObject Addresses...");
 
 	//图层/图层组基址/函数调用等基址
 	{
@@ -30,11 +28,11 @@ void AddressGenerator::PushLayerObjectAddr()
 
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectBaseAddrFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectBaseAddrFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectBaseAddrFeature, sizeof(layerObjectBaseAddrFeature)))
 			{
-				SDL_Log("LayerObject Base Addr Finded.");
+				Log("LayerObject Base Addr Finded.");
 				uint32_t addrOff = *(uint32_t*)(_codeMem + i + 9);
 				addrJson["CspAddressRVA"]["LayerObject_Base"] = _VA + i + 9 + 5 + addrOff;
 				success = true;
@@ -42,7 +40,7 @@ void AddressGenerator::PushLayerObjectAddr()
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject Base Addr Not Found!");
+			LogError( "LayerObject Base Addr Not Found!");
 
 	}
 
@@ -64,18 +62,18 @@ void AddressGenerator::PushLayerObjectAddr()
 0x24,0x30,0x48,0x8B,0x49,0x08,0x48,0x89,0x4C,0x24,0x38
 		};
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectSelectThisLayerFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectSelectThisLayerFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectSelectThisLayerFuncFeature, sizeof(layerObjectSelectThisLayerFuncFeature)))
 			{
-				SDL_Log("LayerObject SelectThisLayer Func Finded.");
+				Log("LayerObject SelectThisLayer Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_SelectThisLayer_Func"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject SelectThisLayer Func Not Found!");
+			LogError( "LayerObject SelectThisLayer Func Not Found!");
 	}
 
 	//图层复制函数的基址
@@ -92,18 +90,18 @@ void AddressGenerator::PushLayerObjectAddr()
 		0x00,0x48,0x85,0xC9,0x74,0x07
 		};
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectDuplicateFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectDuplicateFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectDuplicateFuncFeature, sizeof(layerObjectDuplicateFuncFeature)))
 			{
-				SDL_Log("LayerObject Duplicate Func Finded.");
+				Log("LayerObject Duplicate Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_Duplicate_Func"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject Duplicate Func Not Found!");
+			LogError( "LayerObject Duplicate Func Not Found!");
 
 	}
 
@@ -117,18 +115,18 @@ void AddressGenerator::PushLayerObjectAddr()
 	//		0x48,0x89,0x5C,0x24,0x10,0x48,0x89,0x4C,0x24,0x08,0x55,0x56,0x57,0x41,0x54,0x41,0x55,0x41,0x56,0x41,0x57,0x48,0x8B,0xEC,0x48,0x83,0xEC,0x70,0x4D,0x8B,0xE0,0x44,0x8B,0xEA,0x4C,0x8B,0xF1,0x48,0x8B,0x09,0x48,0x85,0xC9,0x75,0x3D
 	//	};
 	//	bool success = false;
-	//	for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectSetVisibleFuncFeature); i++)
+	//	for (uint32_t i = 0; i + sizeof(layerObjectSetVisibleFuncFeature) <= _codeMemSize; i++)
 	//	{
 	//		if (_MatchFeatureCode(_codeMem + i, layerObjectSetVisibleFuncFeature, sizeof(layerObjectSetVisibleFuncFeature)))
 	//		{
-	//			SDL_Log("LayerObject SetVisible Func Finded.");
+	//			Log("LayerObject SetVisible Func Finded.");
 	//			addrJson["CspAddressRVA"]["LayerObject_SetVisible_Func"] = _VA + i;
 	//			success = true;
 	//			break;
 	//		}
 	//	}
 	//	if (!success)
-	//		SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject SetVisible Func Not Found!");
+	//		LogError( "LayerObject SetVisible Func Not Found!");
 
 	//}
 
@@ -158,7 +156,7 @@ void AddressGenerator::PushLayerObjectAddr()
 		//先寻找下方特征
 		bool success = false;
 		uint32_t resultValue = 0;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectGetMenuParam2InternalFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectGetMenuParam2InternalFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectGetMenuParam2InternalFuncFeature, sizeof(layerObjectGetMenuParam2InternalFuncFeature)))
 			{
@@ -171,7 +169,7 @@ void AddressGenerator::PushLayerObjectAddr()
 		if (success)
 		{
 			success = false;
-			for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectGetMenuParam2FuncFeature); i++)
+			for (uint32_t i = 0; i + sizeof(layerObjectGetMenuParam2FuncFeature) <= _codeMemSize; i++)
 			{
 				if (_MatchFeatureCode(_codeMem + i, layerObjectGetMenuParam2FuncFeature, sizeof(layerObjectGetMenuParam2FuncFeature)))
 				{
@@ -180,7 +178,7 @@ void AddressGenerator::PushLayerObjectAddr()
 
 					if (calcAddress == resultValue)
 					{
-						SDL_Log("LayerObject GetMenuFuncParam2 Func Finded.");
+						Log("LayerObject GetMenuFuncParam2 Func Finded.");
 						addrJson["CspAddressRVA"]["LayerObject_GetMenuFuncParam2_Func"] = _VA + i;
 						addrJson["CspAddressRVA"]["LayerObject_ReleaseMenuFuncParam2_Func"] = _VA + i+0x30;
 						success = true;
@@ -190,7 +188,7 @@ void AddressGenerator::PushLayerObjectAddr()
 			}
 		}
 		else
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject GetMenuFuncParam2 Func Not Found!");
+			LogError( "LayerObject GetMenuFuncParam2 Func Not Found!");
 
 
 	}
@@ -225,11 +223,11 @@ void AddressGenerator::PushLayerObjectAddr()
 		};
 	
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectGetMenuParam3FuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectGetMenuParam3FuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectGetMenuParam3FuncFeature, sizeof(layerObjectGetMenuParam3FuncFeature)))
 			{
-				SDL_Log("LayerObject GetFuncParam3 Func Finded.");
+				Log("LayerObject GetFuncParam3 Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_GetMenuFuncParam3_Func"] = _VA + i ;
 
 				_param3MagicAddr = *(uint32_t*)(_codeMem + i + 9)+i+9+4;
@@ -239,7 +237,7 @@ void AddressGenerator::PushLayerObjectAddr()
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject GetMenuFuncParam3 Func Not Found!");
+			LogError( "LayerObject GetMenuFuncParam3 Func Not Found!");
 	}
 	//释放菜单参数3
 	{
@@ -280,7 +278,7 @@ void AddressGenerator::PushLayerObjectAddr()
 		//};
 	
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectReleaseMenuParam3FuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectReleaseMenuParam3FuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectReleaseMenuParam3FuncFeature, sizeof(layerObjectReleaseMenuParam3FuncFeature)))
 			{
@@ -288,14 +286,14 @@ void AddressGenerator::PushLayerObjectAddr()
 				uint32_t targetAddr = *(uint32_t*)(_codeMem + i + 13) + i + 13 + 4;
 				if (targetAddr != _param3MagicAddr)continue;
 
-				SDL_Log("LayerObject ReleaseFuncParam3 Func Finded.");
+				Log("LayerObject ReleaseFuncParam3 Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_ReleaseMenuFuncParam3_Func"] = _VA + i + 20;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject ReleaseMenuFuncParam3 Func Not Found!");
+			LogError( "LayerObject ReleaseMenuFuncParam3 Func Not Found!");
 	}
 
 
@@ -317,18 +315,18 @@ void AddressGenerator::PushLayerObjectAddr()
 		0x4C,0x8B,0xF9,0x48,0x89,0x4C,0x24,0x60,0x48,0x8D,0x54,0x24,0x50,0x48,0x8B,0x09
 		};
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectMoveUpFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectMoveUpFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectMoveUpFuncFeature, sizeof(layerObjectMoveUpFuncFeature)))
 			{
-				SDL_Log("LayerObject MoveUp Func Finded.");
+				Log("LayerObject MoveUp Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_MoveUp_Func"] = _VA + i+16;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject MoveUp Func Not Found!");	
+			LogError( "LayerObject MoveUp Func Not Found!");	
 	}
 	//图层下移1层
 	{
@@ -345,18 +343,18 @@ void AddressGenerator::PushLayerObjectAddr()
 0x4C,0x8B,0xF9,0x48,0x89,0x4C,0x24,0x60,0x48,0x8D,0x54,0x24,0x50,0x48,0x8B,0x09
 		};
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectMoveDownFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectMoveDownFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectMoveDownFuncFeature, sizeof(layerObjectMoveDownFuncFeature)))
 			{
-				SDL_Log("LayerObject MoveDown Func Finded.");
+				Log("LayerObject MoveDown Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_MoveDown_Func"] = _VA + i+10;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject MoveDown Func Not Found!");	
+			LogError( "LayerObject MoveDown Func Not Found!");	
 	}
 	//图层向下合并
 	{
@@ -419,11 +417,11 @@ void AddressGenerator::PushLayerObjectAddr()
 
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectMergeDownFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectMergeDownFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectMergeDownFuncFeature, sizeof(layerObjectMergeDownFuncFeature)))
 			{
-				SDL_Log("LayerObject MergeDown Func Finded.");
+				Log("LayerObject MergeDown Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_MergeDown_Func"] = _VA + i;
 				success = true;
 				break;
@@ -432,11 +430,11 @@ void AddressGenerator::PushLayerObjectAddr()
 		if (!success)
 		{
 			//寻找UDM特征？
-			for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectMergeDownFuncFeature_UDM); i++)
+			for (uint32_t i = 0; i + sizeof(layerObjectMergeDownFuncFeature_UDM) <= _codeMemSize; i++)
 			{
 				if (_MatchFeatureCode(_codeMem + i, layerObjectMergeDownFuncFeature_UDM, sizeof(layerObjectMergeDownFuncFeature_UDM)))
 				{
-					SDL_Log("LayerObject MergeDown Func Finded.");
+					Log("LayerObject MergeDown Func Finded.");
 					addrJson["CspAddressRVA"]["LayerObject_MergeDown_Func"] = _VA + i;
 					success = true;
 					break;
@@ -444,7 +442,7 @@ void AddressGenerator::PushLayerObjectAddr()
 			}
 			if (!success)
 			{
-				SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject MergeDown Func Not Found!");
+				LogError( "LayerObject MergeDown Func Not Found!");
 			}
 		}
 	}
@@ -467,18 +465,18 @@ void AddressGenerator::PushLayerObjectAddr()
 		};
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectMergeDownPatchAddrFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectMergeDownPatchAddrFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectMergeDownPatchAddrFeature, sizeof(layerObjectMergeDownPatchAddrFeature)))
 			{
-				SDL_Log("LayerObject MergeDown Patch Addr Finded.");
+				Log("LayerObject MergeDown Patch Addr Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_MergeDownPatchAddr"] = _VA + i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject MergeDown Patch Addr Not Found!");
+			LogError( "LayerObject MergeDown Patch Addr Not Found!");
 	}
 
 	//新建图层
@@ -497,18 +495,18 @@ void AddressGenerator::PushLayerObjectAddr()
 0x24,0x30,0xBF,0x01,0x00,0x00,0x00,0x48,0x85,0xC9,0x74,0x07
 		};
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectMergeDownFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectMergeDownFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectMergeDownFuncFeature, sizeof(layerObjectMergeDownFuncFeature)))
 			{
-				SDL_Log("LayerObject CreateLayer Func Finded.");
+				Log("LayerObject CreateLayer Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_CreateLayer_Func"] = _VA + i+5;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject CreateLayer Func Not Found!");
+			LogError( "LayerObject CreateLayer Func Not Found!");
 	}
 	//合并所选图层
 	{
@@ -547,21 +545,21 @@ void AddressGenerator::PushLayerObjectAddr()
 //48,85,C9,74,07
 		//};
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(layerObjectMergeSelectFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(layerObjectMergeSelectFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, layerObjectMergeSelectFuncFeature, sizeof(layerObjectMergeSelectFuncFeature)))
 			{
 				//此代码最后的E8即是调用地址
 				uint32_t off=*(uint32_t*)(_codeMem+i + sizeof(layerObjectMergeSelectFuncFeature));
 
-				SDL_Log("LayerObject MergeSelect Func Finded.");
+				Log("LayerObject MergeSelect Func Finded.");
 				addrJson["CspAddressRVA"]["LayerObject_MergeSelect_Func"] = _VA + i+ sizeof(layerObjectMergeSelectFuncFeature)+4+off;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "LayerObject MergeSelect Func Not Found!");
+			LogError( "LayerObject MergeSelect Func Not Found!");
 	}
 }
 

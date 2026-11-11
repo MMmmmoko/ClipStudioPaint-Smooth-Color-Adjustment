@@ -45,9 +45,7 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 ### Linux
 
-有启动速度的优化，但仅Linux中CSP可用，优动漫不可用。通过对'CSPPatchTool.exe'以"-linux"的命令行参数启动，以此启用针对Linux中使用wine启动CSP的启动时间的优化，这会生成一个新的CSP可执行文件，后续需要使用新生成的文件进入CSP。
-
-注意！请知悉此启动时间的优化的本身是来自一个意外BUG，早期版本的插件对调色计时器打补丁的时候对CSP代码中所有非调色相关计时器也全部打上了补丁，由此辐射影响到Linux中CSP启动速度，具体影响机制是未知的，且也可能在其他地方产生意想不到的正面或负面影响，请谨慎使用。
+旧版 `CSPPatchTool` 的 `-linux` 启动优化已暂停。
 
 ## 正版支持声明
 
@@ -55,23 +53,12 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 ## 使用方法
 
-将下载到的文件CSPMOD.dll和CSPPatchTool.exe移动到CLIPStudioPaint.exe所在的文件夹内（注意是有Paint后缀的，不是CLIPStudio.exe，优动漫是UDMPaintPRO.exe/UDMPaintEX.exe）。双击运行CSPPatchTool.exe，如果成功，此时文件夹内会生成一个json文件，如下图。
+将 `CSPMOD.dll` 放在 `CLIPStudioPaint.exe` 所在目录，优动漫使用 `UDMPaintPRO.exe` 或 `UDMPaintEX.exe` 所在目录。将 `AAload.dll` 和随附的 `SmoothFilter_*.dll` 放到该目录下的 `PlugIn\PAINT\`。启动软件后由 `CSPMOD.dll` 按宿主版本和文件 SHA-256 检查并自动生成 `CSPAddrTable.json`。每次重建会把识别失败的特征写入 `CSPAddrTable.build.log`。安装目录不可写时，缓存和日志保存在当前用户的 `%APPDATA%\CSPMOD\AddressTable\` 下。
 
-<img src="Docs/Images/readme_foldScreenCapture.png"/>
 
-有可能出现因为没有文件夹内的写入权限而创建文件失败，这种情况对CSPPatchTool.exe右键用管理员身份启动即可。
+### 色调调整&色调调整图层&模糊滤镜&自由变换
 
-将工具附带的除CSPMOD.dll之外的dll放进当前文件夹内部的
-`PlugIn\PAINT\`
-文件夹中即可完成此工具的安装。
-
-<img src="Docs/Images/readme_pluginfoldScreenCapture.png"/>
-
-**注意！不要使用第三方文件浏览器进行操作！可能会导致路径问题！**
-
-### 色调调整&色调调整图层&模糊滤镜
-
-进入软件后，调色功能按以往的方式直接使用即可。本辅助工具支持色相明度饱和度、色彩平衡、曲线的预览。
+进入软件后，调色功能按以往的方式直接使用即可。本辅助工具支持色相明度饱和度、色彩平衡、曲线、色阶的预览。
 
 本工具提供的模糊滤镜入口在滤镜菜单的“流畅调色”内，支持高斯模糊和移动模糊。
 
@@ -138,4 +125,6 @@ CSP流畅调色是一个免费提供的，用于改善CSP功能的辅助工具�
 
 下面的内容不是写给普通使用者的，只使用工具的话不用看下面啦。
 
-我已将依赖都放置入库中Common/bin，部分文件超大，我将其打包了一下，需要将其中的压缩包就地解压，解压后的路径应该是Common/bin/*.lib，然后库中的VS解决方案基本就可以直接进行编译了，不过工程属性中仍然有部分难以修改的绝对路径。如果你想要编译和修改此工具，还需要对项目属性的【调试】中的路径和【生成事件->生成后事件】中的路径进行删除或手动指定。DEBUG模式下，需要将Dll文件使用的UI资源（DuiResource文件夹）放置在CLIPStudioPaint_Patched.exe所在的文件夹内，RELEASE模式使用的是Dll内嵌资源，请参考Dui/CatDuiThread.cpp
+我已将依赖都放置入库中Common/bin，部分文件超大，我将其打包了一下，需要将其中的压缩包就地解压，解压后的路径应该是Common/bin/*.lib，然后库中的VS解决方案基本就可以直接进行编译了，不过工程属性中仍然有部分难以修改的绝对路径。如果你想要编译和修改此工具，还需要对项目属性的【调试】中的路径和【生成事件->生成后事件】中的路径进行删除或手动指定。DEBUG模式下，需要将Dll文件使用的UI资源（DuiResource文件夹）放置在CLIPStudioPaint.exe 所在的文件夹内，RELEASE模式使用的是Dll内嵌资源，请参考Dui/CatDuiThread.cpp
+
+如果现有 `duilib.lib` 或 `duilib_d.lib` 因 `GlobalManager::Startup` 接口版本不同而链接失败，可通过 MSBuild 属性 `/p:CSPMODDuiLibDir=<兼容的库目录>` 指定对应版本的 DuiLib。只生成工作区产物时可附加 `/p:PostBuildEventUseInBuild=false`。

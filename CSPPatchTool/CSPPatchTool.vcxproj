@@ -137,22 +137,12 @@
     <ClCompile Include="..\Common\src\json\json_value.cpp" />
     <ClCompile Include="..\Common\src\json\json_writer.cpp" />
     <ClCompile Include="..\Common\src\Util.cpp" />
-    <ClCompile Include="AddressGenerator.cpp" />
-    <ClCompile Include="AddressGenerator_ColorBalance.cpp" />
-    <ClCompile Include="AddressGenerator_CSPData.cpp" />
-    <ClCompile Include="AddressGenerator_CSPHelper.cpp" />
-    <ClCompile Include="AddressGenerator_CustomFilter.cpp" />
-    <ClCompile Include="AddressGenerator_HSV.cpp" />
-    <ClCompile Include="AddressGenerator_LayerObject.cpp" />
-    <ClCompile Include="AddressGenerator_TimeLapseExport.cpp" />
-    <ClCompile Include="AddressGenerator_ToneCurve.cpp" />
     <ClCompile Include="CSPHacker.cpp" />
     <ClCompile Include="DllInject.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\src\json\json_tool.h" />
-    <ClInclude Include="AddressGenerator.h" />
     <ClInclude Include="CSPHacker.h" />
     <ClInclude Include="DllInject.h" />
   </ItemGroup>

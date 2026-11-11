@@ -62,7 +62,7 @@
     <ClInclude Include="AddressTable.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_tool.h">
+    <ClInclude Include="..\Common\src\json\json_tool.h">
       <Filter>Util\Json</Filter>
     </ClInclude>
     <ClInclude Include="CSPMOD.h">
@@ -188,13 +188,13 @@
     <ClCompile Include="AddressTable.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_value.cpp">
+    <ClCompile Include="..\Common\src\json\json_value.cpp">
       <Filter>Util\Json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_writer.cpp">
+    <ClCompile Include="..\Common\src\json\json_writer.cpp">
       <Filter>Util\Json</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_reader.cpp">
+    <ClCompile Include="..\Common\src\json\json_reader.cpp">
       <Filter>Util\Json</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\src\Util.cpp">
@@ -304,7 +304,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\CatTuber64\project\CatTuber64\CatTuber64\src\Util\json\json_valueiterator.inl">
+    <None Include="..\Common\src\json\json_valueiterator.inl">
       <Filter>Util\Json</Filter>
     </None>
     <None Include="DuiResource.zip">
@@ -407,5 +407,27 @@
     <FxCompile Include="Graphic\Shaders\AlphaBlurPS.hlsl">
       <Filter>Graphic\Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator.cpp" />
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_ColorBalance.cpp" />
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_CSPData.cpp" />
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_CSPHelper.cpp" />
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_CustomFilter.cpp" />
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_HSV.cpp" />
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_LayerObject.cpp" />
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_TimeLapseExport.cpp" />
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_ToneCurve.cpp" />
+    <ClInclude Include="..\Common\AddressGenerator\AddressGenerator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FreeTransformLocator.cpp" />
+    <ClCompile Include="LevelsPreview.cpp" />
+    <ClCompile Include="FreeTransform.cpp" />
+    <ClInclude Include="FreeTransform.h" />
+    <FxCompile Include="Graphic\Shaders\FreeTransformCS.hlsl" />
+    <ClInclude Include="FreeTransformLocator.h" />
+    <ClInclude Include="LevelsPreview.h" />
+    <ClInclude Include="NativeCode.h" />
   </ItemGroup>
 </Project>

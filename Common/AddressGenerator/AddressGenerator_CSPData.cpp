@@ -1,13 +1,11 @@
 #include"AddressGenerator.h"
-#include"DllInject.h"
-#include<SDL3/SDL.h>
 
 
 void AddressGenerator::PushCSPDataAddr()
 {
 	//获取一些关于CSP的数据
 
-	SDL_Log("Start Find CSP Info Addresses...");
+	Log("Start Find CSP Info Addresses...");
 
 	//UI色表基址
 	{
@@ -19,11 +17,11 @@ void AddressGenerator::PushCSPDataAddr()
 		};
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(colorTableFeature); i++)
+		for (uint32_t i = 0; i + sizeof(colorTableFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, colorTableFeature, sizeof(colorTableFeature)))
 			{
-				SDL_Log("CSP UI ColorTbale BaseAddr Finded.");
+				Log("CSP UI ColorTbale BaseAddr Finded.");
 				//颜色表在特征的中间，不是起始位置
 				//需要进行一次计算
 				uint32_t addrOff = *(uint32_t*)(_codeMem + i + 7);
@@ -33,7 +31,7 @@ void AddressGenerator::PushCSPDataAddr()
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSP UI ColorTbale BaseAddr Not Found!");
+			LogError( "CSP UI ColorTbale BaseAddr Not Found!");
 	}
 
 	//当前画布尺寸基址
@@ -48,11 +46,11 @@ void AddressGenerator::PushCSPDataAddr()
 		};
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(canvasSizeTableFeature); i++)
+		for (uint32_t i = 0; i + sizeof(canvasSizeTableFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, canvasSizeTableFeature, sizeof(canvasSizeTableFeature)))
 			{
-				SDL_Log("CSP CanvasSize BaseAddr Finded.");
+				Log("CSP CanvasSize BaseAddr Finded.");
 				//颜色表在特征的中间，不是起始位置
 				//需要进行一次计算
 				uint32_t addrOff = *(uint32_t*)(_codeMem + i + 9);
@@ -62,7 +60,7 @@ void AddressGenerator::PushCSPDataAddr()
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSP CanvasSize BaseAddr Not Found!");
+			LogError( "CSP CanvasSize BaseAddr Not Found!");
 	}
 	//主窗口句柄基址
 	{
@@ -75,11 +73,11 @@ void AddressGenerator::PushCSPDataAddr()
 		};
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(nativeWindowHandleFeature); i++)
+		for (uint32_t i = 0; i + sizeof(nativeWindowHandleFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, nativeWindowHandleFeature, sizeof(nativeWindowHandleFeature)))
 			{
-				SDL_Log("CSP Native Window Handle BaseAddr Finded.");
+				Log("CSP Native Window Handle BaseAddr Finded.");
 				//颜色表在特征的中间，不是起始位置
 				//需要进行一次计算
 				uint32_t addrOff = *(uint32_t*)(_codeMem + i + 5);
@@ -89,7 +87,7 @@ void AddressGenerator::PushCSPDataAddr()
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSP Native Window Handle  Not Found!");
+			LogError( "CSP Native Window Handle  Not Found!");
 	}
 	//监听设置窗口显示隐藏的基址
 	//48 89 5C 24 10 48 89 74 24 18 55 57 41 54 41 56 41 57 48 8D 6C 24 C9 48 81 EC E0 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 27 48 8D 55 D7 48 8B D9
@@ -105,18 +103,18 @@ void AddressGenerator::PushCSPDataAddr()
 		};
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(onSetPanelShowStatesFeature); i++)
+		for (uint32_t i = 0; i + sizeof(onSetPanelShowStatesFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, onSetPanelShowStatesFeature, sizeof(onSetPanelShowStatesFeature)))
 			{
-				SDL_Log("CSP OnSetPanelShowStates Func Finded.");
+				Log("CSP OnSetPanelShowStates Func Finded.");
 				addrJson["CspAddressRVA"]["CSPInfo_OnSetPanelShowStates_Func"] = _VA + (uint32_t)i;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSP OnSetPanelShowStates Func Not Found!");
+			LogError( "CSP OnSetPanelShowStates Func Not Found!");
 	}
 
 
@@ -134,21 +132,21 @@ void AddressGenerator::PushCSPDataAddr()
 		};
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(setColorFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(setColorFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, setColorFuncFeature, sizeof(setColorFuncFeature)))
 			{
 				//此代码最后的E8即是调用地址
 				uint32_t off = *(uint32_t*)(_codeMem + i + 11+5+9+1);
 
-				SDL_Log("CSPPaintColor SetColor Func Finded.");
+				Log("CSPPaintColor SetColor Func Finded.");
 				addrJson["CspAddressRVA"]["CSPPaintColor_SetColor_Func"] = _VA + i + 11+5+9+ 5 + off;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSPPaintColor SetColor Func Not Found!");
+			LogError( "CSPPaintColor SetColor Func Not Found!");
 	}
 
 	//获取主副色所用的对象、设置主副色、释放查询对象
@@ -170,7 +168,7 @@ void AddressGenerator::PushCSPDataAddr()
 
 		//每个0x48,0x8D,0x8C,0x24,BYTEWILDCARD, BYTEWILDCARD,BYTEWILDCARD,BYTEWILDCARD 指向的数值相等
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(GetSetColorTypeFeature); i++)
+		for (uint32_t i = 0; i + sizeof(GetSetColorTypeFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, GetSetColorTypeFeature, sizeof(GetSetColorTypeFeature)))
 			{
@@ -181,15 +179,15 @@ void AddressGenerator::PushCSPDataAddr()
 				{
 					
 					uint32_t off = *(uint32_t*)(_codeMem + i + 8 + 8 + 1);
-					SDL_Log("CSPPaintColor GetColorHost Func Finded.");
+					Log("CSPPaintColor GetColorHost Func Finded.");
 					addrJson["CspAddressRVA"]["CSPPaintColor_GetColorHost_Func"] = _VA + i + 8 + 8 + 5 + off;
 					
 					off = *(uint32_t*)(_codeMem + i + 8 + 8 + 5+1+8+2+1);
-					SDL_Log("CSPPaintColor SetWorkingColor Func Finded.");
+					Log("CSPPaintColor SetWorkingColor Func Finded.");
 					addrJson["CspAddressRVA"]["CSPPaintColor_SetWorkingColor_Func"] = _VA + i + 8 + 8 + 5 + 1 + 8 + 2 + 5 + off;
 					
 					off = *(uint32_t*)(_codeMem + i + 8 + 8 + 5+1+8+2+5+3+8+1);
-					SDL_Log("CSPPaintColor ReleaseColorHost Func Finded.");
+					Log("CSPPaintColor ReleaseColorHost Func Finded.");
 					addrJson["CspAddressRVA"]["CSPPaintColor_ReleaseColorHost_Func"] = _VA + i + 8 + 8 + 5 + 1 + 8 + 2 + 5 + 3 + 8 + 5 + off;
 
 
@@ -202,9 +200,9 @@ void AddressGenerator::PushCSPDataAddr()
 		}
 		if (!success)
 		{
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSPPaintColor GetColorHost Func Not Found!");
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSPPaintColor SetWorkingColor Func Not Found!");
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSPPaintColor ReleaseColorHost Func Not Found!");
+			LogError( "CSPPaintColor GetColorHost Func Not Found!");
+			LogError( "CSPPaintColor SetWorkingColor Func Not Found!");
+			LogError( "CSPPaintColor ReleaseColorHost Func Not Found!");
 
 		}
 
@@ -227,21 +225,21 @@ void AddressGenerator::PushCSPDataAddr()
 		};
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(onColorChangedFuncFeature); i++)
+		for (uint32_t i = 0; i + sizeof(onColorChangedFuncFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, onColorChangedFuncFeature, sizeof(onColorChangedFuncFeature)))
 			{
 				//此代码最后的E8即是调用地址
 				uint32_t off = *(uint32_t*)(_codeMem + i + 10 + 10 + 10  +10+8+1);
 
-				SDL_Log("CSPPaintColor OnColorChanged Func Finded.");
+				Log("CSPPaintColor OnColorChanged Func Finded.");
 				addrJson["CspAddressRVA"]["CSPPaintColor_OnColorChanged_Func"] = _VA + i + 10 + 10 + 10 + 10 + 8 + 5 + off;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSPPaintColor OnColorChanged Func Not Found!");
+			LogError( "CSPPaintColor OnColorChanged Func Not Found!");
 	}
 
 
@@ -279,19 +277,19 @@ void AddressGenerator::PushCSPDataAddr()
 		};
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(navigatorRectPosConvertCodeFeature); i++)
+		for (uint32_t i = 0; i + sizeof(navigatorRectPosConvertCodeFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, navigatorRectPosConvertCodeFeature, sizeof(navigatorRectPosConvertCodeFeature)))
 			{
 
-				SDL_Log("CSPNavigator GetRectPos Code Addr Finded.");
+				Log("CSPNavigator GetRectPos Code Addr Finded.");
 				addrJson["CspAddressRVA"]["CSPNavigator_GetRectPos_CodeAddr"] = _VA + i + 10 + 7 ;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSPNavigator GetRectPos CodeAddr Func Not Found!");
+			LogError( "CSPNavigator GetRectPos CodeAddr Func Not Found!");
 	}
 
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window size="560,480"
+<Window size="560,554"
         caption="0,0,0,28" use_system_caption="false" snap_layout_menu="true" sys_menu="true" sys_menu_rect="0,0,36,36" 
         shadow_type="default" shadow_attached="true" shadow_snap="true" layered_window="true" 
         alpha="255" icon="public/caption/logo.ico"
@@ -72,6 +72,20 @@
 				<Control />
 				<Control class="CF_SupportedIcon" name="supportedIcon_tonecurve"/>
 				<CheckBox class="CF_Checkbox_dark" name="checkBox_tonecurve"/>
+			</HBox>
+			<Control class="CF_Separator"/>
+			<HBox height="auto">
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_LEVELS"/>
+				<Control />
+				<Control class="CF_SupportedIcon" name="supportedIcon_levels"/>
+				<CheckBox class="CF_Checkbox_dark" name="checkBox_levels"/>
+			</HBox>
+			<Control class="CF_Separator"/>
+			<HBox height="auto">
+				<Label class="CF_ItemLable" text_id="STRID_CHECKFUNCTIONS_FREETRANSFORM"/>
+				<Control />
+				<Control class="CF_SupportedIcon" name="supportedIcon_freetransform"/>
+				<CheckBox class="CF_Checkbox_dark" name="checkBox_freetransform"/>
 			</HBox>
 			<Control class="CF_Separator"/>
 			<HBox height="auto">

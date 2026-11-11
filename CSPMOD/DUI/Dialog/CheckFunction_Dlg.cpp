@@ -5,6 +5,8 @@
 #include"TA_HSV.h"
 #include"TA_ColorBalance.h"
 #include"TA_ToneCurve.h"
+#include"LevelsPreview.h"
+#include"FreeTransform.h"
 #include"TimeLapseExport.h"
 #include"ScriptAction_ApplyEffects.h"
 #include"AppSettings.h"
@@ -119,6 +121,26 @@ void CheckFunction_Dlg::OnInitWindow()
     checkBox_applyeffects->AttachUnSelect(UiBind(&CheckFunction_Dlg::OnCheckBoxClick, this, std::placeholders::_1));
     checkBox_hideNavigatorViewIndicator->AttachUnSelect(UiBind(&CheckFunction_Dlg::OnCheckBoxClick, this, std::placeholders::_1));
 
+    const auto initPreviewCheckbox = [this](const wchar_t* checkboxName, const wchar_t* iconName,
+        bool available, bool selected) {
+        if (auto* icon = FindControl(iconName))
+            icon->SetVisible(available);
+        auto* checkbox = static_cast<ui::CheckBox*>(FindControl(checkboxName));
+        if (checkbox)
+        {
+            if (CspColorTable::GetTheme() == CspColorTable::Light)
+                checkbox->SetClass(L"CF_Checkbox_light");
+            checkbox->SetVisible(available);
+            checkbox->SetSelected(selected);
+            checkbox->AttachSelect(UiBind(&CheckFunction_Dlg::OnCheckBoxClick, this, std::placeholders::_1));
+            checkbox->AttachUnSelect(UiBind(&CheckFunction_Dlg::OnCheckBoxClick, this, std::placeholders::_1));
+        }
+        return checkbox;
+    };
+    checkBox_levels = initPreviewCheckbox(L"checkBox_levels", L"supportedIcon_levels",
+        LevelsPreview::Available(), AppSettings::GetFunctionEnableLevelsPreview());
+    checkBox_freetransform = initPreviewCheckbox(L"checkBox_freetransform", L"supportedIcon_freetransform",
+        FreeTransform::Available(), AppSettings::GetFunctionEnableFreeTransformPreview());
 
 
     //其他UI控件
@@ -155,6 +177,16 @@ bool CheckFunction_Dlg::OnCheckBoxClick(const ui::EventArgs& args)
     if (args.GetSender() == checkBox_tonecurve)
     {
         AppSettings::SetFunctionEnableToneCurve(checkBox_tonecurve->IsSelected());
+        return true;
+    }
+    if (checkBox_levels && args.GetSender() == checkBox_levels)
+    {
+        AppSettings::SetFunctionEnableLevelsPreview(checkBox_levels->IsSelected());
+        return true;
+    }
+    if (checkBox_freetransform && args.GetSender() == checkBox_freetransform)
+    {
+        AppSettings::SetFunctionEnableFreeTransformPreview(checkBox_freetransform->IsSelected());
         return true;
     }
     if (args.GetSender() == checkBox_timelapseexport)

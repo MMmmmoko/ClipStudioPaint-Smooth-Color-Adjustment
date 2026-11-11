@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="资源文件">
@@ -16,7 +16,6 @@
     <ClCompile Include="DllInject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CSPHacker.cpp" />
-    <ClCompile Include="AddressGenerator.cpp" />
     <ClCompile Include="..\Common\src\Util.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -29,19 +28,10 @@
     <ClCompile Include="..\Common\src\json\json_writer.cpp">
       <Filter>Util\Json</Filter>
     </ClCompile>
-    <ClCompile Include="AddressGenerator_HSV.cpp" />
-    <ClCompile Include="AddressGenerator_ColorBalance.cpp" />
-    <ClCompile Include="AddressGenerator_ToneCurve.cpp" />
-    <ClCompile Include="AddressGenerator_TimeLapseExport.cpp" />
-    <ClCompile Include="AddressGenerator_CSPData.cpp" />
-    <ClCompile Include="AddressGenerator_LayerObject.cpp" />
-    <ClCompile Include="AddressGenerator_CSPHelper.cpp" />
-    <ClCompile Include="AddressGenerator_CustomFilter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DllInject.h" />
     <ClInclude Include="CSPHacker.h" />
-    <ClInclude Include="AddressGenerator.h" />
     <ClInclude Include="..\Common\src\json\json_tool.h">
       <Filter>Util\Json</Filter>
     </ClInclude>

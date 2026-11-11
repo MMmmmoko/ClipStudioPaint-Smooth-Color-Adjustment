@@ -1,11 +1,9 @@
 #include"AddressGenerator.h"
-#include"DllInject.h"
-#include<SDL3/SDL.h>
 
 
 void AddressGenerator::PushCustomFilterAddr()
 {
-	SDL_Log("Start Find CSP CustomFilter Addresses...");
+	Log("Start Find CSP CustomFilter Addresses...");
 	{
 		//66 0F 73 D8 08 66 48 0F 7E C1 48 85 C9 74 07 8B C3 F0 0F C1 41 08 4C 8D 85 A8 00 00 00 48 8D 55 90 48 8D 4D 18 E8 ? ? ? ? ? ? ? ? 0F 10 00 F2 0F 11 87 A0 02 00 00 66 0F 15 C0 F2 0F 11 87 A8 02 00 00 8B D3 48 8D 8D 98 00 00 00
 
@@ -23,21 +21,21 @@ void AddressGenerator::PushCustomFilterAddr()
 		};
 
 		bool success = false;
-		for (uint32_t i = 0; i < _codeMemSize - sizeof(entranceFeature); i++)
+		for (uint32_t i = 0; i + sizeof(entranceFeature) <= _codeMemSize; i++)
 		{
 			if (_MatchFeatureCode(_codeMem + i, entranceFeature, sizeof(entranceFeature)))
 			{
 				//此代码最后的E8即是调用地址
 				uint32_t off = *(uint32_t*)(_codeMem + i + 10 + 10 + 10 + 7 + 1);
 
-				SDL_Log("CSPCustomFilter WindowPosToCanvasPos Func Finded.");
+				Log("CSPCustomFilter WindowPosToCanvasPos Func Finded.");
 				addrJson["CspAddressRVA"]["CSPCustomFilter_WindowPosToCanvasPos_Func"] = _VA + i + 10 + 10 + 10 + 7 +  5 + off;
 				success = true;
 				break;
 			}
 		}
 		if (!success)
-			SDL_LogError(SDL_LogCategory::SDL_LOG_CATEGORY_ERROR, "CSPCustomFilter WindowPosToCanvasPos Func Not Found!");
+			LogError( "CSPCustomFilter WindowPosToCanvasPos Func Not Found!");
 
 	}
 
