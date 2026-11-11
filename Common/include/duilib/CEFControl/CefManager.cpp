@@ -25,15 +25,15 @@
 namespace ui
 {
 //创建CEF控件的回调函数
-static Control* DuilibCreateCefControl(const DString& className)
+static Control* DuilibCreateCefControl(const DString& className,Window* window)
 {
     Control* pControl = nullptr;
     if (className == _T("CefControl")) {
         if (ui::CefManager::GetInstance()->IsEnableOffScreenRendering()) {
-            pControl = new CefControlOffScreen(nullptr);
+            pControl = new CefControlOffScreen(window);
         }
         else {
-            pControl = new CefControlNative(nullptr);
+            pControl = new CefControlNative(window);
         }
     }
     return pControl;

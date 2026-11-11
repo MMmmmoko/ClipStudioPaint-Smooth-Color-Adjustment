@@ -134,7 +134,7 @@ void VirtualVLayout::SetItemSize(UiSize szItem, bool bArrange)
 {
     szItem.cx = std::max(szItem.cx, 0);
     szItem.cy = std::max(szItem.cy, 0);
-    ASSERT((szItem.cx > 0) && (szItem.cy > 0));
+    //ASSERT((szItem.cx > 0) && (szItem.cy > 0));
     if ((m_szItem.cx != szItem.cx) || (m_szItem.cy != szItem.cy)) {
         m_szItem = szItem;
         if (bArrange && (GetOwner() != nullptr)) {

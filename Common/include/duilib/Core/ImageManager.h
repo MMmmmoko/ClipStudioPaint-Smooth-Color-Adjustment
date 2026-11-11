@@ -46,6 +46,8 @@ public:
     */
     void ReleaseImage(const std::shared_ptr<IImage>& pImageData);
 
+    void ReleaseImageIM(const DString& imgPath, int sizeW = 0, int sizeH = 0);
+
     /** 取消释放原图图片
     */
     void CancelReleaseImage(const std::shared_ptr<IImage>& pImageData);

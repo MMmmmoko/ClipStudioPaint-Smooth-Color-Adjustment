@@ -78,15 +78,13 @@ namespace ui
 
                         return true;
                     }
-
-
-
-
-
-
-
                 }
-                else {
+                else if (msg.vkCode == _T('.'))
+                {
+                    return true;
+                }
+                else
+                {
                     return true;
                 }
             }

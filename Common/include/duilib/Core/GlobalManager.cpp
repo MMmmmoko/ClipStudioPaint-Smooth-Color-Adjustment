@@ -903,19 +903,6 @@ bool GlobalManager::FillBoxWithCache(Box* pUserDefinedBox, const FilePath& strXm
     return (pBox != nullptr);
 }
 
-Control* GlobalManager::CreateControl(const DString& strControlName)
-{
-    Control* pControl = nullptr;
-    for (CreateControlCallback pfnCreateControlCallback : m_pfnCreateControlCallbackList) {
-        if (pfnCreateControlCallback != nullptr) {
-            pControl = pfnCreateControlCallback(strControlName);
-            if (pControl != nullptr) {
-                break;
-            }
-        }
-    }
-    return pControl;
-}
 
 void GlobalManager::AddCreateControlCallback(const CreateControlCallback& pfnCreateControlCallback)
 {

@@ -200,12 +200,12 @@ void DrawSkiaImage::DrawImage(SkCanvas* pSkCanvas,
         PerformanceStat statPerformance(_T("Render_Skia::DrawSkiaImage::DrawImage drawImageRect(StbImage)"));
         rcSkSrc.fRight = rcSkSrc.fLeft + skNewImage->width();
         rcSkSrc.fBottom = rcSkSrc.fTop + skNewImage->height();
-        pSkCanvas->drawImageRect(skNewImage, rcSkSrc, rcSkDest, SkSamplingOptions(), &skPaint, SkCanvas::kStrict_SrcRectConstraint);
+        pSkCanvas->drawImageRect(skNewImage, rcSkSrc, rcSkDest, SkSamplingOptions(SkFilterMode::kLinear), &skPaint, SkCanvas::kStrict_SrcRectConstraint);
     }
 #endif
     else {
         PerformanceStat statPerformance(_T("Render_Skia::DrawSkiaImage::DrawImage drawImageRect(Skia Only)"));
-        pSkCanvas->drawImageRect(skSrcImage, rcSkSrc, rcSkDest, SkSamplingOptions(), &skPaint, SkCanvas::kStrict_SrcRectConstraint);
+        pSkCanvas->drawImageRect(skSrcImage, rcSkSrc, rcSkDest, SkSamplingOptions(SkFilterMode::kLinear), &skPaint, SkCanvas::kStrict_SrcRectConstraint);
     }
 }
 

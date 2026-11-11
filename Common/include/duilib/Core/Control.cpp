@@ -856,7 +856,7 @@ DString Control::GetBkColor() const
 
 void Control::SetBkColor(const DString& strColor)
 {
-    ASSERT(strColor.empty() || HasUiColor(strColor));
+    //ASSERT(strColor.empty() || HasUiColor(strColor));
     if (m_pColorData == nullptr) {
         m_pColorData = std::make_unique<TColorData>();
     }
@@ -957,7 +957,7 @@ DString Control::GetForeColor() const
 
 void Control::SetForeColor(const DString& strColor)
 {
-    ASSERT(strColor.empty() || HasUiColor(strColor));
+    //ASSERT(strColor.empty() || HasUiColor(strColor));
     if (m_pColorData == nullptr) {
         m_pColorData = std::make_unique<TColorData>();
     }
@@ -4713,7 +4713,7 @@ UiColor Control::GetUiColor(const DString& colorName) const
         return UiColor();
     }
     UiColor color = GetUiColorByName(colorName);
-    ASSERT(!color.IsEmpty());
+    //ASSERT(!color.IsEmpty());
     return color;
 }
 
@@ -4725,7 +4725,7 @@ UiColor Control::GetUiColorByName(const DString& colorName) const
     }
     if (colorName.at(0) == _T('#')) {
         //优先级1：以'#'字符开头，直接指定颜色值，举例：#FFFFFFFF
-        color = ColorManager::ConvertToUiColor(colorName);
+         return ColorManager::ConvertToUiColor(colorName);
     }
     if (color.GetARGB() == 0) {
         Window* pWindow = GetWindow();

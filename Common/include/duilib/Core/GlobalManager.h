@@ -278,7 +278,9 @@ public:
      * @param [in] strControlName 自定义控件名称
      * @return 返回一个自定义控件的对象指针
      */
-    Control* CreateControl(const DString& strControlName);
+#define GlobalManagerCreateControlPatched
+    //Control* CreateControl(const DString& strControlName);
+    Control* CreateControl(const DString& strControlName,Window* window);
 
     /** 添加控件创建函数，用于用户自定义控件的创建
     */

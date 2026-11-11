@@ -145,6 +145,7 @@
       <ShowIncludes>false</ShowIncludes>
       <AdditionalIncludeDirectories>../../skia;../;third_party/libcef/libcef_win;third_party\libjpeg-turbo\libjpeg-turbo6-win-vc-x64\include;../../../CatTuber64</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -201,6 +202,7 @@
       <ShowIncludes>false</ShowIncludes>
       <AdditionalIncludeDirectories>../../skia;../;third_party/libcef/libcef_win;third_party\libjpeg-turbo\libjpeg-turbo6-win-vc-x64\include;../../../CatTuber64</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -211,10 +213,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\DrawSkiaImage_cpp_patch.cpp" />
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\GlobalManager_cpp_patch.cpp" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\ImageDecoder_patch.cpp" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\ImageInfo_cpp_patch.cpp" />
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\ImageManager_patch.cpp" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\Image_cpp_patch.cpp" />
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\Label_h_patch.cpp" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\RichEdit_Windows_cpp_patch.cpp" />
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\DecimalSlider.cpp" />
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\HexColorEdit.cpp" />
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\LoopSlider.cpp" />
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\NumEdit.cpp" />
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\PowSlider.cpp" />
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\TableGridLayout.cpp" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\WindowBuilder_cpp_patch.cpp" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\ZipManager_cpp_patch.cpp" />
     <ClCompile Include="..\..\skia\tools\ganesh\gl\win\SkWGL_win.cpp">
@@ -557,9 +569,16 @@
     <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\GlobalManager_patch.h" />
     <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\ImageAttribute_patch.h" />
     <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\ImageLoadAttribute_h_patch.h" />
-    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\nanosvg_h_patch_nsvg__parseColor.h" />
     <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\SkParse_Patch.h" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\Slider_cpp_patch.cpp" />
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\CustomLayout.h" />
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\DecimalSlider.h" />
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\DuiUserControls.h" />
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\HexColorEdit.h" />
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\LoopSlider.h" />
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\NumEdit.h" />
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\PowSlider.h" />
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\TableGridLayout.h" />
     <ClInclude Include="..\..\skia\tools\ganesh\gl\win\SkWGL.h" />
     <ClInclude Include="..\..\skia\tools\window\DisplayParams.h" />
     <ClInclude Include="..\..\skia\tools\window\GLWindowContext.h" />
@@ -862,6 +881,8 @@
     <None Include="..\..\..\CatTuber64\duilib_CodePatch\Menu_cpp.inl" />
     <None Include="..\..\..\CatTuber64\duilib_CodePatch\RenderSkia_DrawRichText_cpp_InternalDrawRichText.inl" />
     <None Include="..\..\..\CatTuber64\duilib_CodePatch\unzip_c_CheckCurrentFileCoherencyHeader.inl" />
+    <None Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\README.md" />
+    <None Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\UserControlCreate.inl" />
     <None Include="duilib.ruleset" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

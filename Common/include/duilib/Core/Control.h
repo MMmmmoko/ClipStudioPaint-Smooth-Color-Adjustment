@@ -1286,9 +1286,11 @@ protected:
     */
     UiSize GetBkImageSize() const;
 
+public:
     /** 背景图片的接口
     */
     Image* GetBkImagePtr() const;
+protected:
 
     /** 检查控件估算结果(含是否有缓存结果)，并对估算条件进行预处理
     * @param [in,out] szAvailable 估算输入的可用宽度和高度值，函数内部会对其约束和调整

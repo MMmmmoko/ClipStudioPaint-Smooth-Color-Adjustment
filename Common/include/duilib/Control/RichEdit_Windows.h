@@ -965,7 +965,7 @@ protected:
     */
     virtual void OnSetEnabled(bool bChanged) override;
 
-private:
+protected:
     /** 显示RichEdit上的菜单
     * @param [in] point 客户区的坐标
     */
@@ -980,7 +980,7 @@ private:
     */
     bool IsPasteLimited() const;
 
-private:
+protected:
     /** 触发文本变化事件
     */
     void OnTextChanged();
@@ -1001,7 +1001,7 @@ private:
     */
     void StopAutoAdjustTextNumber();
 
-private:
+protected:
     /** 设置清除按钮功能的Class名称
     */
     void SetClearBtnClass(const DString& btnClass);
@@ -1053,7 +1053,7 @@ private:
     */
     static void GetClipboardText(DStringW& out);
 
-private:
+protected:
     //一组供RichEditHost使用的函数
     friend class RichEditHost;
 
@@ -1108,7 +1108,7 @@ private:
     */
     void DoSetRowSpacingMul(float fRowSpacingMul);
 
-private:
+protected:
     //RichEdit控制辅助工具类
     RichEditCtrl m_richCtrl;
 
@@ -1130,7 +1130,7 @@ private:
 
     bool m_bIsComposition;      //输入法合成窗口是否可见
 
-private:
+protected:
     bool m_bNoCaretReadonly;    //只读模式下，不显示光标
     bool m_bIsCaretVisiable;    //光标是否可见
     int32_t m_iCaretPosX;       //光标X坐标
@@ -1142,7 +1142,7 @@ private:
     WeakCallbackFlag m_drawCaretFlag;   //绘制光标的定时器生命周期
     std::map<UINT, WeakCallbackFlag> m_timerFlagMap; //内部定时器
 
-private:
+protected:
     UiString m_sFontId;                 //字体ID
     UiString m_sTextColor;              //正常文本颜色
     UiString m_sDisabledTextColor;      //Disabled状态的文本颜色
@@ -1157,7 +1157,7 @@ private:
 
     uint8_t m_nFocusBottomBorderSize;    //焦点状态时，底部边框的大小
 
-private:
+protected:
     /** 是否使用Control设置的光标
     */
     bool m_bUseControlCursor;
@@ -1210,7 +1210,7 @@ private:
     */
     Control* m_pShowPasswordButton;
 
-private:
+protected:
     /** 绘制所需的数据结构
     */
     struct TxDrawData
@@ -1253,7 +1253,7 @@ private:
     */
     TxDrawData m_txDrawData;
 
-private:
+protected:
 #ifndef DUILIB_UNICODE
     /** MBCS时，输入的字符
     */

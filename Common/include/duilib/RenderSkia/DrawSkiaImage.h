@@ -36,5 +36,5 @@ public:
 };
 
 } // namespace ui
-
+#define _DrawSkiaImage_DrawImage_patch
 #endif // UI_RENDER_SKIA_DRAW_SKIA_IMAGE_H_

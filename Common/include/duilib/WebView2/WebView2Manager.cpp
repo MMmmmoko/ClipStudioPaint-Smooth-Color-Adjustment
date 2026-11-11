@@ -10,11 +10,11 @@
 namespace ui {
 
 //创建WebView控件的回调函数
-static Control* DuilibCreateWebView2Control(const DString& className)
+static Control* DuilibCreateWebView2Control(const DString& className,Window* window)
 {
     Control* pControl = nullptr;
     if (className == _T("WebView2Control")) {
-        pControl = new WebView2Control(nullptr);
+        pControl = new WebView2Control(window);
     }
     return pControl;
 }

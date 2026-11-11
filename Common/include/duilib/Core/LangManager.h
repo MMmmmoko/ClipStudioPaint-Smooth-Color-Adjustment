@@ -33,7 +33,7 @@ public:
     /** 清理多语言资源
     */
     void ClearStringTable();
-
+    const size_t GetKeyStringCount() { return m_stringTable.size(); };
 public:
     /** 根据ID获取指定语言的字符串
      * @param[in] id 指定字符串 ID

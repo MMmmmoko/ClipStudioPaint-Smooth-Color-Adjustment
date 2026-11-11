@@ -100,6 +100,9 @@
     <Filter Include="_CodePatch">
       <UniqueIdentifier>{44713afd-c063-496d-9ea1-099dabdcd8f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="_CodePatch\_UserControl">
+      <UniqueIdentifier>{cdbb6d9e-e1b0-41bd-99ab-6d4591c0f5ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation\AnimationPlayer.cpp">
@@ -851,6 +854,36 @@
     </ClCompile>
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\Image_cpp_patch.cpp">
       <Filter>_CodePatch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\ImageManager_patch.cpp">
+      <Filter>_CodePatch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\GlobalManager_cpp_patch.cpp">
+      <Filter>_CodePatch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\Label_h_patch.cpp">
+      <Filter>_CodePatch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\DrawSkiaImage_cpp_patch.cpp">
+      <Filter>_CodePatch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\NumEdit.cpp">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\HexColorEdit.cpp">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\LoopSlider.cpp">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\TableGridLayout.cpp">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\PowSlider.cpp">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\DecimalSlider.cpp">
+      <Filter>_CodePatch\_UserControl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1745,9 +1778,6 @@
     <ClInclude Include="Core\StateColorMap2.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\nanosvg_h_patch_nsvg__parseColor.h">
-      <Filter>_CodePatch</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\ImageAttribute_patch.h">
       <Filter>_CodePatch</Filter>
     </ClInclude>
@@ -1766,6 +1796,30 @@
     <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\Control_cpp_patch2.h">
       <Filter>_CodePatch</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\LoopSlider.h">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\NumEdit.h">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\HexColorEdit.h">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\TableGridLayout.h">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\CustomLayout.h">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\DuiUserControls.h">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\PowSlider.h">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\DecimalSlider.h">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="duilib.ruleset" />
@@ -1777,6 +1831,12 @@
     </None>
     <None Include="..\..\..\CatTuber64\duilib_CodePatch\Menu_cpp.inl">
       <Filter>_CodePatch</Filter>
+    </None>
+    <None Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\README.md">
+      <Filter>_CodePatch\_UserControl</Filter>
+    </None>
+    <None Include="..\..\..\CatTuber64\duilib_CodePatch\UserControl\UserControlCreate.inl">
+      <Filter>_CodePatch\_UserControl</Filter>
     </None>
   </ItemGroup>
 </Project>

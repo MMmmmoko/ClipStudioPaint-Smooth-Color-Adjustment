@@ -26,7 +26,7 @@ class WindowCreateAttributes;
 
 /** 创建控件的回调函数
 */
-typedef std::function<Control* (const DString&)> CreateControlCallback;
+typedef std::function<Control* (const DString&, Window*)> CreateControlCallback;
 
 /** 根据XML文件，解析并创建控件和布局
 */
