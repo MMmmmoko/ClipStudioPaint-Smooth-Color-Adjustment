@@ -79,6 +79,7 @@ SizeFunc tileHeight = nullptr;
 const uint8_t* quadReturn = nullptr;
 const uint8_t* toolSlot = nullptr;
 uint32_t modeOffset = 0;
+uint32_t manipulatorModeOffset = 0;
 uint32_t sessionOffset = 0;
 std::atomic<bool> enabled{false};
 std::atomic<bool> installed{false};
@@ -89,7 +90,7 @@ std::atomic<bool> freeDragMode{false};
 struct DragRefresh
 {
     Rect dirty{};
-    std::chrono::steady_clock::time_point last{};
+    std::chrono::steady_clock::time_point next{};
     bool refreshing = false;
 };
 
@@ -114,7 +115,10 @@ using PreviewClock = std::chrono::steady_clock;
 struct PreviewCounts
 {
     unsigned refreshes = 0;
+    unsigned quadCalls = 0;
+    unsigned eligibleCalls = 0;
     unsigned gpuBatches = 0;
+    unsigned cpuFallbackTiles = 0;
 };
 
 wchar_t previewLogPath[1024]{};
@@ -124,6 +128,19 @@ PreviewClock::time_point measurementStart;
 const char* measuredGesture = nullptr;
 unsigned measurementId = 0;
 PreviewCounts measurementTotal;
+enum class PreviewFailure { DestinationFormat, DestinationPlanes, OutputSize, SamplerLayout, SourceBounds,
+    SourcePlanes, Device, Compute, Allocation, OutputMismatch, Quality, Count };
+constexpr const char* previewFailureNames[] = {"destination_format", "destination_planes", "output_size",
+    "sampler_layout", "source_bounds", "source_planes", "device", "compute", "allocation", "output_mismatch", "quality"};
+static_assert(std::size(previewFailureNames) == static_cast<size_t>(PreviewFailure::Count));
+std::array<unsigned, std::size(previewFailureNames)> measurementFailures;
+struct SamplerLayout
+{
+    int boundsMode, flags, channels, defaultAlpha, destinationBytes;
+};
+SamplerLayout rejectedSampler{};
+PreviewClock::duration totalRefreshTime;
+PreviewClock::duration longestRefresh;
 std::array<PreviewCounts, 60> measurementSeconds;
 
 void StartPreviewMeasurement(const void* session, const char* gesture, PreviewClock::time_point now)
@@ -136,22 +153,42 @@ void StartPreviewMeasurement(const void* session, const char* gesture, PreviewCl
     measuredGesture = gesture;
     measurementStart = now;
     measurementTotal = {};
+    totalRefreshTime = {};
+    longestRefresh = {};
+    measurementFailures.fill(0);
+    rejectedSampler = {};
     measurementSeconds.fill({});
     measuredSession.store(session);
 }
 
-void CountPreview(const void* session, unsigned PreviewCounts::*counter)
+void CountPreview(const void* session, unsigned PreviewCounts::*counter, unsigned count = 1,
+    PreviewClock::duration refreshTime = {})
 {
-    if (measuredSession.load() != session)
+    if (!session || measuredSession.load() != session)
         return;
     std::lock_guard lock(previewMeasurementMutex);
     if (measuredSession.load() != session)
         return;
     const auto elapsed = PreviewClock::now() - measurementStart;
     const auto second = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
-    ++(measurementTotal.*counter);
+    measurementTotal.*counter += count;
+    totalRefreshTime += refreshTime;
+    longestRefresh = (std::max)(longestRefresh, refreshTime);
     if (second >= 0 && static_cast<size_t>(second) < measurementSeconds.size())
-        ++(measurementSeconds[static_cast<size_t>(second)].*counter);
+        measurementSeconds[static_cast<size_t>(second)].*counter += count;
+}
+
+void CountPreviewFailure(const void* session, PreviewFailure reason, const SamplerLayout* sampler = nullptr)
+{
+    if (measuredSession.load() != session)
+        return;
+    std::lock_guard lock(previewMeasurementMutex);
+    if (measuredSession.load() == session)
+    {
+        ++measurementFailures[static_cast<size_t>(reason)];
+        if (sampler)
+            rejectedSampler = *sampler;
+    }
 }
 
 void FinishPreviewMeasurement()
@@ -172,13 +209,25 @@ void FinishPreviewMeasurement()
         return;
     }
     const unsigned id = ++measurementId;
-    fprintf(log, "drag=%u gesture=%s elapsed=%.6f refreshes=%u gpu_batches=%u\n",
-        id, measuredGesture, seconds, measurementTotal.refreshes, measurementTotal.gpuBatches);
+    fprintf(log, "drag=%u gesture=%s elapsed=%.6f refreshes=%u gpu_batches=%u quad_calls=%u eligible_calls=%u "
+        "cpu_fallback_tiles=%u refresh_total_ms=%.2f refresh_max_ms=%.2f\n",
+        id, measuredGesture, seconds, measurementTotal.refreshes, measurementTotal.gpuBatches,
+        measurementTotal.quadCalls, measurementTotal.eligibleCalls, measurementTotal.cpuFallbackTiles,
+        std::chrono::duration<double, std::milli>(totalRefreshTime).count(),
+        std::chrono::duration<double, std::milli>(longestRefresh).count());
+    for (size_t i = 0; i < measurementFailures.size(); ++i)
+        if (measurementFailures[i])
+            fprintf(log, "drag=%u fallback=%s count=%u\n", id, previewFailureNames[i], measurementFailures[i]);
+    if (measurementFailures[static_cast<size_t>(PreviewFailure::SamplerLayout)])
+        fprintf(log, "drag=%u sampler_bounds_mode=%d sampler_flags=%d sampler_channels=%d sampler_default_alpha=%d "
+            "destination_bytes=%d\n", id, rejectedSampler.boundsMode, rejectedSampler.flags, rejectedSampler.channels,
+            rejectedSampler.defaultAlpha, rejectedSampler.destinationBytes);
     for (size_t i = 0; i < measurementSeconds.size() && static_cast<double>(i) < seconds; ++i)
     {
         const auto& sample = measurementSeconds[i];
-        fprintf(log, "drag=%u second=%zu elapsed=%.6f refreshes=%u gpu_batches=%u\n",
-            id, i + 1, (std::min)(1.0, seconds - static_cast<double>(i)), sample.refreshes, sample.gpuBatches);
+        fprintf(log, "drag=%u second=%zu elapsed=%.6f refreshes=%u gpu_batches=%u quad_calls=%u eligible_calls=%u "
+            "cpu_fallback_tiles=%u\n", id, i + 1, (std::min)(1.0, seconds - static_cast<double>(i)),
+            sample.refreshes, sample.gpuBatches, sample.quadCalls, sample.eligibleCalls, sample.cpuFallbackTiles);
     }
     fclose(log);
 }
@@ -544,6 +593,8 @@ struct Preview
     bool bilinear = false;
     bool reducedQuality = false;
     int colorSize = 0;
+    int writtenColorBytes = 0;
+    unsigned cpuFallbackTiles = 0;
     std::vector<Pixel> pixels;
 };
 
@@ -560,28 +611,41 @@ private:
 
 bool PreparePreview(Preview& frame, void* state, const double* matrix, bool bilinear)
 {
-    // Layout checked by the sampler constructor and pixel-view call signatures.
-    const int channels = Read<int>(state, 0x294);
-    if (Read<int>(state, 0x288) != 1 || Read<int>(state, 0x28c) != 0 ||
-        (channels != 3 && channels != 4) || (bilinear && channels != frame.colorSize) ||
-        Read<int>(state, 0x298) != 0)
+    const auto fail = [&](PreviewFailure reason) {
+        CountPreviewFailure(frame.session, reason);
         return false;
+    };
+    // Layout checked by the sampler constructor and pixel-view call signatures.
+    const SamplerLayout layout{Read<int>(state, 0x288), Read<int>(state, 0x28c), Read<int>(state, 0x294),
+        Read<int>(state, 0x298), frame.colorSize};
+    const bool paddedColor = bilinear && layout.channels == 3 && frame.colorSize == 4 &&
+        manipulatorModeOffset == FreeTransform::earlierManipulatorModeOffset;
+    if (layout.boundsMode != 1 || layout.flags != 0 || (layout.channels != 3 && layout.channels != 4) ||
+        (bilinear && layout.channels != frame.colorSize && !paddedColor) || layout.defaultAlpha != 0)
+    {
+        CountPreviewFailure(frame.session, PreviewFailure::SamplerLayout, &layout);
+        return false;
+    }
 
     auto* sourceView = static_cast<uint8_t*>(state) + 8;
+    const int sourceColorBytes = paddedColor ? colorBytes(sourceView) : frame.colorSize;
+    if (sourceColorBytes != 3 && sourceColorBytes != 4)
+        return fail(PreviewFailure::SourcePlanes);
+    frame.writtenColorBytes = paddedColor ? layout.channels : frame.colorSize;
     const Rect clip = Intersect(Read<Rect>(state, 0x278), Read<Rect>(sourceView, 0x28));
     Rect input{};
     TransformConstants constants{};
     if (!SourceBounds(clip, frame.output, matrix, input, constants))
-        return false;
+        return fail(PreviewFailure::SourceBounds);
     auto& gpu = PreviewDevice();
     if (!gpu.Available())
-        return false;
+        return fail(PreviewFailure::Device);
 
     constants.bilinear = bilinear ? 1u : 0u;
     std::vector<Pixel> source;
-    if (!ReadSource(sourceView, input, frame.colorSize, source))
-        return false;
-    return gpu.Render(constants, source, frame.pixels);
+    if (!ReadSource(sourceView, input, sourceColorBytes, source))
+        return fail(PreviewFailure::SourcePlanes);
+    return gpu.Render(constants, source, frame.pixels) || fail(PreviewFailure::Compute);
 }
 
 bool TryBlit(void* state, void* destination, int x, int y, int width, int height,
@@ -594,15 +658,19 @@ bool TryBlit(void* state, void* destination, int x, int y, int width, int height
         return false;
     const Rect tile{x, y, x + width, y + height};
     auto& frame = *preview;
+    const auto fail = [&](PreviewFailure reason) {
+        CountPreviewFailure(frame.session, reason);
+        return false;
+    };
     const int colorSize = colorBytes(destination);
     if (alphaBytes(destination) != 1 || (colorSize != 3 && colorSize != 4))
-        return false;
+        return fail(PreviewFailure::DestinationFormat);
 
     uint8_t* alpha;
     uint8_t* color;
     int aPitch, cPitch;
     if (!Planes(destination, width, height, colorSize, true, alpha, color, aPitch, cPitch))
-        return false;
+        return fail(PreviewFailure::DestinationPlanes);
 
     if (!frame.attempted)
     {
@@ -611,7 +679,7 @@ bool TryBlit(void* state, void* destination, int x, int y, int width, int height
         if (!ValidRect(frame.output, minOutputPixels) || !Contains(frame.output, tile))
             frame.output = tile;
         if (!ValidRect(frame.output, minOutputPixels))
-            return false;
+            return fail(PreviewFailure::OutputSize);
         frame.attempted = true;
         frame.colorSize = colorSize;
         frame.nativeContext = state;
@@ -623,6 +691,7 @@ bool TryBlit(void* state, void* destination, int x, int y, int width, int height
         catch (const std::bad_alloc&)
         {
             frame.rendered = false;
+            CountPreviewFailure(frame.session, PreviewFailure::Allocation);
         }
         if (frame.rendered)
         {
@@ -632,10 +701,12 @@ bool TryBlit(void* state, void* destination, int x, int y, int width, int height
                 SDL_Log("Free Transform GPU preview: rendered native raster tiles with D3D11.");
         }
     }
-    if (!frame.rendered || frame.nativeContext != state || frame.bilinear != bilinear ||
+    if (!frame.rendered)
+        return false;
+    if (frame.nativeContext != state || frame.bilinear != bilinear ||
         frame.colorSize != colorSize || !Contains(frame.output, tile) ||
         !enabled || frame.session != activeSession.load())
-        return false;
+        return fail(PreviewFailure::OutputMismatch);
 
     for (int row = 0; row < height; ++row)
     {
@@ -645,7 +716,7 @@ bool TryBlit(void* state, void* destination, int x, int y, int width, int height
         {
             const auto& pixel = source[col];
             auto* output = color + colorSize * col;
-            if (colorSize == 4)
+            if (frame.writtenColorBytes == 4)
                 memcpy(output, &pixel.color, sizeof(pixel.color));
             else
             {
@@ -701,19 +772,26 @@ void RequestDragRefresh(const void* session, void* manipulator, const void* even
         return;
     // The tool may open in its generic mode before the palette switches its manipulator
     // to Free Transform. Scope the preview to the current tool or manipulator mode.
-    const auto manipulatorMode = Read<int>(manipulator, 0x19c);
+    const auto manipulatorMode = Read<int>(manipulator, manipulatorModeOffset);
     const bool isFree = mode == 4 || manipulatorMode == 4;
     freeDragMode.store(isFree);
-    if (Read<int>(event, move ? 0x28 : 0x68) != 0)
+    const bool earlierLayout = manipulatorModeOffset == FreeTransform::earlierManipulatorModeOffset;
+    const bool held = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+    if (Read<int>(event, move ? 0x28 : 0x68) != 0 || (earlierLayout && !held))
+    {
+        if (earlierLayout)
+            dragRefresh = {};
         return;
+    }
     // The native scale branch handles actions 5 through 12, including corner
     // drags with the opposite corner fixed. It uses the common transform modes.
     const int handle = move ? 0 : Read<int>(event, 0x30);
-    const bool held = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
     const bool moving = move && mode == 1 && manipulatorMode == 1 && held;
+    const bool rotating = !move && handle == 4 && held && (mode == 1 || mode == 3) &&
+        (manipulatorMode == 1 || manipulatorMode == 3);
     const bool scaling = !move && handle >= 5 && handle <= 12 && held &&
         (mode == 1 || mode == 2) && (manipulatorMode == 1 || manipulatorMode == 2);
-    if (!isFree && !moving && !scaling)
+    if (!isFree && !moving && !rotating && !scaling)
         return;
     const auto dirty = Read<Rect>(event, move ? 0x30 : 0x70);
     if (dirty.left < -maxCoordinate || dirty.top < -maxCoordinate ||
@@ -730,19 +808,27 @@ void RequestDragRefresh(const void* session, void* manipulator, const void* even
              (std::max)(pending.right, dirty.right), (std::max)(pending.bottom, dirty.bottom)};
     const auto now = std::chrono::steady_clock::now();
     if (held)
-        StartPreviewMeasurement(session, move ? "move" : (isFree ? "quad" : "scale"), now);
-    if (now - dragRefresh.last < std::chrono::milliseconds(16))
+        StartPreviewMeasurement(session, move ? "move" : (handle == 4 ? "rotate" : (isFree ? "quad" : "scale")), now);
+    if (now < dragRefresh.next)
         return;
 
     const auto region = pending;
     pending = {};
-    dragRefresh.last = now;
+    const auto minimumInterval = std::chrono::milliseconds(earlierLayout ? 33 : 16);
+    dragRefresh.next = now + minimumInterval;
     dragRefresh.refreshing = true;
     // The release path takes a by-value native shared pointer and consumes its reference.
     InterlockedIncrement(reinterpret_cast<volatile LONG*>(canvas.control + 8));
     refreshCanvas(&canvas, &region);
     dragRefresh.refreshing = false;
-    CountPreview(session, &PreviewCounts::refreshes);
+    if (earlierLayout || previewLogPath[0])
+    {
+        const auto finished = PreviewClock::now();
+        // Leave time for pointer events even when the synchronous refresh took a full interval.
+        if (earlierLayout)
+            dragRefresh.next = (std::max)(dragRefresh.next, finished + std::chrono::milliseconds(8));
+        CountPreview(session, &PreviewCounts::refreshes, 1, finished - now);
+    }
 }
 
 void DragHook(void* manipulator, const void* event)
@@ -788,8 +874,11 @@ int TransformHook(SharedImage* destination, SharedImage* source, const Rect* sou
 {
     Preview frame;
     const auto session = activeSession.load();
+    const bool fromQuad = _ReturnAddress() == quadReturn;
+    if (fromQuad)
+        CountPreview(session, &PreviewCounts::quadCalls);
     int mode = 0;
-    if (enabled && session && _ReturnAddress() == quadReturn && flags == 0 && quality >= 0 && quality <= 3 &&
+    if (enabled && session && fromQuad && flags == 0 && quality >= 0 && quality <= 3 &&
         destination && source && destination->image != source->image && quad && outputClip &&
         session == GetSession(&mode) && (mode == 4 || freeDragMode.load()))
     {
@@ -800,14 +889,24 @@ int TransformHook(SharedImage* destination, SharedImage* source, const Rect* sou
             frame.session = session;
     }
 
+    const bool measure = frame.session && measuredSession.load() == frame.session;
+    if (measure)
+        CountPreview(session, &PreviewCounts::eligibleCalls);
     PreviewScope scope(frame.session ? &frame : nullptr);
-    return originalTransform(destination, source, sourceClip, quad, outputClip, quality, flags);
+    const int result = originalTransform(destination, source, sourceClip, quad, outputClip, quality, flags);
+    if (measure && frame.cpuFallbackTiles)
+        CountPreview(session, &PreviewCounts::cpuFallbackTiles, frame.cpuFallbackTiles);
+    return result;
 }
 
 void NearestHook(void* state, void* destination, int x, int y, int width, int height, const double* matrix)
 {
     if (!TryBlit(state, destination, x, y, width, height, matrix, false))
+    {
+        if (preview)
+            ++preview->cpuFallbackTiles;
         originalNearest(state, destination, x, y, width, height, matrix);
+    }
 }
 
 void LinearHook(void* state, void* destination, int x, int y, int width, int height,
@@ -815,13 +914,25 @@ void LinearHook(void* state, void* destination, int x, int y, int width, int hei
 {
     const bool previewQuality = quality == 1 || (quality == 2 && preview && preview->reducedQuality);
     if (!previewQuality || !TryBlit(state, destination, x, y, width, height, matrix, true))
+    {
+        if (preview)
+        {
+            ++preview->cpuFallbackTiles;
+            if (!previewQuality)
+                CountPreviewFailure(preview->session, PreviewFailure::Quality);
+        }
         originalLinear(state, destination, x, y, width, height, matrix, quality);
+    }
 }
 
 void OversampleHook(void* state, void* destination, int x, int y, int width, int height, const double* matrix)
 {
     if (!preview || !preview->reducedQuality || !TryBlit(state, destination, x, y, width, height, matrix, true))
+    {
+        if (preview)
+            ++preview->cpuFallbackTiles;
         originalOversample(state, destination, x, y, width, height, matrix);
+    }
 }
 }
 
@@ -834,7 +945,7 @@ void FreeTransform::Install()
 
     const char* features[] = {Begin, End, Drag, DerivedDrag, Move, DerivedMove, CanvasRefresh,
         Wrapper, QuadCall, Nearest, Bilinear, Oversample, ToolSlot,
-        ToolModeInstruction, ToolSessionInstruction, SelectTile, Alpha, Color, AlphaPitch,
+        ToolModeInstruction, ToolSessionInstruction, ManipulatorModeInstruction, SelectTile, Alpha, Color, AlphaPitch,
         ColorPitch, AlphaBytes, ColorBytes, TileWidth, TileHeight};
     for (const auto* key : features)
     {
@@ -848,6 +959,7 @@ void FreeTransform::Install()
     quadReturn = static_cast<const uint8_t*>(AddressTable::GetAddress(QuadCall)) + 5;
     toolSlot = static_cast<const uint8_t*>(AddressTable::GetAddress(ToolSlot));
     modeOffset = Read<uint32_t>(AddressTable::GetAddress(ToolModeInstruction), 9);
+    manipulatorModeOffset = Read<uint32_t>(AddressTable::GetAddress(ManipulatorModeInstruction), 2);
     sessionOffset = Read<uint32_t>(AddressTable::GetAddress(ToolSessionInstruction), 19);
     refreshCanvas = reinterpret_cast<CanvasRefreshFunc>(AddressTable::GetAddress(CanvasRefresh));
     selectTile = reinterpret_cast<SelectTileFunc>(AddressTable::GetAddress(SelectTile));

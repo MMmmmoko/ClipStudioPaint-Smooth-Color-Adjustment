@@ -2,8 +2,11 @@
 #include "CatDui.h"
 #include"CatDuiThread.h"
 
+#ifdef _WINDOWS
+#include <windowsx.h>
+#endif
 
-void NativeModalWindow::DoModalNative(uintptr_t nativeWindowHandle_parent)
+void NativeModalWindow::DoModalNative(uintptr_t nativeWindowHandle_parent, bool disableOwner)
 {
 #ifdef _WINDOWS
     //WINDOWS下nativeWindowHandle是HWND
@@ -18,7 +21,8 @@ void NativeModalWindow::DoModalNative(uintptr_t nativeWindowHandle_parent)
     {
         HWND child = this->NativeWnd()->GetHWND();
         //禁用父窗口
-        if (parent)
+        const bool disabledOwner = disableOwner && parent && ::IsWindowEnabled(parent);
+        if (disabledOwner)
         {
             ::EnableWindow(parent, FALSE);
         }
@@ -34,18 +38,29 @@ void NativeModalWindow::DoModalNative(uintptr_t nativeWindowHandle_parent)
         //局部消息循环
 
         MSG msg;
-        while (GetMessage(&msg, NULL, 0, 0) && ::IsWindow(child))
+        while (::IsWindow(child))
         {
-            //加了IsDialogMessage反而接受不到键盘消息 好神秘
-            if (true/* || !::IsDialogMessage(child, &msg)*/)
+            const BOOL status = GetMessage(&msg, nullptr, 0, 0);
+            if (status <= 0)
             {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
+                if (status == 0)
+                    PostQuitMessage(static_cast<int>(msg.wParam));
+                break;
             }
+            // A wheel message can follow keyboard focus even with the pointer over CSP.
+            if (!disableOwner && msg.message == WM_MOUSEWHEEL && (msg.hwnd == child || ::IsChild(child, msg.hwnd)))
+            {
+                const POINT cursor{GET_X_LPARAM(msg.lParam), GET_Y_LPARAM(msg.lParam)};
+                const HWND target = ::WindowFromPoint(cursor);
+                if (target && ::GetAncestor(target, GA_ROOT) == parent && ::IsWindowEnabled(target))
+                    msg.hwnd = target;
+            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
 
 
-        if (parent)
+        if (disabledOwner && ::IsWindow(parent))
         {
             //启用父窗口
             ::EnableWindow(parent, TRUE);

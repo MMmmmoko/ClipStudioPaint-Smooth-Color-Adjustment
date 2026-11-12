@@ -422,6 +422,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FreeTransformLocator.cpp" />
+    <ClCompile Include="CustomAdjustmentLayer.cpp" />
+    <ClCompile Include="CustomAdjustmentLayerLocator.cpp" />
+    <ClInclude Include="CustomAdjustmentLayer.h" />
+    <ClCompile Include="DUI\Dialog\TestInvertAdjustmentDialog.cpp" />
+    <ClInclude Include="DUI\Dialog\TestInvertAdjustmentDialog.h" />
+    <ClCompile Include="TestInvertAdjustmentLayer.cpp" />
+    <ClInclude Include="TestInvertAdjustmentLayer.h" />
     <ClCompile Include="LevelsPreview.cpp" />
     <ClCompile Include="FreeTransform.cpp" />
     <ClInclude Include="FreeTransform.h" />

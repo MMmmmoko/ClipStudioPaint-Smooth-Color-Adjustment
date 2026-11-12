@@ -127,4 +127,4 @@ CSP流畅调色是一个免费提供的，用于改善CSP功能的辅助工具�
 
 我已将依赖都放置入库中Common/bin，部分文件超大，我将其打包了一下，需要将其中的压缩包就地解压，解压后的路径应该是Common/bin/*.lib，然后库中的VS解决方案基本就可以直接进行编译了，不过工程属性中仍然有部分难以修改的绝对路径。如果你想要编译和修改此工具，还需要对项目属性的【调试】中的路径和【生成事件->生成后事件】中的路径进行删除或手动指定。DEBUG模式下，需要将Dll文件使用的UI资源（DuiResource文件夹）放置在CLIPStudioPaint.exe 所在的文件夹内，RELEASE模式使用的是Dll内嵌资源，请参考Dui/CatDuiThread.cpp
 
-如果现有 `duilib.lib` 或 `duilib_d.lib` 因 `GlobalManager::Startup` 接口版本不同而链接失败，可通过 MSBuild 属性 `/p:CSPMODDuiLibDir=<兼容的库目录>` 指定对应版本的 DuiLib。只生成工作区产物时可附加 `/p:PostBuildEventUseInBuild=false`。
+CSPMOD 默认使用同级 CatTuber64 仓库中 `project\ThirdPart\nim_duilib-main\duilib\duilib.vcxproj` 的头文件和生成库。目录不同可用 `/p:CSPMODDuiRoot=<nim_duilib-main 根目录>`，库输出目录不同可另用 `/p:CSPMODDuiLibDir=<库目录>`。请使用同一份 duilib 源码的头文件和生成库。只生成工作区产物时可附加 `/p:PostBuildEventUseInBuild=false`。

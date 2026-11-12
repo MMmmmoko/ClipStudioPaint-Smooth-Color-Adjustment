@@ -134,20 +134,40 @@ bool LevelsPreview::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
 
     // The correction layer receives a typed SAdjustmentLevels event and registers
     // itself as the timer callback using the same native function.
-    const auto layerTimers = code.Find(
-        "8B 15 ?? ?? ?? ?? 48 8D 4C 24 20 E8 ?? ?? ?? ?? 8B 9F 90 01 00 00 48 8D 05 ?? ?? ?? ??");
-    if (layerTimers.size() != 1)
-        return fail("LevelsPreview layer timer");
-    const auto layerTimer = layerTimers.front();
-    const auto layer = code.Containing(layerTimer);
-    if (!layer.begin || code.Relative(layerTimer + 22, 3, 7) != layer.begin)
-        return fail("LevelsPreview layer timer callback");
-    const auto types = code.Find("48 8D 48 08 48 8D 15 ?? ?? ?? ?? E8 ?? ?? ?? ?? 85 C0 0F 85 ?? ?? ?? ?? 48 8B 0E",
-        layer.begin, layerTimer);
-    const auto type = types.size() == 1 ? code.Relative(types.front() + 4, 3, 7) : 0;
     constexpr char levelsType[] = ".?AUSAdjustmentLevels@Planeswalker@@";
-    if (!inData(type, 8 + sizeof(levelsType)) || memcmp(image + type + 8, levelsType, sizeof(levelsType)) != 0)
-        return fail("LevelsPreview SAdjustmentLevels event");
+    struct TimerRegistration
+    {
+        const char* pattern;
+        unsigned callbackOffset;
+    };
+    constexpr TimerRegistration registrations[] = {
+        {"8B 15 ?? ?? ?? ?? 48 8D 4C 24 20 E8 ?? ?? ?? ?? 8B 9F 90 01 00 00 48 8D 05 ?? ?? ?? ??", 22},
+        {"8B 15 ?? ?? ?? ?? 48 8D 4C 24 50 E8 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? "
+         "48 89 44 24 20 48 89 7C 24 28 0F 28 44 24 20", 16},
+    };
+    uint32_t layerTimer = 0;
+    FunctionRange layer{};
+    for (const auto& registration : registrations)
+    {
+        for (const auto at : code.Find(registration.pattern))
+        {
+            const auto handler = code.Containing(at);
+            if (!handler.begin || code.Relative(at + registration.callbackOffset, 3, 7) != handler.begin)
+                continue;
+            const auto types = code.Find("48 8D 48 08 48 8D 15 ?? ?? ?? ?? E8 ?? ?? ?? ?? 85 C0 0F 85 ?? ?? ?? ?? 48 8B 0E",
+                handler.begin, at);
+            const auto type = types.size() == 1 ? code.Relative(types.front() + 4, 3, 7) : 0;
+            if (!inData(type, 8 + sizeof(levelsType)) ||
+                memcmp(image + type + 8, levelsType, sizeof(levelsType)) != 0)
+                continue;
+            if (layerTimer)
+                return fail("LevelsPreview ambiguous SAdjustmentLevels timer registration");
+            layerTimer = at;
+            layer = handler;
+        }
+    }
+    if (!layerTimer)
+        return fail("LevelsPreview typed layer timer callback registration");
     const auto debounce = code.Relative(layerTimer, 2, 6);
     if (!hasMilliseconds(debounce, originalDebounceMs))
         return fail("LevelsPreview shared debounce value");
@@ -169,10 +189,20 @@ bool LevelsPreview::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         code.Find("83 BB 90 01 00 00 00 74 ?? 48 8B CB E8 ?? ?? ?? ?? C7 83 90 01 00 00 00 00 00 00",
             pixelGate, pixel.end).size() != 1)
         return fail(PixelEvent);
-    const auto waits = code.Find(
-        "8B 0D ?? ?? ?? ?? 48 3B C1 7D ?? 48 8B 4B 30 E8 ?? ?? ?? ?? 85 C0 75 ?? B8 01 00 00 00 EB ?? 48 8B CB E8",
-        pixelGate, pixel.end);
-    const auto schedule = waits.size() == 1 ? code.Call(waits.front() + 34) : 0;
+    uint32_t wait = 0;
+    for (const auto at : code.Find("8B 0D ?? ?? ?? ?? 48 3B C1 7D ?? 48 8B 4B 30 E8 ?? ?? ?? ?? 85 C0 75 ??",
+             pixelGate, pixel.end))
+    {
+        const auto delay = code.Relative(at, 2, 6);
+        if (delay == debounce || !inData(delay, sizeof(LONG)))
+            continue;
+        if (wait)
+            return fail("LevelsPreview ambiguous pixel worker delay");
+        wait = at;
+    }
+    const auto retries = wait ? code.Find("B8 01 00 00 00 EB ?? 48 8B CB E8",
+        wait, pixel.end) : std::vector<uint32_t>{};
+    const auto schedule = retries.size() == 1 ? code.Call(retries.front() + 10) : 0;
     if (!schedule || code.Containing(schedule).begin != schedule ||
         !code.Match(schedule, "40 53 48 83 EC 70 48 8B D9 E8 ?? ?? ?? ?? 48 89 43 20"))
         return fail("LevelsPreview pixel worker retry");
@@ -182,7 +212,7 @@ bool LevelsPreview::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
     const auto milliseconds = code.Call(layerTimer + 11);
     if (starts.size() != 1 || code.Call(starts.front() + 11) != milliseconds ||
         code.Relative(starts.front() + 16, 3, 7) != pixel.begin ||
-        code.Relative(starts.front(), 2, 6) != code.Relative(waits.front(), 2, 6) ||
+        code.Relative(starts.front(), 2, 6) != code.Relative(wait, 2, 6) ||
         !code.Match(milliseconds, "48 69 C2 40 42 0F 00 48 89 41 08 C3"))
         return fail("LevelsPreview pixel timer registration");
 
@@ -190,7 +220,8 @@ bool LevelsPreview::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         "48 8B CA E8 ?? ?? ?? ?? 8B D8 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 3B D8 0F 85 ?? ?? ?? ?? 48 8D 0D",
         layer.begin, layerTimer);
     if (changes.size() != 1 ||
-        !code.Match(layer.begin, "48 89 5C 24 08 48 89 74 24 10 57 48 81 EC B0 01 00 00"))
+        !(code.Match(layer.begin, "48 89 5C 24 08 48 89 74 24 10 57 48 81 EC B0 01 00 00") ||
+          code.Match(layer.begin, "48 89 5C 24 08 48 89 74 24 10 57 48 81 EC A0 01 00 00")))
         return fail(LayerEvent);
     const auto change = changes.front();
     const auto timerPath = code.Relative(change + 24, 2, 6);

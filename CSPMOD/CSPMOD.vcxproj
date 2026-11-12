@@ -69,7 +69,20 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <CSPMODDuiRoot Condition="'$(CSPMODDuiRoot)'==''">$(MSBuildProjectDirectory)\..\..\..\CatTuber64\project\ThirdPart\nim_duilib-main</CSPMODDuiRoot>
+    <CSPMODDuiLibDir Condition="'$(CSPMODDuiLibDir)'==''">$(CSPMODDuiRoot)\lib\$(Platform)</CSPMODDuiLibDir>
+    <CSPMODDuiLibName Condition="'$(Configuration)'=='Debug'">duilib_d.lib</CSPMODDuiLibName>
+    <CSPMODDuiLibName Condition="'$(CSPMODDuiLibName)'==''">duilib.lib</CSPMODDuiLibName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(CSPMODDuiLibDir)\$(CSPMODDuiLibName);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -110,7 +123,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\Common\include;$(ProjectDir);..\Common\include\skia;..\..\..\Lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CSPMODDuiRoot);..\Common\include;$(ProjectDir);..\Common\include\skia;..\..\..\Lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -140,7 +153,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\Common\include;$(ProjectDir);..\Common\include\skia;..\..\..\Lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CSPMODDuiRoot);..\Common\include;$(ProjectDir);..\Common\include\skia;..\..\..\Lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -176,6 +189,7 @@
     <ClInclude Include="DUI\Dialog\ApplyEffects_Dlg.h" />
     <ClInclude Include="DUI\Dialog\CheckFunction_Dlg.h" />
     <ClInclude Include="DUI\Dialog\ColWheelWnd.h" />
+    <ClInclude Include="DUI\Dialog\TestInvertAdjustmentDialog.h" />
     <ClInclude Include="DUI\Dialog\TimeLapseExport_Dlg.h" />
     <ClInclude Include="DUI\DuiCommon.h" />
     <ClInclude Include="DUI\UserControl\BrushColorBlock.h" />
@@ -232,6 +246,7 @@
     <ClCompile Include="DUI\Dialog\ApplyEffects_Dlg.cpp" />
     <ClCompile Include="DUI\Dialog\CheckFunction_Dlg.cpp" />
     <ClCompile Include="DUI\Dialog\ColWheelWnd.cpp" />
+    <ClCompile Include="DUI\Dialog\TestInvertAdjustmentDialog.cpp" />
     <ClCompile Include="DUI\Dialog\TimeLapseExport_Dlg.cpp" />
     <ClCompile Include="DUI\UserControl\BrushColorBlock.cpp" />
     <ClCompile Include="DUI\UserControl\LchColorControl.cpp" />
@@ -416,6 +431,11 @@
   </ImportGroup>
   <ItemGroup>
     <ClCompile Include="FreeTransformLocator.cpp" />
+    <ClCompile Include="CustomAdjustmentLayer.cpp" />
+    <ClCompile Include="CustomAdjustmentLayerLocator.cpp" />
+    <ClInclude Include="CustomAdjustmentLayer.h" />
+    <ClCompile Include="TestInvertAdjustmentLayer.cpp" />
+    <ClInclude Include="TestInvertAdjustmentLayer.h" />
     <ClCompile Include="LevelsPreview.cpp" />
     <ClCompile Include="FreeTransform.cpp">
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

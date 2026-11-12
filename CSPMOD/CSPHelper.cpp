@@ -5,6 +5,8 @@
 #include"DUI/Dialog/ApplyEffects_Dlg.h"
 #include"duilib/duilib.h"
 #include"CspData.h"
+#include"CustomAdjustmentLayer.h"
+#include"TestInvertAdjustmentLayer.h"
 
 #include"DUI/Dialog/CheckFunction_Dlg.h"
 #include"DUI/Dialog/About_Dlg.h"
@@ -49,7 +51,8 @@ void CSPHelper::OnClickEntrance()
 
     menu->ShowMenu(xml, { p.x-10,p.y+4 });
     HWND child = menu->NativeWnd()->GetHWND();
-    ::SetWindowLongPtr(child, GWLP_HWNDPARENT, (LONG_PTR)CspData::GetNativeWindowHandle());
+    const auto host = reinterpret_cast<HWND>(CspData::GetNativeWindowHandle());
+    ::SetWindowLongPtr(child, GWLP_HWNDPARENT, reinterpret_cast<LONG_PTR>(host));
     ::UpdateWindow(child);
 
     ui::MenuItem* helperMenu_applyEffects = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_applyEffects"));
@@ -57,6 +60,8 @@ void CSPHelper::OnClickEntrance()
     ui::MenuItem* helperMenu_about = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_about"));
 
     ui::MenuItem* helperMenu_colorWheel = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_colorWheel"));
+    auto* customAdjustment = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_customAdjustment"));
+    auto* editCustomAdjustment = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_editCustomAdjustment"));
     
     ui::UiSize sizeMax(9999, 9999);
     int32_t maxW = 0;
@@ -81,6 +86,31 @@ void CSPHelper::OnClickEntrance()
     {
         int32_t curW = helperMenu_colorWheel->EstimateSize(sizeMax).cx.GetInt32();
         if (curW > maxW)maxW = curW;
+    }
+    const bool adjustmentAvailable = (customAdjustment || editCustomAdjustment) && CustomAdjustmentLayer::PrepareMenu(host);
+    const auto bindAdjustment = [&](ui::MenuItem* item, void (*command)(HWND, uint32_t), bool enabled)
+    {
+        if (!item)
+            return;
+        item->SetVisible(adjustmentAvailable);
+        if (!adjustmentAvailable)
+            return;
+        item->SetEnabled(enabled);
+        maxW = (std::max)(maxW, item->EstimateSize(sizeMax).cx.GetInt32());
+        item->AttachClick([host, command](const ui::EventArgs&) {
+            command(host, TestInvertAdjustment::Type);
+            return true;
+        });
+    };
+    bindAdjustment(customAdjustment, CustomAdjustmentLayer::RequestCreate, adjustmentAvailable);
+    bindAdjustment(editCustomAdjustment, CustomAdjustmentLayer::RequestEdit,
+        adjustmentAvailable && CustomAdjustmentLayer::CanEdit(TestInvertAdjustment::Type));
+    if (adjustmentAvailable)
+    {
+        if (customAdjustment)
+            customAdjustment->SetFixedWidth(ui::UiFixedInt(maxW), true, false);
+        if (editCustomAdjustment)
+            editCustomAdjustment->SetFixedWidth(ui::UiFixedInt(maxW), true, false);
     }
 
     helperMenu_applyEffects->SetFixedWidth(ui::UiFixedInt(maxW), true, false);

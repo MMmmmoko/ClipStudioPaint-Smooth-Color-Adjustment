@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window caption="0,0,0,30" use_system_caption="false" layered_window="true"
+        shadow_type="default" shadow_attached="true" alpha="255" icon="public/caption/logo.ico"
+        xmlns="http://tempuri.org/NIMDUISchema.xsd">
+    <Class name="adjustmentLabel" font="system_14" normal_text_color="#CSPColor_Content" valign="center"/>
+    <Class name="adjustmentSlider" width="stretch" height="30" valign="center"
+           bkimage="file='slider_bg.svg' corner='4,4,4,4'" padding="7,10,7,10"
+           normal_color="#CSPColor_ControlBG" normal_color_margin="7,10,7,10"
+           hot_color="#CSPColor_Selected" hot_color_margin="7,10,7,10" fade_hot="false"
+           thumb_normal_image="file='slider_thumb.svg' width='16' height='30'" thumb_size="16,30"/>
+    <Class name="adjustmentButton" width="92" height="30" border_size="1" border_round="2,2"
+           border_color="#CSPColor_Separator" fade_hot="false" normal_text_color="#CSPColor_Content"
+           bkcolor="#CSPColor_ControlBG" hot_color="#CSPColor_Selected" pushed_color="#CSPColor_ButtonPush"/>
+
+    <VBox width="390" height="auto" bkcolor="#CSPColor_PanelBG">
+        <HBox height="30" normal_color="#CSPColor_CaptionFocus" disabled_color="#CSPColor_CaptionNoFocus">
+            <Label margin="12,0,0,0" valign="center" font="system_14" text_id="STRID_CUSTOMADJUSTMENT_TITLE"
+                   normal_text_color="#CSPColor_CaptionContent"/>
+            <Control />
+            <Button class="btn_wnd_close_11" name="close" width="40" height="stretch" tooltip_text_id="STRING_CLOSE"
+                    normal_image="file='icon_close.svg' width='24' height='24' valign='center' halign='center'"/>
+        </HBox>
+        <VBox height="auto" margin="18,16,18,14" child_margin="6">
+            <HBox height="30" child_margin="8">
+                <Label class="adjustmentLabel" width="66" text_id="STRID_CUSTOMADJUSTMENT_RED"/>
+                <Slider class="adjustmentSlider" name="red" min="0" max="100" step="1" value="100"/>
+                <Label class="adjustmentLabel" name="redValue" width="45" text_align="right,vcenter"/>
+            </HBox>
+            <HBox height="30" child_margin="8">
+                <Label class="adjustmentLabel" width="66" text_id="STRID_CUSTOMADJUSTMENT_GREEN"/>
+                <Slider class="adjustmentSlider" name="green" min="0" max="100" step="1" value="100"/>
+                <Label class="adjustmentLabel" name="greenValue" width="45" text_align="right,vcenter"/>
+            </HBox>
+            <HBox height="30" child_margin="8">
+                <Label class="adjustmentLabel" width="66" text_id="STRID_CUSTOMADJUSTMENT_BLUE"/>
+                <Slider class="adjustmentSlider" name="blue" min="0" max="100" step="1" value="100"/>
+                <Label class="adjustmentLabel" name="blueValue" width="45" text_align="right,vcenter"/>
+            </HBox>
+            <HBox height="22" margin="0,8,0,6" child_margin="2">
+                <Control name="sample0" width="stretch"/>
+                <Control name="sample1" width="stretch"/>
+                <Control name="sample2" width="stretch"/>
+                <Control name="sample3" width="stretch"/>
+                <Control name="sample4" width="stretch"/>
+            </HBox>
+            <HBox height="30" child_margin="8">
+                <Button class="adjustmentButton" name="reset" text_id="STRID_CUSTOMADJUSTMENT_RESET"/>
+                <Control />
+                <Button class="adjustmentButton" name="cancel" text_id="STRING_CANCEL"/>
+                <Button class="adjustmentButton" name="apply" text_id="STRING_OK" normal_text_color="#FFFFFF"
+                        bkcolor="#CSPColor_BlueButton" hot_color="#CSPColor_BlueButtonHot" pushed_color="#CSPColor_BlueButtonPush"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</Window>

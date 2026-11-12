@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "AddressTable.h"
 #include "CSPMOD.h"
+#include "CustomAdjustmentLayer.h"
 #include "FreeTransformLocator.h"
 #include "LevelsPreview.h"
 #include "../Common/AddressGenerator/AddressGenerator.h"
@@ -20,7 +21,7 @@
 
 namespace
 {
-constexpr unsigned tableSchema = 15;
+constexpr unsigned tableSchema = 25;
 constexpr auto tableName = L"CSPAddrTable.json";
 constexpr auto logName = L"CSPAddrTable.build.log";
 
@@ -172,7 +173,8 @@ bool MatchesTable(const Json::Value& table, const std::string& version, const st
 
     for (const auto& name : entries.getMemberNames())
         if (!ValidEntry(entries[name], imageSize) ||
-            ((name.compare(0, 14, "FreeTransform_") == 0 || name.compare(0, 14, "LevelsPreview_") == 0) &&
+            ((name.compare(0, 14, "FreeTransform_") == 0 || name.compare(0, 14, "LevelsPreview_") == 0 ||
+                name.compare(0, 17, "CustomAdjustment_") == 0) &&
                 !verifiedFeatures.isMember(name)))
             return false;
     for (const auto& name : verifiedFeatures.getMemberNames())
@@ -219,12 +221,37 @@ bool AddressTable::LoadOrBuild()
     std::ostringstream featureLog;
     Json::Value verifiedFeatures(Json::objectValue);
     const auto& unwind = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
-    const bool freeTransformReady = isUDM || FreeTransform::Locate(image, static_cast<uint32_t>(ins.imageSize),
+    const bool freeTransformReady = FreeTransform::Locate(image, static_cast<uint32_t>(ins.imageSize),
         text->VirtualAddress, static_cast<uint32_t>(textSize), unwind.VirtualAddress, unwind.Size,
         verifiedFeatures, featureLog);
-    const bool levelsReady = isUDM || LevelsPreview::Locate(image, static_cast<uint32_t>(ins.imageSize),
+    const bool levelsReady = LevelsPreview::Locate(image, static_cast<uint32_t>(ins.imageSize),
         text->VirtualAddress, static_cast<uint32_t>(textSize), unwind.VirtualAddress, unwind.Size,
         data ? data->VirtualAddress : 0, data ? data->Misc.VirtualSize : 0, verifiedFeatures, featureLog);
+    const bool customAdjustmentReady = CustomAdjustmentLayer::Locate(image, static_cast<uint32_t>(ins.imageSize),
+        text->VirtualAddress, static_cast<uint32_t>(textSize), unwind.VirtualAddress, unwind.Size,
+        verifiedFeatures, featureLog);
+    const bool customAdjustmentNavigationReady = customAdjustmentReady &&
+        CustomAdjustmentLayer::LocateDialogNavigation(image, static_cast<uint32_t>(ins.imageSize),
+            text->VirtualAddress, static_cast<uint32_t>(textSize), unwind.VirtualAddress, unwind.Size,
+            verifiedFeatures, featureLog);
+    const bool customAdjustmentMenuReady = customAdjustmentReady &&
+        CustomAdjustmentLayer::LocateNativeMenu(image, static_cast<uint32_t>(ins.imageSize),
+            text->VirtualAddress, static_cast<uint32_t>(textSize), unwind.VirtualAddress, unwind.Size,
+            verifiedFeatures, featureLog);
+    const bool customAdjustmentCatalogReady = customAdjustmentMenuReady &&
+        CustomAdjustmentLayer::LocateCommandCatalog(image, static_cast<uint32_t>(ins.imageSize),
+            text->VirtualAddress, static_cast<uint32_t>(textSize), unwind.VirtualAddress, unwind.Size,
+            verifiedFeatures, featureLog);
+    const bool customAdjustmentBindingsReady = customAdjustmentCatalogReady &&
+        CustomAdjustmentLayer::LocateCommandBindings(image, static_cast<uint32_t>(ins.imageSize),
+            text->VirtualAddress, static_cast<uint32_t>(textSize), unwind.VirtualAddress, unwind.Size,
+            verifiedFeatures, featureLog);
+    if (!customAdjustmentReady)
+        featureLog << "SKIP: CustomAdjustment dialog navigation and native menu require the layer factory and render callbacks.\n";
+    if (!customAdjustmentMenuReady)
+        featureLog << "SKIP: CustomAdjustment command catalog requires the native menu.\n";
+    if (!customAdjustmentCatalogReady)
+        featureLog << "SKIP: CustomAdjustment shortcut and toolbar bindings require the command catalog.\n";
 
     std::filesystem::path fallback;
     if (char* preferencePath = SDL_GetPrefPath("CSPMOD", "AddressTable"))
@@ -249,17 +276,19 @@ bool AddressTable::LoadOrBuild()
     }
     else
     {
-        std::ofstream log(path.parent_path() / logName, std::ios::app);
+        std::ofstream log(path.parent_path() / logName, std::ios::out | std::ios::trunc);
         if (!log && !fallback.empty())
         {
             const auto fallbackLog = fallback / logName;
             log.clear();
-            log.open(fallbackLog, std::ios::app);
+            log.open(fallbackLog, std::ios::out | std::ios::trunc);
             if (log)
                 SDL_Log("Address table log: %s", fallbackLog.u8string().c_str());
         }
 
-        log << "\nAddress table rebuild for " << path.filename().u8string()
+        if (!log)
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: could not open a build log.");
+        log << "Address table rebuild for " << path.filename().u8string()
             << " version " << ins.cspVersion << " SHA-256 " << digest << '\n';
         SDL_Log("Address table: rebuilding for version %s.", ins.cspVersion.c_str());
         AddressGenerator generator;
@@ -269,7 +298,9 @@ bool AddressTable::LoadOrBuild()
         for (const auto& name : verifiedFeatures.getMemberNames())
             entries[name] = verifiedFeatures[name];
         log << featureLog.str();
-        if (!freeTransformReady || !levelsReady)
+        if (!freeTransformReady || !levelsReady || !customAdjustmentReady || !customAdjustmentNavigationReady ||
+            !customAdjustmentMenuReady ||
+            !customAdjustmentCatalogReady || !customAdjustmentBindingsReady)
             SDL_LogError(SDL_LOG_CATEGORY_ERROR, "%s", featureLog.str().c_str());
 
         for (const auto& name : entries.getMemberNames())

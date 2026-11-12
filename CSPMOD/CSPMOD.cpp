@@ -3,6 +3,7 @@
 
 #include "CSPMOD.h"
 #include"AddressTable.h"
+#include"CustomAdjustmentLayer.h"
 #include"FreeTransform.h"
 #include"LevelsPreview.h"
 
@@ -65,6 +66,7 @@ void CSPMOD::OnAttachCSP( uintptr_t moduleHandle)
 	TA_ColorBalance::Init();
 	TA_ToneCurve::Init();
 	LevelsPreview::Install();
+	CustomAdjustmentLayer::Install();
 	TimeLapseExport_hook::Init();
 	LayerObject::Init();
 	FreeTransform::Install();

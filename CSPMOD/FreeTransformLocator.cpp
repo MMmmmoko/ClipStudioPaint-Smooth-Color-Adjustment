@@ -27,12 +27,57 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
     const Code code(image, imageSize, textRva, textSize,
         reinterpret_cast<const FunctionRange*>(image + unwindRva), unwindSize / sizeof(FunctionRange));
 
-    const auto starts = code.Find("BA 25 00 0D 00 48 8D 4C 24 ?? E8 ?? ?? ?? ?? 4C 8D 44 24 ?? BA 04 00 00 00 48 8B CE E8");
-    const auto begin = starts.size() == 1 ? code.Call(starts.front() + 28) : 0;
+    // Resolve the native command and its catalog label before locating the mode-4 entry.
+    constexpr char freeCommand[] = "transformfree";
+    uint32_t token = 0;
+    for (const auto at : code.Find("41 B9 01 00 00 00 4C 8D 05 ?? ?? ?? ?? 48 8D 15 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E9"))
+    {
+        const auto name = code.Relative(at + 6, 3, 7);
+        if (!name || imageSize - name < sizeof(freeCommand) || memcmp(image + name, freeCommand, sizeof(freeCommand)) != 0)
+            continue;
+        if (token)
+            return fail("FreeTransform command token");
+        token = code.Relative(at + 20, 3, 7);
+    }
+    if (!token)
+        return fail("FreeTransform command token");
+
+    uint32_t label = 0;
+    for (const auto at : code.Find("48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 90 48 89 7C 24 30 "
+             "C7 44 24 28 ?? ?? 0D 00 89 44 24 20 45 33 C9"))
+    {
+        if (code.Relative(at, 3, 7) != token)
+            continue;
+        if (label)
+            return fail("FreeTransform command catalog entry");
+        memcpy(&label, image + at + 22, sizeof(label));
+    }
+    if (!label)
+        return fail("FreeTransform command catalog entry");
+
+    uint32_t begin = 0;
+    for (const auto at : code.Find("BA ?? ?? 0D 00 48 8D 4C 24 ?? E8 ?? ?? ?? ?? 4C 8D 44 24 ?? "
+             "BA 04 00 00 00 48 8B CE E8 ?? ?? ?? ?? 8B D8 E8"))
+    {
+        uint32_t commandLabel = 0;
+        memcpy(&commandLabel, image + at + 1, sizeof(commandLabel));
+        if (commandLabel != label)
+            continue;
+        if (begin)
+            return fail(Begin);
+        begin = code.Call(at + 28);
+    }
     if (!begin || code.Containing(begin).begin != begin ||
         !code.Match(begin, "48 89 5C 24 20 55 56 57 41 56 41 57 48 8D AC 24 E0 FC FF FF 48 81 EC 20 04 00 00") ||
         !code.Match(begin + 44, "4D 8B F8 44 8B F2 48 8B F1 33 DB"))
         return fail(Begin);
+
+    const auto olderDragModes = code.Find("8B 97 94 01 00 00 8D 42 FF 83 F8 01 0F 86 ?? ?? ?? ?? 83 FA 04 75 ?? 85 C9 75 ??");
+    const auto newerDragModes = code.Find("8B 97 9C 01 00 00 8D 42 FF 83 F8 01 0F 86 ?? ?? ?? ?? 83 FA 04 75 ?? 85 C9 75 ??");
+    if (olderDragModes.size() + newerDragModes.size() != 1)
+        return fail(ManipulatorModeInstruction);
+    const bool olderDispatch = !olderDragModes.empty();
+    const auto dragMode = olderDispatch ? olderDragModes.front() : newerDragModes.front();
 
     // The two canvas handlers pass opposing flags to the same teardown function.
     const auto cancels = code.Find("48 0F 7E C1 48 85 C9 74 0A B8 01 00 00 00 F0 0F C1 41 08 41 B9 01 00 00 00 4C 8D 44 24 70 48 8D 55 80 48 8D 4D 90 E8");
@@ -41,7 +86,8 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         return fail(End);
     const auto end = code.Call(finishes.front() + 35);
     if (!end || end != code.Call(cancels.front() + 38) || code.Containing(end).begin != end ||
-        !code.Match(end, "40 53 56 57 41 54 41 55 41 56 41 57 48 81 EC 70 01 00 00"))
+        !code.Match(end, olderDispatch ? "40 53 56 57 41 54 41 55 41 56 41 57 48 81 EC 60 01 00 00" :
+            "40 53 56 57 41 54 41 55 41 56 41 57 48 81 EC 70 01 00 00"))
         return fail(End);
 
     const auto sessions = code.Find("48 8B 1D ?? ?? ?? ?? 48 85 DB 0F 84 ?? ?? ?? ?? 48 8B BB ?? 02 00 00",
@@ -57,8 +103,7 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         return fail("FreeTransform execution path to mode update");
 
     // Drag and release both accumulate their dirty rectangle through the same virtual slot.
-    const auto dragModes = code.Find("8B 97 9C 01 00 00 8D 42 FF 83 F8 01 0F 86 ?? ?? ?? ?? 83 FA 04 75 ?? 85 C9 75 ??");
-    const auto baseDrag = dragModes.size() == 1 ? code.Containing(dragModes.front()) : FunctionRange{};
+    const auto baseDrag = code.Containing(dragMode);
     if (!code.Match(baseDrag.begin, "48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 08 FE FF FF") ||
         code.Find("48 8B DA 48 8B F9 48 8B 02 48 89 45 80 48 8B 4A 08 48 89 4D 88 BE 01 00 00 00 48 85 C9 74 07 8B C6 F0 0F C1 41 08",
             baseDrag.begin, baseDrag.end).size() != 1 ||
@@ -66,14 +111,30 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
             baseDrag.begin, baseDrag.end).size() != 1)
         return fail(Drag);
 
+    // Action 4 rotates the selection. Both paths pass the transformed bounds to the common dirty-area update.
+    const auto rotationActions = code.Find(olderDispatch ?
+        "83 F9 04 0F 85 ?? ?? ?? ?? 83 F8 02 0F 84 ?? ?? ?? ?? 8B 4B 34 8B D1" :
+        "83 F8 04 0F 85 ?? ?? ?? ?? 8B 87 9C 01 00 00 83 F8 02 0F 84 ?? ?? ?? ?? 8B 4B 34 8B D1",
+        baseDrag.begin, baseDrag.end);
+    const auto rotationCalls = code.Find("89 74 24 28 89 54 24 20 4C 8D 4D 30 4C 8D 45 40 48 8D 55 F0 48 8B CF "
+        "E8 ?? ?? ?? ?? 41 BF 12 00 00 00 E9", baseDrag.begin, baseDrag.end);
+    const auto rotate = rotationCalls.size() == 1 ? code.Call(rotationCalls.front() + 23) : 0;
+    if (rotationActions.size() != 1 || !rotate || code.Containing(rotate).begin != rotate ||
+        rotationCalls.front() <= rotationActions.front() ||
+        rotationCalls.front() >= code.Relative(rotationActions.front() + 3, 2, 6) ||
+        !code.Match(rotate, "48 8B C4 55 53 56 57 41 56 48 8D A8 18 FF FF FF 48 81 EC C0 01 00 00"))
+        return fail("FreeTransform rotation drag path");
+
     // Verify the scale handler's corner and edge action range.
     const auto scaleCalls = code.Find(
         "8B 44 24 40 89 44 24 20 45 8B CC 4C 8D 45 00 48 8B D3 48 8B CF E8",
         baseDrag.begin, baseDrag.end);
     const auto scale = scaleCalls.size() == 1 ? code.Call(scaleCalls.front() + 21) : 0;
     if (!scale || code.Containing(scale).begin != scale ||
-        !code.Match(scale, "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57") ||
-        code.Find("8B 7A 30 8D 47 FB 83 F8 07 0F 87 ?? ?? ?? ?? E8",
+        !code.Match(scale, olderDispatch ? "48 8B C4 55 53 56 57 41 54 41 56 41 57" :
+            "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57") ||
+        code.Find(olderDispatch ? "8B 5A 30 8D 43 FB 83 F8 07 0F 87 ?? ?? ?? ?? 48 8D 54 24 40 E8" :
+            "8B 7A 30 8D 47 FB 83 F8 07 0F 87 ?? ?? ?? ?? E8",
             scale, code.Containing(scale).end).size() != 1)
         return fail("FreeTransform scale drag handle layout");
 
@@ -82,7 +143,7 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         "0F 28 44 24 50 66 0F 7F 85 90 00 00 00 66 0F 73 D8 08 66 48 0F 7E C1 48 85 C9 74 07 8B C6 F0 0F C1 41 08 "
         "8B 44 24 40 89 44 24 20 45 8B CC 4C 8D 85 90 00 00 00 48 8B D3 48 8B CF E8",
         baseDrag.begin, baseDrag.end);
-    const auto scalePath = code.Relative(dragModes.front() + 12, 2, 6);
+    const auto scalePath = code.Relative(dragMode + 12, 2, 6);
     const auto alternateScale = alternateScalePaths.size() == 1 && alternateScalePaths.front() == scalePath ?
         code.Call(scalePath + 59) : 0;
     if (!alternateScale || code.Containing(alternateScale).begin != alternateScale ||
@@ -186,8 +247,10 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         return fail("FreeTransform canvas cache and widget invalidation");
 
     // Resolve both blitters from the call chain that receives the two quadrilaterals.
-    const auto quad = code.Find("44 89 44 24 30 44 89 74 24 28 48 8B 44 24 50 48 89 44 24 20 4C 8D 4D ?? 4C 8D 44 24 ?? 48 8D 54 24 ?? 48 8D 4C 24 ?? E8");
-    const auto quadCall = quad.size() == 1 ? quad.front() + 39 : 0;
+    const auto quad = code.Find(olderDispatch ?
+        "44 89 44 24 30 89 74 24 28 4C 89 6C 24 20 4C 8D 4D ?? 4C 8D 44 24 ?? 48 8D 54 24 ?? 48 8D 4C 24 ?? E8" :
+        "44 89 44 24 30 44 89 74 24 28 48 8B 44 24 50 48 89 44 24 20 4C 8D 4D ?? 4C 8D 44 24 ?? 48 8D 54 24 ?? 48 8D 4C 24 ?? E8");
+    const auto quadCall = quad.size() == 1 ? quad.front() + (olderDispatch ? 33 : 39) : 0;
     const auto wrapper = code.Call(quadCall);
     if (!wrapper || code.Containing(wrapper).begin != wrapper ||
         !code.Match(wrapper, "48 8B C4 48 89 58 18 48 89 50 10 48 89 48 08 56 57 41 56"))
@@ -207,6 +270,16 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         return fail(Nearest);
     if (!code.Match(linear, "48 89 5C 24 08 44 89 4C 24 20 44 89 44 24 18 55 56 57 41 54 41 55 41 56 41 57 48 81 EC B0 00 00 00 4C 8B E1"))
         return fail(Bilinear);
+
+    // The 8-bit interpolation kernels write the channel count, independent of the pixel stride.
+    const auto colorKernels = code.Find("83 BC 24 28 01 00 00 02 0F B6 C8 89 4C 24 30 49 8B CC 44 89 4C 24 28 "
+        "44 8B CA 44 89 44 24 20 48 8B D7 4C 8B C3 75 07 E8 ?? ?? ?? ?? EB 05 E8", linear, linear + 0x300);
+    const auto cubicColor = colorKernels.size() == 1 ? code.Call(colorKernels.front() + 39) : 0;
+    const auto linearColor = colorKernels.size() == 1 ? code.Call(colorKernels.front() + 46) : 0;
+    if (!cubicColor || !linearColor ||
+        !code.Match(cubicColor + 0x2f7, "41 88 04 0B 41 FF C4 48 FF C1 44 3B A7 94 02 00 00 7C") ||
+        !code.Match(linearColor + 0x7f3, "88 44 24 FF 3B B7 94 02 00 00 7C"))
+        return fail("FreeTransform color channel write count");
 
     const auto oversample = nearestCalls.size() == 1 ? code.Call(nearestCalls.front() + 0x2a) : 0;
     if (!code.Match(oversample, "40 53 55 56 57 41 56 48 81 EC 50 01 00 00 0F 29 BC 24 20 01 00 00") ||
@@ -260,7 +333,9 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         !code.Match(selectTileData + 0x1e8, "44 2B 73 3C 44 2B 7B 38 41 8B C6"))
         return fail("FreeTransform tile bounds and pixel coordinates");
 
-    const auto dimensions = code.Find("E8 ?? ?? ?? ?? 48 8B CB 89 47 28 E8 ?? ?? ?? ?? 8B 4F 28 44 8B C8 89 47 2C");
+    const auto dimensions = code.Find(olderDispatch ?
+        "E8 ?? ?? ?? ?? 48 8B CB 89 47 30 E8 ?? ?? ?? ?? 8B 4F 30 44 8B C8 89 47 34 8B 06 99 F7 F9 89 47 18" :
+        "E8 ?? ?? ?? ?? 48 8B CB 89 47 28 E8 ?? ?? ?? ?? 8B 4F 28 44 8B C8 89 47 2C");
     const auto tileWidth = dimensions.size() == 1 ? code.Call(dimensions.front()) : 0;
     const auto tileHeight = dimensions.size() == 1 ? code.Call(dimensions.front() + 11) : 0;
     if (!code.Match(tileWidth, "8B 81 C0 00 00 00 C3") || !code.Match(tileHeight, "8B 81 C4 00 00 00 C3"))
@@ -272,6 +347,7 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         {CanvasRefresh, refresh}, {Wrapper, wrapper}, {QuadCall, quadCall},
         {Nearest, nearest}, {Bilinear, linear}, {Oversample, oversample}, {ToolSlot, tool},
         {ToolModeInstruction, modes.front()}, {ToolSessionInstruction, sessions.front()},
+        {ManipulatorModeInstruction, dragMode},
         {SelectTile, tile}, {Alpha, alpha}, {Color, color}, {AlphaPitch, alphaPitch},
         {ColorPitch, colorPitch}, {AlphaBytes, alphaBytes}, {ColorBytes, colorBytes},
         {TileWidth, tileWidth}, {TileHeight, tileHeight}
@@ -281,5 +357,6 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         table[name] = address;
         log << "Located " << name << '\n';
     }
+    log << "FreeTransform: verified " << (olderDispatch ? "earlier" : "later") << " manipulator and sampler layout.\n";
     return true;
 }

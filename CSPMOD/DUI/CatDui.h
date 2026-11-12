@@ -38,5 +38,5 @@
 class NativeModalWindow :public ui::WindowImplBase
 {
 public:
-    void DoModalNative(uintptr_t nativeWindowHandle);
+    void DoModalNative(uintptr_t nativeWindowHandle, bool disableOwner = true);
 };

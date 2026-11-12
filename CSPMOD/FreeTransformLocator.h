@@ -6,6 +6,7 @@
 
 namespace FreeTransform
 {
+inline constexpr uint32_t earlierManipulatorModeOffset = 0x194;
 inline constexpr const char* Begin = "FreeTransform_Begin";
 inline constexpr const char* End = "FreeTransform_End";
 inline constexpr const char* Drag = "FreeTransform_Drag";
@@ -20,6 +21,7 @@ inline constexpr const char* Bilinear = "FreeTransform_Bilinear";
 inline constexpr const char* Oversample = "FreeTransform_Oversample";
 inline constexpr const char* ToolSlot = "FreeTransform_ToolSlot";
 inline constexpr const char* ToolModeInstruction = "FreeTransform_ToolModeInstruction";
+inline constexpr const char* ManipulatorModeInstruction = "FreeTransform_ManipulatorModeInstruction";
 inline constexpr const char* ToolSessionInstruction = "FreeTransform_ToolSessionInstruction";
 inline constexpr const char* SelectTile = "FreeTransform_SelectTile";
 inline constexpr const char* Alpha = "FreeTransform_Alpha";

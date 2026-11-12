@@ -67,13 +67,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 #ifdef _DEBUG
 #pragma comment(lib, "cximage_d.lib")
-#pragma comment(lib, "duilib_d.lib")
 #pragma comment(lib, "libpng_d.lib")
 #pragma comment(lib, "libwebp_d.lib")
 #pragma comment(lib, "zlib_d.lib")
 #else
 #pragma comment(lib, "cximage_s.lib")
-#pragma comment(lib, "duilib.lib")
 #pragma comment(lib, "libpng_s.lib")
 #pragma comment(lib, "libwebp_s.lib")
 #pragma comment(lib, "zlib_s.lib")
