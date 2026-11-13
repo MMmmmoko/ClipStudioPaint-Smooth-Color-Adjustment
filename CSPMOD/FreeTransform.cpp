@@ -101,6 +101,7 @@ constexpr int maxDimension = 8192;
 constexpr int maxCoordinate = 1 << 20;
 constexpr int64_t maxPixels = 8 * 1024 * 1024;
 constexpr int64_t minOutputPixels = 16 * 1024;
+constexpr auto dragRefreshInterval = std::chrono::milliseconds(16);
 
 template<typename T>
 T Read(const void* base, size_t offset = 0)
@@ -780,7 +781,7 @@ void RequestDragRefresh(const void* session, void* manipulator, const void* even
     if (Read<int>(event, move ? 0x28 : 0x68) != 0 || (earlierLayout && !held))
     {
         if (earlierLayout)
-            dragRefresh = {};
+            dragRefresh.dirty = {};
         return;
     }
     // The native scale branch handles actions 5 through 12, including corner
@@ -814,21 +815,14 @@ void RequestDragRefresh(const void* session, void* manipulator, const void* even
 
     const auto region = pending;
     pending = {};
-    const auto minimumInterval = std::chrono::milliseconds(earlierLayout ? 33 : 16);
-    dragRefresh.next = now + minimumInterval;
+    dragRefresh.next = now + dragRefreshInterval;
     dragRefresh.refreshing = true;
     // The release path takes a by-value native shared pointer and consumes its reference.
     InterlockedIncrement(reinterpret_cast<volatile LONG*>(canvas.control + 8));
     refreshCanvas(&canvas, &region);
     dragRefresh.refreshing = false;
-    if (earlierLayout || previewLogPath[0])
-    {
-        const auto finished = PreviewClock::now();
-        // Leave time for pointer events even when the synchronous refresh took a full interval.
-        if (earlierLayout)
-            dragRefresh.next = (std::max)(dragRefresh.next, finished + std::chrono::milliseconds(8));
-        CountPreview(session, &PreviewCounts::refreshes, 1, finished - now);
-    }
+    if (previewLogPath[0])
+        CountPreview(session, &PreviewCounts::refreshes, 1, PreviewClock::now() - now);
 }
 
 void DragHook(void* manipulator, const void* event)

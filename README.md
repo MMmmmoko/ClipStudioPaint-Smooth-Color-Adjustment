@@ -53,7 +53,7 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 ## 使用方法
 
-将 `CSPMOD.dll` 放在 `CLIPStudioPaint.exe` 所在目录，优动漫使用 `UDMPaintPRO.exe` 或 `UDMPaintEX.exe` 所在目录。将 `AAload.dll` 和随附的 `SmoothFilter_*.dll` 放到该目录下的 `PlugIn\PAINT\`。启动软件后由 `CSPMOD.dll` 按宿主版本和文件 SHA-256 检查并自动生成 `CSPAddrTable.json`。每次重建会把识别失败的特征写入 `CSPAddrTable.build.log`。安装目录不可写时，缓存和日志保存在当前用户的 `%APPDATA%\CSPMOD\AddressTable\` 下。
+将 `CSPMOD.dll` 放在 `CLIPStudioPaint.exe` 所在目录，优动漫使用 `UDMPaintPRO.exe` 或 `UDMPaintEX.exe` 所在目录。将 `AAload.dll` 和随附的 `SmoothFilter_*.dll` 放到该目录下的 `PlugIn\PAINT\`。启动时，`CSPMOD.dll` 在宿主产品版本和地址表 schema 匹配时直接加载 `CSPAddrTable.json`。地址表缺失、无法读取或版本不匹配时重新扫描，识别失败的特征写入 `CSPAddrTable.build.log`。安装目录不可写时，缓存和日志保存在当前用户的 `%APPDATA%\CSPMOD\AddressTable\` 下。
 
 
 ### 色调调整&色调调整图层&模糊滤镜&自由变换

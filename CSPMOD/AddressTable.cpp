@@ -6,22 +6,19 @@
 #include "LevelsPreview.h"
 #include "../Common/AddressGenerator/AddressGenerator.h"
 
-#include <bcrypt.h>
 #include <winver.h>
-#include <array>
 #include <algorithm>
-#include <limits>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <utility>
 
-#pragma comment(lib, "bcrypt.lib")
 #pragma comment(lib, "version.lib")
 
 namespace
 {
-constexpr unsigned tableSchema = 25;
+// Increment when the address table format or locator results change.
+constexpr unsigned tableSchema = 26;
 constexpr auto tableName = L"CSPAddrTable.json";
 constexpr auto logName = L"CSPAddrTable.build.log";
 
@@ -60,49 +57,6 @@ std::string ProductVersion(const std::filesystem::path& path)
     if (LOWORD(info.dwProductVersionLS))
         version += "." + std::to_string(LOWORD(info.dwProductVersionLS));
     return version;
-}
-
-std::string ExecutableDigest(const std::filesystem::path& path)
-{
-    const HANDLE file = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_DELETE,
-        nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-    if (file == INVALID_HANDLE_VALUE)
-        return {};
-    LARGE_INTEGER size{};
-    HANDLE mapping = nullptr;
-    if (GetFileSizeEx(file, &size) && size.QuadPart > 0 && size.QuadPart <= (std::numeric_limits<ULONG>::max)())
-        mapping = CreateFileMappingW(file, nullptr, PAGE_READONLY, 0, 0, nullptr);
-    CloseHandle(file);
-    if (!mapping)
-        return {};
-
-    auto* bytes = static_cast<uint8_t*>(MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, 0));
-    CloseHandle(mapping);
-    if (!bytes)
-        return {};
-
-    std::array<uint8_t, 32> hash{};
-    BCRYPT_ALG_HANDLE algorithm = nullptr;
-    bool hashed = false;
-    if (BCryptOpenAlgorithmProvider(&algorithm, BCRYPT_SHA256_ALGORITHM, nullptr, 0) >= 0)
-    {
-        hashed = BCryptHash(algorithm, nullptr, 0, bytes, static_cast<ULONG>(size.QuadPart),
-            hash.data(), static_cast<ULONG>(hash.size())) >= 0;
-        BCryptCloseAlgorithmProvider(algorithm, 0);
-    }
-    UnmapViewOfFile(bytes);
-    if (!hashed)
-        return {};
-
-    constexpr char hex[] = "0123456789abcdef";
-    std::string digest;
-    digest.reserve(hash.size() * 2);
-    for (const auto byte : hash)
-    {
-        digest += hex[byte >> 4];
-        digest += hex[byte & 15];
-    }
-    return digest;
 }
 
 const IMAGE_SECTION_HEADER* FindSection(const IMAGE_NT_HEADERS64& nt,
@@ -159,28 +113,11 @@ bool ValidEntry(const Json::Value& entry, size_t size)
     return validRva(entry);
 }
 
-bool MatchesTable(const Json::Value& table, const std::string& version, const std::string& digest,
-    size_t imageSize, const Json::Value& verifiedFeatures)
+bool MatchesTable(const Json::Value& table, const std::string& version)
 {
-    if (!table.isObject() || digest.empty() || !table["SchemaVersion"].isUInt() ||
-        table["SchemaVersion"].asUInt() != tableSchema || table["CspVersion"] != Json::Value(version) ||
-        table["ExecutableSHA256"] != Json::Value(digest))
-        return false;
-
-    const auto& entries = table["CspAddressRVA"];
-    if (!entries.isObject())
-        return false;
-
-    for (const auto& name : entries.getMemberNames())
-        if (!ValidEntry(entries[name], imageSize) ||
-            ((name.compare(0, 14, "FreeTransform_") == 0 || name.compare(0, 14, "LevelsPreview_") == 0 ||
-                name.compare(0, 17, "CustomAdjustment_") == 0) &&
-                !verifiedFeatures.isMember(name)))
-            return false;
-    for (const auto& name : verifiedFeatures.getMemberNames())
-        if (!entries[name].isUInt() || entries[name].asUInt() != verifiedFeatures[name].asUInt())
-            return false;
-    return true;
+    return table.isObject() && table["SchemaVersion"].isUInt() &&
+        table["SchemaVersion"].asUInt() == tableSchema && table["CspVersion"] == Json::Value(version) &&
+        table["CspAddressRVA"].isObject();
 }
 }
 
@@ -198,13 +135,7 @@ bool AddressTable::LoadOrBuild()
     if (nt->Signature != IMAGE_NT_SIGNATURE || nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC)
         return false;
 
-    const auto* text = FindSection(*nt, ".text\0\0", IMAGE_SCN_MEM_EXECUTE);
-    const auto* data = FindSection(*nt, ".data\0\0", IMAGE_SCN_MEM_WRITE);
     ins.imageSize = nt->OptionalHeader.SizeOfImage;
-    if (!text || text->VirtualAddress >= ins.imageSize)
-        return false;
-    const size_t textSize = (std::min)({static_cast<size_t>(text->Misc.VirtualSize),
-        static_cast<size_t>(text->SizeOfRawData), ins.imageSize - text->VirtualAddress});
 
     ins.cspVersion = ProductVersion(path);
     if (ins.cspVersion.empty())
@@ -214,9 +145,34 @@ bool AddressTable::LoadOrBuild()
     }
 
     const auto tablePath = path.parent_path() / tableName;
-    const std::string digest = ExecutableDigest(path);
+    auto table = ReadTable(tablePath);
+    bool matches = MatchesTable(table, ins.cspVersion);
     const auto filename = path.filename().wstring();
-    const bool isUDM = _wcsnicmp(filename.c_str(), L"UDMPaint", 8) == 0;
+    std::filesystem::path fallback;
+    std::filesystem::path fallbackTable;
+    if (char* preferencePath = matches ? nullptr : SDL_GetPrefPath("CSPMOD", "AddressTable"))
+    {
+        fallback = std::filesystem::u8path(preferencePath);
+        SDL_free(preferencePath);
+        const auto version = std::filesystem::u8path(ins.cspVersion).wstring();
+        fallbackTable = fallback / (L"CSPAddrTable-" + filename + L"-" + version + L".json");
+        table = ReadTable(fallbackTable);
+        matches = MatchesTable(table, ins.cspVersion);
+    }
+    if (matches)
+    {
+        ins.addressMap = std::move(table);
+        SDL_Log("Address table: loaded for version %s.", ins.cspVersion.c_str());
+        DoStaticPatch();
+        return true;
+    }
+
+    const auto* text = FindSection(*nt, ".text\0\0", IMAGE_SCN_MEM_EXECUTE);
+    const auto* data = FindSection(*nt, ".data\0\0", IMAGE_SCN_MEM_WRITE);
+    if (!text || text->VirtualAddress >= ins.imageSize)
+        return false;
+    const size_t textSize = (std::min)({static_cast<size_t>(text->Misc.VirtualSize),
+        static_cast<size_t>(text->SizeOfRawData), ins.imageSize - text->VirtualAddress});
 
     std::ostringstream featureLog;
     Json::Value verifiedFeatures(Json::objectValue);
@@ -253,77 +209,52 @@ bool AddressTable::LoadOrBuild()
     if (!customAdjustmentCatalogReady)
         featureLog << "SKIP: CustomAdjustment shortcut and toolbar bindings require the command catalog.\n";
 
-    std::filesystem::path fallback;
-    if (char* preferencePath = SDL_GetPrefPath("CSPMOD", "AddressTable"))
+    std::ofstream log(path.parent_path() / logName, std::ios::out | std::ios::trunc);
+    if (!log && !fallback.empty())
     {
-        fallback = std::filesystem::u8path(preferencePath);
-        SDL_free(preferencePath);
+        const auto fallbackLog = fallback / logName;
+        log.clear();
+        log.open(fallbackLog, std::ios::out | std::ios::trunc);
+        if (log)
+            SDL_Log("Address table log: %s", fallbackLog.u8string().c_str());
     }
-    const auto fallbackTable = fallback.empty() || digest.empty() ? std::filesystem::path{} :
-        fallback / ("CSPAddrTable-" + digest + ".json");
 
-    auto table = ReadTable(tablePath);
-    bool matches = MatchesTable(table, ins.cspVersion, digest, ins.imageSize, verifiedFeatures);
-    if (!matches && !fallbackTable.empty())
+    if (!log)
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: could not open a build log.");
+    log << "Address table rebuild for " << path.filename().u8string()
+        << " version " << ins.cspVersion << '\n';
+    SDL_Log("Address table: rebuilding for version %s.", ins.cspVersion.c_str());
+    AddressGenerator generator;
+    generator.SetUpCode(image + text->VirtualAddress, textSize, text->VirtualAddress, &log);
+    const bool isUDM = _wcsnicmp(filename.c_str(), L"UDMPaint", 8) == 0;
+    table = generator.Build(ins.cspVersion, isUDM);
+    auto& entries = table["CspAddressRVA"];
+    for (const auto& name : verifiedFeatures.getMemberNames())
+        entries[name] = verifiedFeatures[name];
+    log << featureLog.str();
+    if (!freeTransformReady || !levelsReady || !customAdjustmentReady || !customAdjustmentNavigationReady ||
+        !customAdjustmentMenuReady ||
+        !customAdjustmentCatalogReady || !customAdjustmentBindingsReady)
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "%s", featureLog.str().c_str());
+
+    for (const auto& name : entries.getMemberNames())
     {
-        table = ReadTable(fallbackTable);
-        matches = MatchesTable(table, ins.cspVersion, digest, ins.imageSize, verifiedFeatures);
-    }
-    if (matches)
-    {
-        ins.addressMap = std::move(table);
-        SDL_Log("Address table: loaded for version %s.", ins.cspVersion.c_str());
-    }
-    else
-    {
-        std::ofstream log(path.parent_path() / logName, std::ios::out | std::ios::trunc);
-        if (!log && !fallback.empty())
+        if (!ValidEntry(entries[name], ins.imageSize))
         {
-            const auto fallbackLog = fallback / logName;
-            log.clear();
-            log.open(fallbackLog, std::ios::out | std::ios::trunc);
-            if (log)
-                SDL_Log("Address table log: %s", fallbackLog.u8string().c_str());
+            log << "ERROR: " << name << " points outside the executable image.\n";
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: invalid feature %s.", name.c_str());
+            entries.removeMember(name);
         }
-
-        if (!log)
-            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: could not open a build log.");
-        log << "Address table rebuild for " << path.filename().u8string()
-            << " version " << ins.cspVersion << " SHA-256 " << digest << '\n';
-        SDL_Log("Address table: rebuilding for version %s.", ins.cspVersion.c_str());
-        AddressGenerator generator;
-        generator.SetUpCode(image + text->VirtualAddress, textSize, text->VirtualAddress, &log);
-        table = generator.Build(ins.cspVersion, isUDM);
-        auto& entries = table["CspAddressRVA"];
-        for (const auto& name : verifiedFeatures.getMemberNames())
-            entries[name] = verifiedFeatures[name];
-        log << featureLog.str();
-        if (!freeTransformReady || !levelsReady || !customAdjustmentReady || !customAdjustmentNavigationReady ||
-            !customAdjustmentMenuReady ||
-            !customAdjustmentCatalogReady || !customAdjustmentBindingsReady)
-            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "%s", featureLog.str().c_str());
-
-        for (const auto& name : entries.getMemberNames())
-        {
-            if (!ValidEntry(entries[name], ins.imageSize))
-            {
-                log << "ERROR: " << name << " points outside the executable image.\n";
-                SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: invalid feature %s.", name.c_str());
-                entries.removeMember(name);
-            }
-        }
-
-        table["SchemaVersion"] = tableSchema;
-        table["ExecutableSHA256"] = digest;
-        if (digest.empty() || (!WriteTable(tablePath, table) &&
-            (fallbackTable.empty() || !WriteTable(fallbackTable, table))))
-        {
-            log << "Cache could not be saved. The rebuilt table is available for this process.\n";
-            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: cache unavailable, using the rebuilt table in memory.");
-        }
-        log << "Located " << entries.size() << " address entries.\n";
-        ins.addressMap = std::move(table);
     }
+
+    table["SchemaVersion"] = tableSchema;
+    if (!WriteTable(tablePath, table) && (fallbackTable.empty() || !WriteTable(fallbackTable, table)))
+    {
+        log << "Cache could not be saved. The rebuilt table is available for this process.\n";
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Address table: cache unavailable, using the rebuilt table in memory.");
+    }
+    log << "Located " << entries.size() << " address entries.\n";
+    ins.addressMap = std::move(table);
 
     DoStaticPatch();
     return true;
