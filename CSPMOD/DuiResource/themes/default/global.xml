@@ -270,7 +270,15 @@
                                         hot_color="#FFFAFCFF" 
                                         pushed_color="#FFB0B4B8"/>
     
-    <!--窗口右上角按钮 -->
+    <!-- CSPMOD 自绘窗口：视觉色轮标题栏及边框 -->
+    <Class name="csp_window_frame" bkcolor="#CSPColor_PanelBG" border_color="#CSPColor_CaptionFocus" border_size="2,0,2,2"/>
+    <Class name="csp_window_caption" width="stretch" height="18"
+           normal_color="#CSPColor_CaptionFocus" disabled_color="#CSPColor_CaptionNoFocus"/>
+    <Class name="csp_window_title" font="system_12" text_align="hcenter,vcenter" margin="8,0,8,0" valign="center"
+           normal_text_color="#CSPColor_CaptionContent" disabled_text_color="#CSPColor_CaptionContentNoFocus"/>
+    <Class name="csp_window_close" width="24" height="stretch" margin="0,0,0,2"
+           normal_image="file='cspHelper_default/icon_close.svg' width='24' height='24' valign='center' halign='center'"/>
+
     <Class name="btn_wnd_min_11" normal_image="file='public/button/window-minimize.svg' 
                                  width='24' height='24' valign='center' halign='center'" hot_color="AliceBlue" pushed_color="Lavender"/>
     <Class name="btn_wnd_close_11" normal_image="file='public/button/window-close.svg' 

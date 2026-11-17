@@ -21,14 +21,14 @@
 					   focus_border_color="#CSPColor_CaptionContent" number_only="true" want_return="true" text_align="hcenter,vcenter"  />
 
 
-	<VBox bkcolor="#CSPColor_PanelBG" border_color="#CSPColor_CaptionFocus" border_size="2,0,2,2">    
+	<VBox class="csp_window_frame">
         <!-- 标题栏区域 工具窗口不需要文字标题-->
-        <HBox name="window_caption_bar" width="stretch" height="18" normal_color="#CSPColor_CaptionFocus" disabled_color="#CSPColor_CaptionNoFocus">
-			  <Button name="windowMenu"  width="26" height="18" normal_image="file='menu24x.svg' dest='5,1,21,17' " hot_image="file='menu24x_hot.svg' dest='5,1,21,17'"/>
-			  <Control />
-			<Label font="system_12" text_id="STRID_COLORWHEEL"  text_align="vcenter"  margin="8,0,8,0" valign="center"  normal_text_color="#CSPColor_CaptionContent" disabled_text_color="#CSPColor_CaptionContentNoFocus"/>
-			<Control />
-              <Button class="btn_wnd_close_11" height="stretch" width="24" name="btn_Close" margin="0,0,0,2" tooltip_text_id="STRING_CLOSE" normal_image="file='icon_close.svg' width='24' height='24' valign='center' halign='center'"/>
+        <HBox class="csp_window_caption" name="window_caption_bar">
+            <Button name="windowMenu" width="26" height="18" normal_image="file='menu24x.svg' dest='5,1,21,17' " hot_image="file='menu24x_hot.svg' dest='5,1,21,17'"/>
+            <Control/>
+            <Label class="csp_window_title" text_id="STRID_COLORWHEEL"/>
+            <Control/>
+            <Button class="btn_wnd_close_11 csp_window_close" name="btn_Close" tooltip_text_id="STRING_CLOSE"/>
         </HBox>
 
 		<!-- 工作区域，除了标题栏外的内容都放在这个大的Box区域 -->
