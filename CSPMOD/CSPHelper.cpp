@@ -5,12 +5,13 @@
 #include"DUI/Dialog/ApplyEffects_Dlg.h"
 #include"duilib/duilib.h"
 #include"CspData.h"
-#include"CustomAdjustmentLayer.h"
-#include"TestInvertAdjustmentLayer.h"
 
 #include"DUI/Dialog/CheckFunction_Dlg.h"
 #include"DUI/Dialog/About_Dlg.h"
-#include"DUI/Dialog/ColWheelWnd.h"
+#ifdef CSPMOD_PRIVATE
+#include "DUI/Dialog/ColWheelWnd.h"
+#include "PaintColor.h"
+#endif
 #include"ScriptAction_ApplyEffects.h"
 void CSPHelper::Init()
 {
@@ -58,10 +59,9 @@ void CSPHelper::OnClickEntrance()
     ui::MenuItem* helperMenu_applyEffects = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_applyEffects"));
     ui::MenuItem* helperMenu_checkFunctions = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_checkFunctions"));
     ui::MenuItem* helperMenu_about = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_about"));
+    auto* license = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_license"));
 
     ui::MenuItem* helperMenu_colorWheel = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_colorWheel"));
-    auto* customAdjustment = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_customAdjustment"));
-    auto* editCustomAdjustment = dynamic_cast<ui::MenuItem*>(menu->FindControl(L"helperMenu_editCustomAdjustment"));
     
     ui::UiSize sizeMax(9999, 9999);
     int32_t maxW = 0;
@@ -82,44 +82,31 @@ void CSPHelper::OnClickEntrance()
         int32_t curW = helperMenu_about->EstimateSize(sizeMax).cx.GetInt32();
         if (curW > maxW)maxW = curW;
     }
+#ifdef CSPMOD_PRIVATE
+    const bool showColorWheel = isProUser() && PaintColor::IsColorWheelAvailable();
+    const bool showLicense = !isPaid();
+#else
+    constexpr bool showColorWheel = false;
+    constexpr bool showLicense = false;
+#endif
     if (helperMenu_colorWheel)
     {
-        int32_t curW = helperMenu_colorWheel->EstimateSize(sizeMax).cx.GetInt32();
-        if (curW > maxW)maxW = curW;
+        helperMenu_colorWheel->SetVisible(showColorWheel);
+        if (showColorWheel)
+            maxW = (std::max)(maxW, helperMenu_colorWheel->EstimateSize(sizeMax).cx.GetInt32());
     }
-    const bool adjustmentAvailable = (customAdjustment || editCustomAdjustment) && CustomAdjustmentLayer::PrepareMenu(host);
-    const auto bindAdjustment = [&](ui::MenuItem* item, void (*command)(HWND, uint32_t), bool enabled)
+    if (license)
     {
-        if (!item)
-            return;
-        item->SetVisible(adjustmentAvailable);
-        if (!adjustmentAvailable)
-            return;
-        item->SetEnabled(enabled);
-        maxW = (std::max)(maxW, item->EstimateSize(sizeMax).cx.GetInt32());
-        item->AttachClick([host, command](const ui::EventArgs&) {
-            command(host, TestInvertAdjustment::Type);
-            return true;
-        });
-    };
-    bindAdjustment(customAdjustment, CustomAdjustmentLayer::RequestCreate, adjustmentAvailable);
-    bindAdjustment(editCustomAdjustment, CustomAdjustmentLayer::RequestEdit,
-        adjustmentAvailable && CustomAdjustmentLayer::CanEdit(TestInvertAdjustment::Type));
-    if (adjustmentAvailable)
-    {
-        if (customAdjustment)
-            customAdjustment->SetFixedWidth(ui::UiFixedInt(maxW), true, false);
-        if (editCustomAdjustment)
-            editCustomAdjustment->SetFixedWidth(ui::UiFixedInt(maxW), true, false);
+        license->SetVisible(showLicense);
+        if (showLicense)
+            maxW = (std::max)(maxW, license->EstimateSize(sizeMax).cx.GetInt32());
     }
-
-    helperMenu_applyEffects->SetFixedWidth(ui::UiFixedInt(maxW), true, false);
-    helperMenu_checkFunctions->SetFixedWidth(ui::UiFixedInt(maxW), true, false);
-    helperMenu_about->SetFixedWidth(ui::UiFixedInt(maxW), true, false);
-    helperMenu_colorWheel->SetFixedWidth(ui::UiFixedInt(maxW), true, false);
-
-
-    helperMenu_colorWheel->SetVisible(isProUser());
+    for (auto* item : {helperMenu_applyEffects, helperMenu_checkFunctions, helperMenu_about,
+        helperMenu_colorWheel, license})
+    {
+        if (item)
+            item->SetFixedWidth(ui::UiFixedInt(maxW), true, false);
+    }
 
     ////设置部分项目的显隐
     //if (AppSettings::GetIns().GetWindowTransparent())
@@ -148,11 +135,18 @@ void CSPHelper::OnClickEntrance()
             About_Dlg::ShowModalDlg();
             return true;
         });
+#ifdef CSPMOD_PRIVATE
+    if (license)license->AttachClick(
+        [](const ui::EventArgs&)->bool {
+            ShowLicenseDialog();
+            return true;
+        });
     if (helperMenu_colorWheel)helperMenu_colorWheel->AttachClick(
         [](const ui::EventArgs&)->bool {
             ColWheelWnd::ShowForm();
             return true;
         });
+#endif
 
 
 

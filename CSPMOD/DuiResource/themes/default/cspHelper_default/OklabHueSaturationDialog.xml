@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window caption="0,0,0,30" use_system_caption="false" layered_window="true"
+        shadow_type="default" shadow_attached="true" alpha="255" icon="public/caption/logo.ico">
+    <Class name="hueLabel" font="system_14" normal_text_color="#CSPColor_Content" valign="center"/>
+    <Class name="hueButton" width="96" height="30" border_size="1" border_round="2,2"
+           border_color="#CSPColor_Separator" normal_text_color="#CSPColor_Content"
+           bkcolor="#CSPColor_ControlBG" hot_color="#CSPColor_Selected" pushed_color="#CSPColor_ButtonPush"/>
+    <Class name="huePicker" width="34" height="30" border_size="1" border_round="2,2"
+           border_color="#CSPColor_Separator" bkcolor="#CSPColor_ControlBG"
+           hot_color="#CSPColor_Selected" pushed_color="#CSPColor_ButtonPush"/>
+    <Class name="hueNumber" width="58" height="26" valign="center" single_line="true" limit_text="5"
+           select_all_on_focus="true" text_align="center,vcenter" bkcolor="#CSPColor_ControlBG"
+           font="system_14" normal_text_color="#CSPColor_Content" border_size="1" border_color="#CSPColor_Separator"/>
+    <Class name="hueSlider" width="stretch" height="30" valign="center" step="1" value="0"
+           bkimage="file='slider_bg.svg' corner='4,4,4,4'" padding="7,10,7,10"
+           normal_color="#CSPColor_ControlBG" normal_color_margin="7,10,7,10"
+           hot_color="#CSPColor_Selected" hot_color_margin="7,10,7,10" fade_hot="false"
+           thumb_normal_image="file='slider_thumb.svg' width='16' height='30'" thumb_size="16,30"/>
+    <VBox width="558" height="auto" bkcolor="#CSPColor_PanelBG">
+        <HBox height="30" normal_color="#CSPColor_CaptionFocus">
+            <Label margin="12,0,0,0" valign="center" font="system_14" text_id="STRID_OKHUESAT_TITLE"
+                   normal_text_color="#CSPColor_CaptionContent"/>
+            <Control/>
+            <Button class="btn_wnd_close_11" name="close" width="40" height="stretch" tooltip_text_id="STRING_CLOSE"
+                    normal_image="file='icon_close.svg' width='24' height='24' valign='center' halign='center'"/>
+        </HBox>
+        <VBox height="auto" margin="16,12,16,14" child_margin="6">
+            <HBox height="30" child_margin="5">
+                <Button class="hueButton" name="all" width="stretch" text_id="STRID_OKHUESAT_ALL"/>
+                <Button class="hueButton" name="reds" width="stretch" text_id="STRID_OKHUESAT_REDS"/>
+                <Button class="hueButton" name="yellows" width="stretch" text_id="STRID_OKHUESAT_YELLOWS"/>
+                <Button class="hueButton" name="greens" width="stretch" text_id="STRID_OKHUESAT_GREENS"/>
+                <Button class="hueButton" name="cyans" width="stretch" text_id="STRID_OKHUESAT_CYANS"/>
+                <Button class="hueButton" name="blues" width="stretch" text_id="STRID_OKHUESAT_BLUES"/>
+                <Button class="hueButton" name="magentas" width="stretch" text_id="STRID_OKHUESAT_MAGENTAS"/>
+            </HBox>
+            <HBox height="30" child_margin="6">
+                <Label class="hueLabel" width="86" text_id="STRID_OKHUESAT_HUE"/>
+                <Slider class="hueSlider" name="hue" min="-180" max="180"/>
+                <RichEdit class="hueNumber" name="hueValue"/>
+            </HBox>
+            <HBox height="30" child_margin="6">
+                <Label class="hueLabel" width="86" text_id="STRID_OKHUESAT_SATURATION"/>
+                <Slider class="hueSlider" name="saturation" min="-100" max="100"/>
+                <RichEdit class="hueNumber" name="saturationValue"/>
+            </HBox>
+            <HBox height="30" child_margin="6">
+                <Label class="hueLabel" width="86" text_id="STRID_OKHUESAT_LIGHTNESS"/>
+                <Slider class="hueSlider" name="lightness" min="-100" max="100"/>
+                <RichEdit class="hueNumber" name="lightnessValue"/>
+            </HBox>
+            <HBox height="30" child_margin="5">
+                <Button class="huePicker" name="pick" tooltip_text_id="STRID_OKHUESAT_PICK" normal_image="file='sip_normal.svg' width='22' height='22' halign='center' valign='center'"/>
+                <Button class="huePicker" name="add" tooltip_text_id="STRID_OKHUESAT_ADD" normal_image="file='sip_add.svg' width='22' height='22' halign='center' valign='center'"/>
+                <Button class="huePicker" name="subtract" tooltip_text_id="STRID_OKHUESAT_SUBTRACT" normal_image="file='sip_sub.svg' width='22' height='22' halign='center' valign='center'"/>
+                <Control name="swatch" width="24" height="24" valign="center" margin="4,0,4,0" bkcolor="#CSPColor_ControlBG" border_size="1" border_color="#CSPColor_Separator"/>
+            </HBox>
+            <Label class="hueLabel" name="status" height="20"/>
+            <Label class="hueLabel" name="limits" height="17" text_align="center,vcenter"/>
+            <OklabHueRange name="range" width="stretch" height="38" tooltip_text_id="STRID_OKHUESAT_RANGE_HELP"/>
+            <HBox height="24" child_margin="18">
+                <CheckBox class="checkbox_1" name="preview" width="auto" font="system_14"
+                          text_id="STRID_CUSTOMADJUSTMENT_PREVIEW" normal_text_color="#CSPColor_Content"/>
+                <CheckBox class="checkbox_1" name="colorize" width="auto" font="system_14"
+                          text_id="STRID_OKHUESAT_COLORIZE" normal_text_color="#CSPColor_Content"/>
+            </HBox>
+            <HBox height="30" child_margin="8">
+                <Button class="hueButton" name="reset" text_id="STRID_OKHUESAT_RESET"/>
+                <Control/>
+                <Button class="hueButton" name="cancel" text_id="STRING_CANCEL"/>
+                <Button class="hueButton" name="apply" text_id="STRING_OK" normal_text_color="#FFFFFF"
+                        bkcolor="#CSPColor_BlueButton" hot_color="#CSPColor_BlueButtonHot" pushed_color="#CSPColor_BlueButtonPush"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</Window>

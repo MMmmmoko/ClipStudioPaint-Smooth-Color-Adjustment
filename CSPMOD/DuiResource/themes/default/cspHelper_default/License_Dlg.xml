@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window size="520,280" caption="0,0,0,28" use_system_caption="false" sys_menu="true"
+        shadow_type="default" shadow_attached="true" shadow_snap="true" layered_window="true"
+        icon="public/caption/logo.ico"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://tempuri.org/NIMDUISchema.xsd"
+		>
+    <Class name="LicenseButton" width="150" height="32" border_size="1" border_round="2,2"
+           border_color="#CSPColor_Separator" fade_hot="false" font="system_14"
+           normal_text_color="#CSPColor_Content" disabled_text_color="#CSPColor_Separator"
+           hot_color="#CSPColor_CaptionNoFocus"/>
+    <VBox bkcolor="#CSPColor_PanelBG">
+        <HBox height="28" normal_color="#CSPColor_CaptionFocus">
+            <Label text_id="STRID_LICENSE_TITLE" margin="8,0,8,0" valign="center"
+                   text_align="vcenter" normal_text_color="#CSPColor_CaptionContent" font="system_14"/>
+            <Control/>
+            <Button class="btn_wnd_close_11" name="close" width="40" height="stretch"
+                    tooltip_text_id="STRING_CLOSE"
+                    normal_image="file='icon_close.svg' width='24' height='24' valign='center' halign='center'"/>
+        </HBox>
+        <VBox margin="20,10,20,12">
+			<RichText text_id="STRID_LICENSE_DESCRIPTION" text_color="#CSPColor_Content" height="auto"/>
+			<Control/>
+            <Label name="status" height="24" normal_text_color="#CSPColor_Content" font="system_bold_16"/>
+            <Label text_id="STRID_LICENSE_CODE" height="22" normal_text_color="#CSPColor_Content" font="system_14"/>
+            <RichEdit name="code" height="30" single_line="true" word_wrap="false" limit_text="64"
+                      text_padding="8,3,8,3" font="system_14" normal_text_color="#CSPColor_Content"
+                      bkcolor="#CSPColor_ControlBG" border_size="1" border_color="#CSPColor_Separator"/>
+            <Label name="message" height="40" margin="0,4,0,4" single_line="false"
+                   normal_text_color="#CSPColor_Content" font="system_14"/>			
+			
+            <RichText name="url_getActivationCode" height="30" text_align="left,vcenter"
+                      text_color="#CSPColor_Content" link_font_underline="true" default_link_font_color="#8EB8E0"/>
+
+			<HBox height="32">
+				<Button class="LicenseButton" name="trial" text_id="STRID_LICENSE_START_TRIAL"/>
+				<Control/>
+				<Button class="LicenseButton" name="activate" text_id="STRID_LICENSE_ACTIVATE"
+                        bkcolor="#CSPColor_BlueButton" hot_color="#CSPColor_BlueButtonHot"
+                        pushed_color="#CSPColor_BlueButtonPush"/>
+			</HBox>
+        </VBox>
+    </VBox>
+</Window>

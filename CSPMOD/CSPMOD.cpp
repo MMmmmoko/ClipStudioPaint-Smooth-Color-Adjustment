@@ -14,12 +14,16 @@
 #include"CspData.h"
 #include"LayerObject.h"
 #include"CSPHelper.h"
-#include"DUI/Dialog/ColWheelWnd.h"
+#ifdef CSPMOD_PRIVATE
+#include "DUI/Dialog/ColWheelWnd.h"
+#include "PrivateFeatures.h"
+#endif
 
 #include"duilib/third_party/libudis86/udis86.h"
 #include"DUI/CatDuiThread.h"
 
 #include"AppSettings.h"
+#include "UpdateCheck.h"
 
 void CSPMOD::OnAttachCSP( uintptr_t moduleHandle)
 {
@@ -66,6 +70,9 @@ void CSPMOD::OnAttachCSP( uintptr_t moduleHandle)
 	TA_ColorBalance::Init();
 	TA_ToneCurve::Init();
 	LevelsPreview::Install();
+#ifdef CSPMOD_PRIVATE
+	RegisterPrivateAdjustments();
+#endif
 	CustomAdjustmentLayer::Install();
 	TimeLapseExport_hook::Init();
 	LayerObject::Init();
@@ -74,6 +81,10 @@ void CSPMOD::OnAttachCSP( uintptr_t moduleHandle)
 
 	//加载设置项
 	AppSettings::GetIns().Load();
+#ifdef CSPMOD_PRIVATE
+	ui::GlobalManager::Instance().Thread().PostTask(ui::kThreadUI, CSPHelper::LoadLicenseAtStartup);
+#endif
+	UpdateCheck::Start();
 
 
 
@@ -85,11 +96,14 @@ void CSPMOD::OnAttachCSP( uintptr_t moduleHandle)
 static bool processStarted = false;
 void CSPMOD::OnMainWindowStart()
 {
+#ifdef CSPMOD_PRIVATE
+	CSPHelper::LoadLicenseAtStartup();
 	//一些主窗口运行后的启动项
 	if (AppSettings::GetColorWheelOpenWhenStart())
 	{
 		ColWheelWnd::ShowForm();
 	}
+#endif
 	ui::GlobalManager::Instance().Thread().PostTask(ui::kThreadUI, []() {processStarted = true; });
 
 }
@@ -99,6 +113,7 @@ void CSPMOD::OnDetachCSP()
 	if (processStarted&& ui::GlobalManager::Instance().Thread().GetCurrentThreadIdentifier() == ui::kThreadUI)
 	{
 		processStarted = false;
+#ifdef CSPMOD_PRIVATE
 		//关闭所有UI资源
 		bool needSave = false;
 		if (ColWheelWnd::GetCurrentForm())
@@ -109,6 +124,7 @@ void CSPMOD::OnDetachCSP()
 		}
 		if(needSave)
 			AppSettings::GetIns()._DoSave();
+#endif
 		SDL_Log("OnDetachCSP");
 	}
 }

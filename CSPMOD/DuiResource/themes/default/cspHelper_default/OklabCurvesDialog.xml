@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window caption="0,0,0,30" use_system_caption="false" layered_window="true"
+        shadow_type="default" shadow_attached="true" alpha="255" icon="public/caption/logo.ico">
+    <Class name="curveLabel" font="system_14" normal_text_color="#CSPColor_Content" valign="center"/>
+    <Class name="curveButton" width="96" height="30" border_size="1" border_round="2,2"
+           border_color="#CSPColor_Separator" normal_text_color="#CSPColor_Content"
+           bkcolor="#CSPColor_ControlBG" hot_color="#CSPColor_Selected" pushed_color="#CSPColor_ButtonPush"/>
+    <Class name="curveNumber" width="74" height="26" single_line="true" limit_text="8" text_align="center,vcenter"
+           bkcolor="#CSPColor_ControlBG" font="system_14" normal_text_color="#CSPColor_Content"
+           border_size="1" border_color="#CSPColor_Separator"/>
+    <VBox width="470" height="auto" bkcolor="#CSPColor_PanelBG">
+        <HBox height="30" normal_color="#CSPColor_CaptionFocus">
+            <Label margin="12,0,0,0" valign="center" font="system_14" text_id="STRID_OKCURVES_TITLE"
+                   normal_text_color="#CSPColor_CaptionContent"/>
+            <Control/>
+            <Button class="btn_wnd_close_11" name="close" width="40" height="stretch" tooltip_text_id="STRING_CLOSE"
+                    normal_image="file='icon_close.svg' width='24' height='24' valign='center' halign='center'"/>
+        </HBox>
+        <VBox height="auto" margin="16,12,16,14" child_margin="6">
+            <HBox height="30" child_margin="6">
+                <Label class="curveLabel" text_id="STRID_OKCURVES_CHANNEL" width="auto"/>
+                <Button class="curveButton" name="channelL" width="stretch" text_id="STRID_OKCURVES_L"/>
+                <Button class="curveButton" name="channelC" width="stretch" text_id="STRID_OKCURVES_C"/>
+                <Button class="curveButton" name="channelA" width="stretch" text_id="STRID_OKCURVES_A"/>
+                <Button class="curveButton" name="channelB" width="stretch" text_id="STRID_OKCURVES_B"/>
+                <Button class="curveButton" name="auto" width="70" text_id="STRID_OKCURVES_AUTO" visible="false"/>
+            </HBox>
+            <OklabCurveGraph name="graph" width="360" height="360" halign="center" tabstop="true"/>
+            <HBox height="28" child_margin="8">
+                <Control/>
+                <Label class="curveLabel" text_id="STRID_OKCURVES_INPUT" width="auto"/>
+                <RichEdit class="curveNumber" name="input"/>
+                <Label class="curveLabel" text_id="STRID_OKCURVES_OUTPUT" width="auto"/>
+                <RichEdit class="curveNumber" name="output"/>
+                <Button class="curveButton" name="remove" text_id="STRID_OKCURVES_REMOVE"/>
+            </HBox>
+            <Label class="curveLabel" name="status" height="26"/>
+            <HBox height="24" child_margin="18">
+                <CheckBox class="checkbox_1" name="preview" width="auto" font="system_14"
+                          text_id="STRID_CUSTOMADJUSTMENT_PREVIEW" normal_text_color="#CSPColor_Content"/>
+            </HBox>
+            <HBox height="30" child_margin="8">
+                <Button class="curveButton" name="reset" text_id="STRID_OKCURVES_RESET"/>
+                <Control/>
+                <Button class="curveButton" name="cancel" text_id="STRING_CANCEL"/>
+                <Button class="curveButton" name="apply" text_id="STRING_OK" normal_text_color="#FFFFFF"
+                        bkcolor="#CSPColor_BlueButton" hot_color="#CSPColor_BlueButtonHot" pushed_color="#CSPColor_BlueButtonPush"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</Window>

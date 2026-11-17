@@ -6,7 +6,8 @@
 #include <windowsx.h>
 #endif
 
-void NativeModalWindow::DoModalNative(uintptr_t nativeWindowHandle_parent, bool disableOwner)
+void NativeModalWindow::DoModalNative(uintptr_t nativeWindowHandle_parent, bool disableOwner, MessageFilter filter,
+    MessageFilter ownerMouseFilter)
 {
 #ifdef _WINDOWS
     //WINDOWS下nativeWindowHandle是HWND
@@ -47,6 +48,12 @@ void NativeModalWindow::DoModalNative(uintptr_t nativeWindowHandle_parent, bool 
                     PostQuitMessage(static_cast<int>(msg.wParam));
                 break;
             }
+            if (filter && msg.message == WM_KEYDOWN)
+            {
+                const HWND root = ::GetAncestor(msg.hwnd, GA_ROOT);
+                if (root && (root == child || root == parent) && filter(msg))
+                    continue;
+            }
             // A wheel message can follow keyboard focus even with the pointer over CSP.
             if (!disableOwner && msg.message == WM_MOUSEWHEEL && (msg.hwnd == child || ::IsChild(child, msg.hwnd)))
             {
@@ -55,6 +62,9 @@ void NativeModalWindow::DoModalNative(uintptr_t nativeWindowHandle_parent, bool 
                 if (target && ::GetAncestor(target, GA_ROOT) == parent && ::IsWindowEnabled(target))
                     msg.hwnd = target;
             }
+            if (ownerMouseFilter && !disableOwner && msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST &&
+                ::GetAncestor(msg.hwnd, GA_ROOT) == parent && ownerMouseFilter(msg))
+                continue;
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }

@@ -3,17 +3,21 @@
 #include "AddressTable.h"
 #include "CSPMOD.h"
 #include "CspData.h"
-#include "TestInvertAdjustmentLayer.h"
+#include "NativeCanvasCoordinates.h"
 #include "duilib/duilib.h"
 
 #include <CommCtrl.h>
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <cmath>
 #include <cstddef>
 #include <cstring>
+#include <deque>
 #include <intrin.h>
 #include <iterator>
+#include <memory>
+#include <mutex>
 #include <string>
 
 #pragma comment(lib, "Comctl32.lib")
@@ -57,10 +61,11 @@ struct OwnedInfo
     ~OwnedInfo() { Release(value); }
 };
 
+using ManageCallable = void (*)(void*, void*, int);
 template <typename Invoke>
 struct alignas(8) CallableTable
 {
-    void* manage = nullptr;
+    ManageCallable manage = nullptr;
     Invoke invoke;
 };
 
@@ -164,6 +169,8 @@ MenuGetCommand originalGetMenuEventCommand = nullptr;
 MenuMakeItem menuMakeItem = nullptr;
 MenuAppend menuAppend = nullptr;
 MenuResizeLabel menuResizeLabel = nullptr;
+uint32_t layerNameOffset = 0;
+const void* layerNameVtable = nullptr;
 const void* menuVtable = nullptr;
 const void* menuItemVtable = nullptr;
 std::array<const void*, NativeCorrectionCommandCount> correctionMenuTokens{};
@@ -182,34 +189,43 @@ struct MenuToken
 static_assert(offsetof(MenuToken, once) == 0x18 && offsetof(MenuToken, id) == 0x20);
 struct RegisteredAdjustment
 {
-    explicit RegisteredAdjustment(const AdjustmentLayer& adjustment)
-        : adjustment(adjustment), token{1, "23EC37C1-9E46-4356-8ACB-4BB9DB41D96C", adjustment.commandName}
+    RegisteredAdjustment(const AdjustmentLayer& adjustment, bool supportsCreation, CreationGate gate)
+        : adjustment(adjustment), supportsCreation(supportsCreation), gate(gate),
+          token{1, "23EC37C1-9E46-4356-8ACB-4BB9DB41D96C", adjustment.commandName}
     {
     }
 
+    bool CanCreate() const { return supportsCreation && (!gate || gate()); }
+
     const AdjustmentLayer& adjustment;
+    const bool supportsCreation;
+    const CreationGate gate;
     MenuToken token;
     std::atomic<uint32_t> command{0};
 };
 
-RegisteredAdjustment adjustments[] = {
-    RegisteredAdjustment(TestInvertAdjustment::Definition()),
-};
+std::deque<RegisteredAdjustment> adjustments;
 
-const AdjustmentLayer* FindLayer(uint32_t type)
+const RegisteredAdjustment* FindRegistration(uint32_t type)
 {
     const auto entry = std::find_if(std::begin(adjustments), std::end(adjustments),
         [type](const auto& candidate) { return candidate.adjustment.type == type; });
-    return entry == std::end(adjustments) ? nullptr : &entry->adjustment;
+    return entry == std::end(adjustments) ? nullptr : &*entry;
+}
+
+const AdjustmentLayer* FindLayer(uint32_t type)
+{
+    const auto* entry = FindRegistration(type);
+    return entry ? &entry->adjustment : nullptr;
 }
 
 bool ValidateRegistry()
 {
-    for (const auto& entry : adjustments)
+    for (auto entry = adjustments.cbegin(); entry != adjustments.cend(); ++entry)
     {
-        const auto& adjustment = entry.adjustment;
+        const auto& adjustment = entry->adjustment;
         if (adjustment.type <= UserStart || !adjustment.commandName || !*adjustment.commandName ||
-            std::any_of(std::cbegin(adjustments), &entry, [&](const auto& other) {
+            std::any_of(adjustments.cbegin(), entry, [&](const auto& other) {
                 return other.adjustment.type == adjustment.type ||
                     strcmp(other.adjustment.commandName, adjustment.commandName) == 0;
             }))
@@ -284,31 +300,158 @@ AddToolbarItem addToolbarItem = nullptr;
 void* const* toolbarRoot = nullptr;
 const void* nativeIconReturn = nullptr;
 
+struct SourceSample
+{
+    SourceSample(const void* renderIdentity, uint32_t width, uint32_t height)
+        : renderIdentity(renderIdentity), width(width), height(height) {}
+
+    void Request(int x, int y)
+    {
+        const std::lock_guard<std::mutex> lock(mutex);
+        column = x;
+        ready = false;
+        value.reset();
+        scanline.store(y, std::memory_order_release);
+    }
+
+    void Capture(int x, int y, const PixelRow& row)
+    {
+        if (y < 0 || y != scanline.load(std::memory_order_acquire))
+            return;
+        const std::lock_guard<std::mutex> lock(mutex);
+        const int64_t offset = int64_t(column) - x;
+        if (y != scanline.load(std::memory_order_relaxed) || offset < 0 || offset >= row.width)
+            return;
+        if (row.source && row.alpha && (row.sourceStride >= 3 || row.sourceStride <= -3) && row.alpha[offset * row.alphaStride])
+        {
+            const auto* pixel = row.source + offset * row.sourceStride;
+            value = SourceColor{pixel[0], pixel[1], pixel[2]};
+        }
+        ready = true;
+        scanline.store(-1, std::memory_order_relaxed);
+    }
+
+    bool Read(std::optional<SourceColor>& color)
+    {
+        const std::lock_guard<std::mutex> lock(mutex);
+        if (!ready)
+            return false;
+        ready = false;
+        color = value;
+        return true;
+    }
+
+    void Cancel()
+    {
+        const std::lock_guard<std::mutex> lock(mutex);
+        scanline.store(-1, std::memory_order_relaxed);
+        ready = false;
+    }
+
+    const void* const renderIdentity;
+    const uint32_t width, height;
+
+private:
+    std::mutex mutex;
+    std::atomic<int> scanline{-1};
+    int column = 0;
+    bool ready = false;
+    std::optional<SourceColor> value;
+};
+
+std::shared_ptr<SourceSample> activeSample;
+
 struct RowContext
 {
     const AdjustmentLayer* adjustment;
-    Parameters parameters;
+    const Parameters* parameters;
+    void* source;
+    SourceRowObserver* observer;
+    SourceSample* sample;
+    bool bypass;
+    int x = 0, y = 0, row = 0;
+    bool first = true;
 };
-static_assert(sizeof(RowContext) <= sizeof(Callable::data));
 
 // The host passes the destination auxiliary plane before the source color plane.
 void RenderRow(const void* closure, const RowLayout* layout, uint8_t* destination,
     const void* /* destinationAuxiliary */, const uint8_t* source, const uint8_t* alpha)
 {
-    RowContext context;
-    memcpy(&context, closure, sizeof(context));
-    context.adjustment->RenderRow({destination, source, alpha, layout->destinationStride,
-        layout->sourceStride, layout->alphaStride, layout->width}, context.parameters);
+    auto& context = **static_cast<RowContext* const*>(closure);
+    const PixelRow row{destination, source, alpha, layout->destinationStride,
+        layout->sourceStride, layout->alphaStride, layout->width};
+    if (context.observer || context.sample)
+    {
+        // SelectTile records the current source origin. The native loop advances the planes between rows.
+        int origin[2];
+        memcpy(origin, static_cast<const uint8_t*>(context.source) + 0x40, sizeof(origin));
+        if (context.first || context.x != origin[0] || context.y != origin[1])
+        {
+            context.x = origin[0];
+            context.y = origin[1];
+            context.row = 0;
+            context.first = false;
+        }
+        const int y = context.y + context.row++;
+        if (context.observer)
+            context.observer->CaptureRow(context.x, y, row);
+        if (context.sample)
+            context.sample->Capture(context.x, y, row);
+    }
+    if (context.bypass)
+        row.TransformBgr([](uint8_t* output, const uint8_t* input) { std::copy_n(input, 3, output); });
+    else
+        context.adjustment->RenderRow(row, *context.parameters);
 }
 
-LONG* RenderData(uint8_t* info)
+struct RenderState
 {
-    return reinterpret_cast<LONG*>(info + 0x88);
+    explicit RenderState(const Parameters& initial)
+        : parameters(std::make_shared<const Parameters>(initial)) {}
+
+    std::atomic<unsigned> references{1};
+    std::atomic<bool> bypass{false};
+    std::shared_ptr<const Parameters> parameters;
+};
+
+void ManageRenderState(void* from, void* to, int operation)
+{
+    auto*& source = *static_cast<RenderState**>(from);
+    switch (operation)
+    {
+    case 0: // Copy.
+        *static_cast<RenderState**>(to) = source;
+        if (source)
+            ++source->references;
+        break;
+    case 1: // Move.
+        *static_cast<RenderState**>(to) = source;
+        source = nullptr;
+        break;
+    case 2: // Destroy.
+        if (source && --source->references == 0)
+            delete source;
+        source = nullptr;
+        break;
+    }
 }
 
-Parameters GetParameters(uint8_t* info)
+RenderState& GetRenderState(uint8_t* info)
 {
-    return static_cast<Parameters>(InterlockedCompareExchange(RenderData(info), 0, 0));
+    return **reinterpret_cast<RenderState**>(info + 0x88);
+}
+
+std::shared_ptr<const Parameters> GetParameters(uint8_t* info)
+{
+    return std::atomic_load(&GetRenderState(info).parameters);
+}
+
+bool SetParameters(uint8_t* info, const Parameters& parameters)
+{
+    if (*GetParameters(info) == parameters)
+        return false;
+    std::atomic_store(&GetRenderState(info).parameters, std::make_shared<const Parameters>(parameters));
+    return true;
 }
 
 uint32_t GetInfoType(const uint8_t* info)
@@ -321,20 +464,29 @@ uint32_t GetInfoType(const uint8_t* info)
 int Render(const void*, uint8_t* info, void* destination, const void* region, void* source)
 {
     const int format = getFormat(destination);
-    const auto* adjustment = FindLayer(GetInfoType(info));
+    const auto type = GetInfoType(info);
+    const auto* adjustment = FindLayer(type);
     if (!adjustment || (format != 1 && format != 2))
         return 0;
 
     static const CallableTable<decltype(&RenderRow)> table{nullptr, RenderRow};
-    const RowContext context{adjustment, GetParameters(info)};
+    const bool bypass = GetRenderState(info).bypass.load();
+    const auto parameters = GetParameters(info);
+    const auto observer = adjustment->ObserveSource(info);
+    const auto sample = adjustment->WantsCanvasSample() ? std::atomic_load(&activeSample) : nullptr;
+    RowContext context{adjustment, parameters.get(), source, observer.get(),
+        sample && sample->renderIdentity == &GetRenderState(info) ? sample.get() : nullptr, bypass};
+    auto* contextPointer = &context;
     Callable row{reinterpret_cast<uintptr_t>(&table) | 1u};
-    memcpy(row.data, &context, sizeof(context));
+    memcpy(row.data, &contextPointer, sizeof(contextPointer));
     return renderRows(destination, region, source, &row);
 }
 
 void WriteParameters(const void*, uint8_t* info, void* stream)
 {
-    write32(stream, GetParameters(info));
+    const auto parameters = GetParameters(info);
+    for (const auto word : *parameters)
+        write32(stream, word);
 }
 
 void ReadParameters(const void*, uint8_t* info, void* stream)
@@ -346,11 +498,18 @@ void ReadParameters(const void*, uint8_t* info, void* stream)
     memcpy(&position, streamBytes + 0x58, sizeof(position));
     memcpy(&end, streamBytes + 0x5c, sizeof(end));
     const auto* adjustment = FindLayer(GetInfoType(info));
-    if (adjustment && position >= 0 && end >= position && end - position >= static_cast<int32_t>(sizeof(Parameters)))
-        InterlockedExchange(RenderData(info), static_cast<LONG>(adjustment->NormalizeParameters(read32(stream))));
+    if (!adjustment || position < 0 || end <= position || (end - position) % sizeof(uint32_t))
+        return;
+    const size_t words = (end - position) / sizeof(uint32_t);
+    if (words > adjustment->ParameterWordLimit())
+        return;
+    Parameters parameters(words);
+    for (auto& word : parameters)
+        word = read32(stream);
+    SetParameters(info, adjustment->NormalizeParameters(parameters));
 }
 
-const CallableTable<decltype(&Render)> renderTable{nullptr, Render};
+const CallableTable<decltype(&Render)> renderTable{ManageRenderState, Render};
 
 const AdjustmentLayer* GetAdjustment(const uint8_t* info)
 {
@@ -362,7 +521,7 @@ const AdjustmentLayer* GetAdjustment(const uint8_t* info)
     if (vtable != expectedVtable)
         return nullptr;
     memcpy(&renderer, info + 0x80, sizeof(renderer));
-    return renderer == (reinterpret_cast<uintptr_t>(&renderTable) | 1u) ?
+    return renderer == reinterpret_cast<uintptr_t>(&renderTable) ?
         FindLayer(GetInfoType(info)) : nullptr;
 }
 
@@ -386,6 +545,8 @@ const AdjustmentLayer* GetSelectedAdjustment(const SharedInfo& controller, Owned
     return GetAdjustment(info.value.object);
 }
 
+bool PrepareHostWindow(HWND host);
+
 uint32_t QueryLayerType(SharedInfo* layer)
 {
     const auto caller = _ReturnAddress();
@@ -395,7 +556,7 @@ uint32_t QueryLayerType(SharedInfo* layer)
         (caller == paletteTypeReturn || caller == dialogTypeReturn))
     {
         const auto host = reinterpret_cast<HWND>(CspData::GetNativeWindowHandle());
-        if (PrepareMenu(host))
+        if (PrepareHostWindow(host))
             PostMessageW(host, editAdjustmentMessage, type, identity);
     }
     return type;
@@ -423,12 +584,16 @@ SharedInfo* BuildInfo(SharedInfo* output, uint32_t type, SharedInfo* source)
             static const CallableTable<decltype(&WriteParameters)> writer{nullptr, WriteParameters};
             static const CallableTable<decltype(&ReadParameters)> reader{nullptr, ReadParameters};
             const auto parameters = !create && source && GetAdjustment(source->object) == adjustment ?
-                GetParameters(source->object) : adjustment->DefaultParameters();
+                *GetParameters(source->object) : adjustment->DefaultParameters();
             const Callable write{reinterpret_cast<uintptr_t>(&writer) | 1u};
             const Callable read{reinterpret_cast<uintptr_t>(&reader) | 1u};
-            const Callable render{reinterpret_cast<uintptr_t>(&renderTable) | 1u, {parameters}};
+            Callable render{reinterpret_cast<uintptr_t>(&renderTable)};
+            auto* state = new RenderState(parameters);
+            memcpy(render.data, &state, sizeof(state));
             setStreams(result->object, &write, &read);
             setRender(result->object, &render);
+            if (render.table)
+                ManageRenderState(render.data, render.data, 2);
             memcpy(result->object + sizeof(vtable), &adjustment->type, sizeof(adjustment->type));
             if (create)
                 pendingCreation->created = true;
@@ -446,12 +611,8 @@ struct EditSession
     Parameters pending;
     bool armed = false;
 
-    void Apply(Parameters parameters)
+    void Notify()
     {
-        const auto value = static_cast<LONG>(parameters);
-        if (InterlockedExchange(RenderData(info), value) == value)
-            return;
-
         auto ownerArg = controller;
         auto layerArg = layer;
         Retain(ownerArg);
@@ -459,13 +620,39 @@ struct EditSession
         notifyChange(&ownerArg, &layerArg);
     }
 
-    void Queue(Parameters parameters)
+    void Apply(const Parameters& parameters)
+    {
+        if (SetParameters(info, parameters))
+            Notify();
+    }
+
+    void Queue(const Parameters& parameters)
     {
         pending = parameters;
+        if (GetRenderState(info).bypass.load())
+            return;
         if (!armed)
             armed = SetTimer(window, previewTimer, previewIntervalMs, nullptr) != 0;
         if (!armed)
             Apply(pending);
+    }
+
+    void SetPreview(bool enabled)
+    {
+        CancelTimer();
+        const bool changed = enabled && SetParameters(info, pending);
+        const bool wasBypassed = GetRenderState(info).bypass.exchange(!enabled);
+        if (changed || wasBypassed == enabled)
+            Notify();
+    }
+
+    void Finish(const Parameters& parameters)
+    {
+        CancelTimer();
+        const bool changed = SetParameters(info, parameters);
+        const bool wasBypassed = GetRenderState(info).bypass.exchange(false);
+        if (changed || wasBypassed)
+            Notify();
     }
 
     void CancelTimer()
@@ -477,6 +664,53 @@ struct EditSession
 };
 
 thread_local EditSession* activeEdit = nullptr;
+
+struct CanvasView
+{
+    OwnedInfo reference;
+    const MSG* motion = nullptr;
+    HWND window = nullptr;
+    HWND hitWindow = nullptr;
+    double offset[2]{};
+};
+
+thread_local CanvasView* activeCanvas = nullptr;
+
+void ObserveCanvasPosition(const void* view, const double* position)
+{
+    if (!activeCanvas || !activeCanvas->motion || !view || !position)
+        return;
+    auto& canvas = *activeCanvas;
+    const auto& reference = *static_cast<const SharedInfo*>(view);
+    if (!reference.object || !reference.control || !std::isfinite(position[0]) || !std::isfinite(position[1]))
+        return;
+
+    const auto screen = canvas.motion->pt;
+    const HWND hit = ::WindowFromPoint(screen);
+    if (!hit || ::GetAncestor(hit, GA_ROOT) != activeEdit->window)
+        return;
+    POINT hitPoint = screen;
+    ::ScreenToClient(hit, &hitPoint);
+    const HWND child = ::ChildWindowFromPointEx(hit, hitPoint, CWP_SKIPINVISIBLE | CWP_SKIPDISABLED);
+    for (const HWND window : {child, hit, canvas.motion->hwnd})
+    {
+        POINT client = screen;
+        if (!window || !::ScreenToClient(window, &client))
+            continue;
+        const double dx = position[0] - client.x, dy = position[1] - client.y;
+        if (std::abs(dx) > 1.0 || std::abs(dy) > 1.0)
+            continue;
+        Retain(reference);
+        Release(canvas.reference.value);
+        canvas.reference.value = reference;
+        canvas.window = window;
+        canvas.hitWindow = hit;
+        canvas.offset[0] = dx;
+        canvas.offset[1] = dy;
+        canvas.motion = nullptr;
+        break;
+    }
+}
 
 class DialogCanvasNavigation
 {
@@ -512,6 +746,29 @@ private:
     bool active = false;
 };
 
+bool WriteTitle(void* label, const wchar_t* text)
+{
+    const auto length = static_cast<int>(wcslen(text));
+    auto* buffer = menuResizeLabel(label, length);
+    if (!buffer)
+        return false;
+    memcpy(buffer, text, static_cast<size_t>(length) * sizeof(wchar_t));
+    return true;
+}
+
+bool SetCreatedLayerName(uint8_t* layer, const AdjustmentLayer& adjustment)
+{
+    if (!layerNameOffset || !layerNameVtable || !menuResizeLabel)
+        return false;
+    auto* field = layer + layerNameOffset;
+    if (!CSPMOD::IsPtrValid(field, 0x30))
+        return false;
+    const void* vtable = nullptr;
+    memcpy(&vtable, field, sizeof(vtable));
+    const auto* name = adjustment.DefaultLayerName(GetUserDefaultUILanguage());
+    return vtable == layerNameVtable && name && *name && WriteTitle(field, name);
+}
+
 bool EditAdjustment(HWND window, const SharedInfo& controller, const SharedInfo& layer, uint8_t* info,
     const AdjustmentLayer& adjustment, bool newlyCreated)
 {
@@ -525,21 +782,51 @@ bool EditAdjustment(HWND window, const SharedInfo& controller, const SharedInfo&
             return false;
     }
 
-    const auto original = GetParameters(info);
+    const auto original = *GetParameters(info);
     auto parameters = original;
     EditSession session{window, controller, layer, info, original};
+    if (newlyCreated)
+    {
+        // Keep the name on the layer created by the native command and use the same undo entry.
+        if (SetCreatedLayerName(layer.object, adjustment))
+            session.Notify();
+        else
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Custom adjustment: unable to set the created layer name.");
+    }
     activeEdit = &session;
     bool accepted = false;
     {
         const DialogCanvasNavigation navigation;
-        accepted = adjustment.Edit(window, parameters, [&](Parameters next) {
-            session.Queue(adjustment.NormalizeParameters(next));
+        const bool observing = adjustment.BeginSourceObservation(info);
+        if (observing)
+            session.Notify();
+        CanvasView canvas;
+        if (adjustment.WantsCanvasSample())
+        {
+            uint32_t width = 0, height = 0;
+            if (navigation.IsActive() && CspData::GetCurrentProjCanvasSize(&width, &height) && width && height &&
+                width <= INT_MAX && height <= INT_MAX && NativeCanvasCoordinates::SetObserver(ObserveCanvasPosition))
+            {
+                std::atomic_store(&activeSample, std::make_shared<SourceSample>(&GetRenderState(info), width, height));
+                activeCanvas = &canvas;
+            }
+        }
+        accepted = adjustment.Edit(window, parameters, {
+            [&](const Parameters& next) { session.Queue(adjustment.NormalizeParameters(next)); },
+            [&](bool enabled) { session.SetPreview(enabled); }
         }, navigation.IsActive());
+        if (observing)
+            adjustment.EndSourceObservation();
+        if (adjustment.WantsCanvasSample())
+        {
+            activeCanvas = nullptr;
+            NativeCanvasCoordinates::SetObserver(nullptr);
+            std::atomic_store(&activeSample, std::shared_ptr<SourceSample>{});
+        }
     }
-    session.CancelTimer();
     activeEdit = nullptr;
     parameters = accepted ? adjustment.NormalizeParameters(parameters) : original;
-    session.Apply(parameters);
+    session.Finish(parameters);
 
     if (accepted && parameters != original && undo.value.object)
     {
@@ -572,11 +859,12 @@ void EditOnHostThread(HWND window, uint32_t type, const uint8_t* expectedLayer)
         EditAdjustment(window, controller.value, layer.value, info.value.object, *adjustment, false);
 }
 
-void CreateOnHostThread(HWND window, const AdjustmentLayer& adjustment)
+void CreateOnHostThread(HWND window, const RegisteredAdjustment& entry)
 {
-    if (pendingCreation)
+    if (pendingCreation || !entry.CanCreate())
         return;
 
+    const auto& adjustment = entry.adjustment;
     const uint32_t command = lookupCommand(commandToken);
     const uint32_t cancelCreation = lookupCommand(undoToken);
     OwnedInfo controller;
@@ -628,8 +916,8 @@ LRESULT CALLBACK HostWindowProc(HWND window, UINT message, WPARAM wParam, LPARAM
             const auto type = static_cast<uint32_t>(wParam);
             if (message == editAdjustmentMessage)
                 EditOnHostThread(window, type, reinterpret_cast<const uint8_t*>(lParam));
-            else if (const auto* adjustment = FindLayer(type))
-                CreateOnHostThread(window, *adjustment);
+            else if (const auto* entry = FindRegistration(type))
+                CreateOnHostThread(window, *entry);
             dialogOpen = false;
         }
         return 0;
@@ -648,7 +936,14 @@ LRESULT CALLBACK HostWindowProc(HWND window, UINT message, WPARAM wParam, LPARAM
     return DefSubclassProc(window, message, wParam, lParam);
 }
 
-bool CanCreateAdjustment()
+bool PrepareHostWindow(HWND host)
+{
+    return createAdjustmentMessage && editAdjustmentMessage && host &&
+        GetWindowThreadProcessId(host, nullptr) == GetCurrentThreadId() &&
+        SetWindowSubclass(host, HostWindowProc, subclassId, 0);
+}
+
+bool HasLayerForCreation()
 {
     OwnedInfo controller;
     if (!RetainController(controller))
@@ -685,49 +980,54 @@ RegisteredAdjustment* FindCommand(uint32_t command, bool resolve = false)
         const auto id = resolve ? ResolveCommand(candidate) : candidate.command.load(std::memory_order_relaxed);
         return id == command;
     });
-    return entry == std::end(adjustments) ? nullptr : entry;
+    return entry == std::end(adjustments) ? nullptr : &*entry;
 }
 
 uint32_t GetMenuEventCommand(const void* eventId)
 {
     const auto caller = _ReturnAddress();
     const auto command = originalGetMenuEventCommand(eventId);
-    if (std::find(menuStatusReturns.begin(), menuStatusReturns.end(), caller) != menuStatusReturns.end() &&
-        FindCommand(command))
-        return lookupCommand(commandToken);
+    if (std::find(menuStatusReturns.begin(), menuStatusReturns.end(), caller) != menuStatusReturns.end())
+        if (const auto* entry = FindCommand(command); entry && entry->CanCreate())
+            return lookupCommand(commandToken);
     return command;
 }
 
-bool InvokeAdjustment(const AdjustmentLayer& adjustment)
+bool InvokeAdjustment(const RegisteredAdjustment& entry)
 {
+    if (!entry.CanCreate() || dialogOpen)
+        return false;
     const auto host = reinterpret_cast<HWND>(CspData::GetNativeWindowHandle());
-    return !dialogOpen && host && IsWindowEnabled(host) && PrepareMenu(host) && CanCreateAdjustment() &&
-        PostMessageW(host, createAdjustmentMessage, adjustment.type, 0);
+    return host && IsWindowEnabled(host) && PrepareHostWindow(host) && HasLayerForCreation() &&
+        PostMessageW(host, createAdjustmentMessage, entry.adjustment.type, 0);
 }
 
 int SendMenuCommand(void* sender, uint32_t command, int mode)
 {
     if (const auto* entry = FindCommand(command, originalDispatchBinding != nullptr))
-        return InvokeAdjustment(entry->adjustment);
+        return InvokeAdjustment(*entry);
     return originalMenuSendCommand(sender, command, mode);
 }
 
 int DispatchCommandBinding(void* dispatcher, uint32_t command, int parameter, int mode)
 {
     if (const auto* entry = FindCommand(command, true))
-        return InvokeAdjustment(entry->adjustment);
+        return InvokeAdjustment(*entry);
     return originalDispatchBinding(dispatcher, command, parameter, mode);
 }
 
 int GetToolbarCommandStatus(void* view, uint32_t command)
 {
-    if (_ReturnAddress() != toolbarStatusReturn || !FindCommand(command, true))
+    if (_ReturnAddress() != toolbarStatusReturn)
+        return originalToolbarStatus(view, command);
+    const auto* entry = FindCommand(command, true);
+    if (!entry)
         return originalToolbarStatus(view, command);
 
     const auto host = reinterpret_cast<HWND>(CspData::GetNativeWindowHandle());
     // CSP caches this bit. A refresh during a parameter edit can outlive the
     // dialog, so check temporary input restrictions when invoking the command.
-    const bool available = host && CanCreateAdjustment();
+    const bool available = entry->CanCreate() && host && HasLayerForCreation();
     const int nativeStatus = originalToolbarStatus(view, lookupCommand(commandToken));
     constexpr int enabled = 1;
     return available ? nativeStatus | enabled : nativeStatus & ~enabled;
@@ -761,16 +1061,6 @@ CatalogRow* FindCorrectionGroupEnd(const CatalogRows& rows)
         match = row;
     }
     return match;
-}
-
-bool WriteTitle(void* label, const wchar_t* text)
-{
-    const auto length = static_cast<int>(wcslen(text));
-    auto* buffer = menuResizeLabel(label, length);
-    if (!buffer)
-        return false;
-    memcpy(buffer, text, static_cast<size_t>(length) * sizeof(wchar_t));
-    return true;
 }
 
 struct CatalogLabel
@@ -825,6 +1115,7 @@ void WrapToolbarRegistration(void* root, uint32_t command, int depth, uint32_t i
 
     for (auto& entry : adjustments)
     {
+        // Saved buttons need their command metadata even before the license is loaded.
         const auto custom = ResolveCommand(entry);
         if (!custom || custom == command)
             continue;
@@ -839,6 +1130,8 @@ void RegisterCatalogCommands(CatalogRows* rows, CatalogRow gradient)
     // Appending can reallocate the host vector. Retain a copy of the gradient row's metadata.
     for (auto& entry : adjustments)
     {
+        if (!entry.supportsCreation)
+            continue;
         const uint32_t command = ResolveCommand(entry);
         if (!command || std::any_of(rows->begin, rows->end,
                 [&](const auto& row) { return row.command == command; }))
@@ -909,7 +1202,6 @@ SharedInfo* ReadSubmenu(const void* parent, SharedInfo* output)
     const auto count = menuCount(output->object);
     if (count < correctionMenuTokens.size() || count > correctionMenuTokens.size() + std::size(adjustments))
         return result;
-
     const auto host = reinterpret_cast<HWND>(CspData::GetNativeWindowHandle());
     if (!host || GetWindowThreadProcessId(host, nullptr) != GetCurrentThreadId())
         return result;
@@ -938,7 +1230,8 @@ SharedInfo* ReadSubmenu(const void* parent, SharedInfo* output)
         if (i + 1 == correctionMenuCommands.size())
             std::swap(item.value, nativeItem.value);
     }
-    std::array<bool, std::size(adjustments)> present{};
+    std::vector<const RegisteredAdjustment*> present;
+    present.reserve(adjustments.size());
     for (size_t i = correctionMenuCommands.size(); i < count; ++i)
     {
         OwnedInfo item;
@@ -946,21 +1239,18 @@ SharedInfo* ReadSubmenu(const void* parent, SharedInfo* output)
         if (!HasVtable(item.value.object, menuItemVtable))
             return result;
         const auto* entry = FindCommand(menuGetCommand(item.value.object));
-        if (!entry || present[entry - adjustments])
+        if (!entry || std::find(present.begin(), present.end(), entry) != present.end())
             return result;
-        present[entry - adjustments] = true;
+        present.push_back(entry);
     }
-    if (std::all_of(present.begin(), present.end(), [](bool appended) { return appended; }))
-        return result;
-    if (!CanCreateAdjustment())
+    if (!HasLayerForCreation())
         return result;
 
     constexpr size_t labelField = 0x10;
-    for (size_t i = 0; i < std::size(adjustments); ++i)
+    for (auto& entry : adjustments)
     {
-        if (present[i])
+        if (!entry.CanCreate() || std::find(present.begin(), present.end(), &entry) != present.end())
             continue;
-        auto& entry = adjustments[i];
         const auto command = ResolveCommand(entry);
         if (!command || std::find(correctionMenuCommands.begin(), correctionMenuCommands.end(),
                 command) != correctionMenuCommands.end())
@@ -996,6 +1286,14 @@ bool InstallNativeMenu()
     menuMakeItem = reinterpret_cast<MenuMakeItem>(AddressTable::GetAddress("CustomAdjustment_MenuMakeItem"));
     menuAppend = reinterpret_cast<MenuAppend>(AddressTable::GetAddress("CustomAdjustment_MenuAppendItem"));
     menuResizeLabel = reinterpret_cast<MenuResizeLabel>(AddressTable::GetAddress("CustomAdjustment_MenuResizeLabel"));
+    layerNameVtable = AddressTable::GetAddress("CustomAdjustment_LayerNameVtable");
+    if (const auto* nameSite = static_cast<const uint8_t*>(AddressTable::GetAddress("CustomAdjustment_LayerNameSite")))
+    {
+        int32_t displacement = 0;
+        memcpy(&displacement, nameSite + 3, sizeof(displacement));
+        if (displacement > 0 && displacement % sizeof(void*) == 0)
+            layerNameOffset = static_cast<uint32_t>(displacement);
+    }
     menuVtable = AddressTable::GetAddress("CustomAdjustment_MenuVtable");
     menuItemVtable = AddressTable::GetAddress("CustomAdjustment_MenuItemVtable");
     if (!readSubmenu || !sendCommand || !getEventCommand || !menuCount || !menuGetItem || !menuGetCommand ||
@@ -1096,9 +1394,88 @@ void InstallCommandCatalog()
 }
 }
 
+void BindPreviewCheckbox(ui::Window& dialog, const SetPreviewEnabled& setEnabled)
+{
+    if (auto* checkbox = static_cast<ui::CheckBox*>(dialog.FindControl(L"preview")))
+    {
+        checkbox->SetSelected(true);
+        checkbox->AttachSelect([setEnabled](const ui::EventArgs&) { setEnabled(true); return true; });
+        checkbox->AttachUnSelect([setEnabled](const ui::EventArgs&) { setEnabled(false); return true; });
+    }
+}
+
+bool TrackCanvasMouse(const MSG& message)
+{
+    if (!activeCanvas || message.message != WM_MOUSEMOVE)
+        return false;
+    activeCanvas->motion = &message;
+    ::DispatchMessageW(&message);
+    activeCanvas->motion = nullptr;
+    return true;
+}
+
+bool CanSampleCanvas() { return activeCanvas != nullptr; }
+
+bool RequestCanvasSample(const MSG& message)
+{
+    const auto sample = std::atomic_load(&activeSample);
+    if (!sample || !activeEdit || !activeCanvas)
+        return false;
+
+    POINT screen = message.pt;
+    const auto& canvas = *activeCanvas;
+    const auto viewUnderPointer = [&] {
+        return canvas.reference.value.object && ::IsWindow(canvas.window) && canvas.hitWindow &&
+            ::WindowFromPoint(screen) == canvas.hitWindow;
+    };
+    if (!viewUnderPointer())
+    {
+        // Let the native canvas process a move when the click is the first event over this view.
+        MSG motion = message;
+        motion.message = WM_MOUSEMOVE;
+        motion.wParam &= ~WPARAM(MK_LBUTTON);
+        TrackCanvasMouse(motion);
+        if (!viewUnderPointer())
+            return false;
+    }
+    if (!::ScreenToClient(canvas.window, &screen))
+        return false;
+    RECT client{};
+    if (!::GetClientRect(canvas.window, &client) || !::PtInRect(&client, screen))
+        return false;
+    double point[2]{screen.x + canvas.offset[0], screen.y + canvas.offset[1]};
+    double mapped[2]{};
+    auto argument = canvas.reference.value;
+    Retain(argument); // The host consumes this shared reference.
+    NativeCanvasCoordinates::Convert(mapped, &argument, point);
+    if (!std::isfinite(mapped[0]) || !std::isfinite(mapped[1]) ||
+        mapped[0] < 0.0 || mapped[1] < 0.0 || mapped[0] >= sample->width || mapped[1] >= sample->height)
+        return false;
+    sample->Request(static_cast<int>(mapped[0]), static_cast<int>(mapped[1]));
+    activeEdit->Notify();
+    return true;
+}
+
+bool ReadCanvasSample(std::optional<SourceColor>& color)
+{
+    const auto sample = std::atomic_load(&activeSample);
+    return sample && sample->Read(color);
+}
+
+void CancelCanvasSample()
+{
+    if (const auto sample = std::atomic_load(&activeSample))
+        sample->Cancel();
+}
+
+void Register(const AdjustmentLayer& adjustment, bool supportsCreation, CreationGate gate)
+{
+    adjustments.emplace_back(adjustment, supportsCreation, gate);
+}
+
 void Install()
 {
-    if (!ValidateRegistry())
+    if (adjustments.empty() || !ValidateRegistry())
         return;
     if (const auto* commandNamespace = static_cast<const char*>(
             AddressTable::GetAddress("CustomAdjustment_BindingNamespace")))
@@ -1148,7 +1525,7 @@ void Install()
     if (!createMessage || !editMessage || !CSPMOD::Hook(factory, reinterpret_cast<void*>(BuildInfo),
             reinterpret_cast<void**>(&originalFactory), CSPMOD::_HOOKREG_R11))
     {
-        SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Custom adjustment: unable to install the test layer.");
+        SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Custom adjustment: unable to install the layer factory.");
         return;
     }
     createAdjustmentMessage = createMessage;
@@ -1160,33 +1537,4 @@ void Install()
         InstallCommandCatalog();
 }
 
-bool PrepareMenu(HWND host)
-{
-    return createAdjustmentMessage && editAdjustmentMessage && host &&
-        GetWindowThreadProcessId(host, nullptr) == GetCurrentThreadId() &&
-        SetWindowSubclass(host, HostWindowProc, subclassId, 0);
-}
-
-bool CanEdit(uint32_t type)
-{
-    SharedInfo controller{};
-    OwnedInfo layer;
-    OwnedInfo info;
-    if (!editAdjustmentMessage || !GetController(controller))
-        return false;
-    const auto* adjustment = GetSelectedAdjustment(controller, layer, info);
-    return adjustment && adjustment->type == type;
-}
-
-void RequestCreate(HWND host, uint32_t type)
-{
-    if (host && createAdjustmentMessage)
-        PostMessageW(host, createAdjustmentMessage, type, 0);
-}
-
-void RequestEdit(HWND host, uint32_t type)
-{
-    if (host && editAdjustmentMessage)
-        PostMessageW(host, editAdjustmentMessage, type, 0);
-}
 }

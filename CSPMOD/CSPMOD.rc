@@ -51,6 +51,7 @@ END
 //
 
 IDR_THEME1              Theme                   "DuiResource.zip"
+IDR_UPDATE_INSTALLER    RCDATA                  "InstallUpdate.ps1"
 
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////

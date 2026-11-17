@@ -49,16 +49,6 @@ private:
 
 
 
-struct Color96
-{
-	uint32_t R;
-	uint32_t G;
-	uint32_t B;
-};
-
-
-
-
 class CspColorTable
 {
 private:
@@ -74,21 +64,6 @@ public://0x144f62860 + 8 +0
 	static Theme GetTheme();
 
 	
-
-
-	static void SetCurrentPaintColor(const Color96& col);
-	static void SetMainPaintColor(SDL_Color col);
-	static void SetSubPaintColor(SDL_Color col);
-	static void GetMainPaintColor(Color96* col);
-	static void GetSubPaintColor(Color96* col);
-	enum PaintColorType
-	{
-		Main,
-		Sub,
-		Transparent
-	};
-	static PaintColorType GetPaintColorType();
-	static void SetPaintColorType(PaintColorType type);
 
 
 	//神色模式调最高后搜索00 00 00 00 00 00 00 00 00 00 00 00 69 69 69 69 69 69 69 69 69 69 69 69 C2 C2 C2 C2 C2 C2 C2 C2 C2 C2 C2 C2
@@ -136,42 +111,9 @@ public://0x144f62860 + 8 +0
 
 
 
-	//static int64_t Hook_SetCurrentPaintColor(const Color96* arg0);
-	//static inline int64_t(*orig_SetCurrentPaintColor)(const Color96* arg0) = NULL;
-
-	static int64_t Hook_SetTargetColorType(uintptr_t type,const void* infoBuffer);
-	static inline int64_t(*orig_SetTargetColorType)(uintptr_t type,const void* infoBuffer) = NULL;
-
-	static int64_t Hook_SetPaintColor(void* unknown,uintptr_t type, Color96* col);
-	static inline int64_t(*orig_SetPaintColor)(void* unknown, uintptr_t type, Color96* col) = NULL;
 private:
 	static uint32_t _GetColorAt(uintptr_t offset,uint32_t fullback);
 	static uint32_t _GetColor96At(uintptr_t offset,uint32_t fullback);//CSP色标颜色其实是92位的... （3个uint32组成的R0 G1 B2颜色.）
-
-
-
-
-	static void _Task_SetCurrentPaintColor();
-
-
-
-
-
-	//5.0.0 exe+0543e2d0+410+168+38+320+240+0
-	//5.0.0 exe+0543e2d0+410+168+38+320+240+30 字节0表示当前为main，1表示当前为sub，2表示为透明
-	//5.0.0 exe+0543e2d0+410+168+38+320+240+4C 为1表示选择透明色之前为sub颜色，为0表示选择透明色前为主色 
-	//static inline void* painColorBaseAttr = nullptr;
-
-
-	static inline void* setCurrentPainColorFuncAttr = nullptr;
-
-	static inline void* getTargetColorTypeInfoFuncAttr = nullptr;
-	static inline void* setTargetColorTypeFuncAttr = nullptr;
-	static inline void* releaseTargetColorTypeInfoFuncAttr = nullptr;
-
-	static inline void* setPaintColorFuncAttr = nullptr;
-
-
 
 
 

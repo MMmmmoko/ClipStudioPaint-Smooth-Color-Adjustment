@@ -28,11 +28,7 @@
 			<RichText name="url_developerMainPage" text_id="STRID_ABOUT_DEVELOPER" height="auto" valign="center" margin="24,0,24,0" text_align="left,vcenter"  text_color="#CSPColor_Content" default_link_font_color="#8EB8E0" font="system_14"/>
 			
 			<RichText text_id="STRID_ABOUT_DISCLAIMER" height="auto" valign="center" margin="24,12,24,0" text_align="left,vcenter"  text_color="#CSPColor_Content" font="system_14" />
-			<RichText text_id="STRID_ABOUT_DISCLAIMER_TEXT1" height="auto" valign="center" margin="24,6,24,0" text_align="left,vcenter"  text_color="#CSPColor_Content" font="system_14" />
-			<RichText text_id="STRID_ABOUT_DISCLAIMER_TEXT2" height="auto" valign="center" margin="24,6,24,0" text_align="left,vcenter"  text_color="#CSPColor_Content" font="system_14" />
-			<RichText text_id="STRID_ABOUT_DISCLAIMER_TEXT3" height="auto" valign="center" margin="24,6,24,0" text_align="left,vcenter"  text_color="#CSPColor_Content" font="system_14" />
-			<RichText text_id="STRID_ABOUT_DISCLAIMER_TEXT4" height="auto" valign="center" margin="24,6,24,0" text_align="left,vcenter"  text_color="#CSPColor_Content" font="system_14" />
-
+			<RichText text_id="STRID_ABOUT_DISCLAIMER_TEXT" height="auto" valign="center" margin="24,6,24,0" text_align="left,vcenter"  text_color="#CSPColor_Content" font="system_14" />
 
 			<Control height="30"/>
 			<!--按钮区-->

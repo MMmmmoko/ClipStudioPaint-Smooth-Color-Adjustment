@@ -72,12 +72,16 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         !code.Match(begin + 44, "4D 8B F8 44 8B F2 48 8B F1 33 DB"))
         return fail(Begin);
 
-    const auto olderDragModes = code.Find("8B 97 94 01 00 00 8D 42 FF 83 F8 01 0F 86 ?? ?? ?? ?? 83 FA 04 75 ?? 85 C9 75 ??");
-    const auto newerDragModes = code.Find("8B 97 9C 01 00 00 8D 42 FF 83 F8 01 0F 86 ?? ?? ?? ?? 83 FA 04 75 ?? 85 C9 75 ??");
-    if (olderDragModes.size() + newerDragModes.size() != 1)
+    // The compiler can move the mode field while keeping the same drag dispatch.
+    const auto dragModes = code.Find("8B 97 ?? ?? 00 00 8D 42 FF 83 F8 01 0F 86 ?? ?? ?? ?? 83 FA 04 75 ?? 85 C9 75 ??");
+    if (dragModes.size() != 1)
         return fail(ManipulatorModeInstruction);
-    const bool olderDispatch = !olderDragModes.empty();
-    const auto dragMode = olderDispatch ? olderDragModes.front() : newerDragModes.front();
+    const auto dragMode = dragModes.front();
+    uint32_t manipulatorModeOffset = 0;
+    memcpy(&manipulatorModeOffset, image + dragMode + 2, sizeof(manipulatorModeOffset));
+    if (!manipulatorModeOffset || manipulatorModeOffset % alignof(uint32_t))
+        return fail(ManipulatorModeInstruction);
+    const bool olderDispatch = manipulatorModeOffset == earlierManipulatorModeOffset;
 
     // The two canvas handlers pass opposing flags to the same teardown function.
     const auto cancels = code.Find("48 0F 7E C1 48 85 C9 74 0A B8 01 00 00 00 F0 0F C1 41 08 41 B9 01 00 00 00 4C 8D 44 24 70 48 8D 55 80 48 8D 4D 90 E8");
@@ -102,27 +106,41 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
     if (modeChanges.size() != 1 || code.Call(modeChanges.front() + 7) != code.Containing(modes.front()).begin)
         return fail("FreeTransform execution path to mode update");
 
-    // Drag and release both accumulate their dirty rectangle through the same virtual slot.
+    // Drag, move and release accumulate their dirty rectangle through the same virtual slot.
     const auto baseDrag = code.Containing(dragMode);
+    const auto dragDirtyCalls = code.Find(
+        "48 8D 43 70 48 89 44 24 30 44 89 7C 24 28 8B 43 68 89 44 24 20 45 8B CE 4C 8D 85 20 01 00 00 48 8D 55 A0 48 8B CF 41 FF 92 ?? ?? 00 00",
+        baseDrag.begin, baseDrag.end);
     if (!code.Match(baseDrag.begin, "48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 08 FE FF FF") ||
         code.Find("48 8B DA 48 8B F9 48 8B 02 48 89 45 80 48 8B 4A 08 48 89 4D 88 BE 01 00 00 00 48 85 C9 74 07 8B C6 F0 0F C1 41 08",
             baseDrag.begin, baseDrag.end).size() != 1 ||
-        code.Find("48 8D 43 70 48 89 44 24 30 44 89 7C 24 28 8B 43 68 89 44 24 20 45 8B CE 4C 8D 85 20 01 00 00 48 8D 55 A0 48 8B CF 41 FF 92 C8 01 00 00",
-            baseDrag.begin, baseDrag.end).size() != 1)
+        dragDirtyCalls.size() != 1)
+        return fail(Drag);
+    uint32_t dirtySlot = 0;
+    memcpy(&dirtySlot, image + dragDirtyCalls.front() + 41, sizeof(dirtySlot));
+    if (!dirtySlot || dirtySlot % sizeof(void*))
         return fail(Drag);
 
     // Action 4 rotates the selection. Both paths pass the transformed bounds to the common dirty-area update.
     const auto rotationActions = code.Find(olderDispatch ?
         "83 F9 04 0F 85 ?? ?? ?? ?? 83 F8 02 0F 84 ?? ?? ?? ?? 8B 4B 34 8B D1" :
-        "83 F8 04 0F 85 ?? ?? ?? ?? 8B 87 9C 01 00 00 83 F8 02 0F 84 ?? ?? ?? ?? 8B 4B 34 8B D1",
+        "83 F8 04 0F 85 ?? ?? ?? ?? 8B 87 ?? ?? 00 00 83 F8 02 0F 84 ?? ?? ?? ?? 8B 4B 34 8B D1",
         baseDrag.begin, baseDrag.end);
     const auto rotationCalls = code.Find("89 74 24 28 89 54 24 20 4C 8D 4D 30 4C 8D 45 40 48 8D 55 F0 48 8B CF "
         "E8 ?? ?? ?? ?? 41 BF 12 00 00 00 E9", baseDrag.begin, baseDrag.end);
     const auto rotate = rotationCalls.size() == 1 ? code.Call(rotationCalls.front() + 23) : 0;
     if (rotationActions.size() != 1 || !rotate || code.Containing(rotate).begin != rotate ||
+        (!olderDispatch && memcmp(image + rotationActions.front() + 11, image + dragMode + 2,
+            sizeof(manipulatorModeOffset)) != 0) ||
         rotationCalls.front() <= rotationActions.front() ||
         rotationCalls.front() >= code.Relative(rotationActions.front() + 3, 2, 6) ||
-        !code.Match(rotate, "48 8B C4 55 53 56 57 41 56 48 8D A8 18 FF FF FF 48 81 EC C0 01 00 00"))
+        !code.Match(rotate, "48 8B C4 55 53 56 57 41 56 48 8D A8 ?? ?? FF FF 48 81 EC ?? ?? 00 00 0F 29 70 C8"))
+        return fail("FreeTransform rotation drag path");
+    // The rotation handler's frame can grow. Verify its mode check against the dispatch field.
+    const auto rotationModes = code.Find("83 BB ?? ?? 00 00 08 0F 85 ?? ?? ?? ?? 0F 28 05",
+        rotate, code.Containing(rotate).end);
+    if (rotationModes.size() != 1 ||
+        memcmp(image + rotationModes.front() + 2, image + dragMode + 2, sizeof(manipulatorModeOffset)) != 0)
         return fail("FreeTransform rotation drag path");
 
     // Verify the scale handler's corner and edge action range.
@@ -192,9 +210,10 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
         return fail(DerivedDrag);
 
     // The integer delta event has a separate slot, but feeds the same dirty-rect callback.
-    const auto moves = code.Find("48 8D 43 30 48 89 44 24 30 C7 44 24 28 11 00 00 00 8B 43 28 89 44 24 20 41 B9 01 00 00 00 4C 8D 45 F0 48 8D 54 24 70 48 8B CF 41 FF 92 C8 01 00 00");
+    const auto moves = code.Find("48 8D 43 30 48 89 44 24 30 C7 44 24 28 11 00 00 00 8B 43 28 89 44 24 20 41 B9 01 00 00 00 4C 8D 45 F0 48 8D 54 24 70 48 8B CF 41 FF 92 ?? ?? 00 00");
     const auto move = moves.size() == 1 ? code.Containing(moves.front()) : FunctionRange{};
     if (!code.Match(move.begin, "48 89 5C 24 18 55 56 57 48 8D 6C 24 E0 48 81 EC 20 01 00 00") ||
+        memcmp(image + moves.front() + 45, &dirtySlot, sizeof(dirtySlot)) != 0 ||
         code.Find("48 8B DA 48 8B F9 48 8B 02 48 89 44 24 60 48 8B 4A 08 48 89 4C 24 68", move.begin, move.end).size() != 1 ||
         code.Find("8B 4B 20 85 C9 7E ?? 01 4D F8 EB ?? 01 4D F0 8B 43 24 85 C0 7E ?? 01 45 FC", move.begin, move.end).size() != 1)
         return fail(Move);
@@ -227,8 +246,9 @@ bool FreeTransform::Locate(const uint8_t* image, uint32_t imageSize, uint32_t te
     }
     if (!derivedMove)
         return fail(DerivedMove);
-    const auto releaseSites = code.Find("49 8D 7E 3C 48 8B 06 48 89 7C 24 30 44 89 7C 24 28 44 89 7C 24 20 41 B9 01 00 00 00 4C 8D 85 B0 00 00 00 48 8D 55 A8 48 8B CE FF 90 C8 01 00 00");
-    if (releaseSites.size() != 1)
+    const auto releaseSites = code.Find("49 8D 7E 3C 48 8B 06 48 89 7C 24 30 44 89 7C 24 28 44 89 7C 24 20 41 B9 01 00 00 00 4C 8D 85 B0 00 00 00 48 8D 55 A8 48 8B CE FF 90 ?? ?? 00 00");
+    if (releaseSites.size() != 1 ||
+        memcmp(image + releaseSites.front() + 44, &dirtySlot, sizeof(dirtySlot)) != 0)
         return fail("FreeTransform mouse release dirty rectangle");
     const auto release = code.Containing(releaseSites.front());
     const auto refreshCalls = code.Find("49 8B 06 48 89 45 B8 49 8B 4E 08 48 89 4D C0 48 85 C9 74 0F B8 01 00 00 00 F0 0F C1 41 08 48 8B 5C 24 58 48 8B D7 48 8D 4D B8 E8",

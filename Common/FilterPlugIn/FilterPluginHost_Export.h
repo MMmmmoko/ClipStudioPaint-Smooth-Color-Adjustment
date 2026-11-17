@@ -1,6 +1,7 @@
-#include "../Common/FilterPlugIn/TriglavPlugInSDK/TriglavPlugInType.h"
-#include "../Common/FilterPlugIn/TriglavPlugInSDK/TriglavPlugInServer.h"
-#include "../Common/FilterPlugIn/TriglavPlugInSDK/TriglavPlugInService.h"
+#pragma once
+#include "TriglavPlugInSDK/TriglavPlugInType.h"
+#include "TriglavPlugInSDK/TriglavPlugInServer.h"
+#include "TriglavPlugInSDK/TriglavPlugInService.h"
 
 
 

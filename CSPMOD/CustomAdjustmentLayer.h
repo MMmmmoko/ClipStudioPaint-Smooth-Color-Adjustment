@@ -1,11 +1,16 @@
 #pragma once
 
 #include <Windows.h>
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <iosfwd>
+#include <optional>
+#include <memory>
+#include <vector>
 
 namespace Json { class Value; }
+namespace ui { class Window; }
 
 namespace CustomAdjustmentLayer
 {
@@ -13,8 +18,15 @@ namespace CustomAdjustmentLayer
 inline constexpr uint32_t UserStart = 0x43530000;
 inline constexpr size_t NativeCorrectionCommandCount = 9;
 
-using Parameters = uint32_t;
-using Preview = std::function<void(Parameters)>;
+using Parameters = std::vector<uint32_t>;
+using SetPreviewEnabled = std::function<void(bool)>;
+struct Preview
+{
+    std::function<void(const Parameters&)> update;
+    SetPreviewEnabled setEnabled;
+};
+void BindPreviewCheckbox(ui::Window& dialog, const SetPreviewEnabled& setEnabled);
+using SourceColor = std::array<uint8_t, 3>; // BGR order.
 
 struct PixelRow
 {
@@ -46,6 +58,13 @@ struct PixelRow
     }
 };
 
+class SourceRowObserver
+{
+public:
+    virtual ~SourceRowObserver() = default;
+    virtual void CaptureRow(int x, int y, const PixelRow& row) = 0;
+};
+
 // One immutable definition per registered type. The host can render on multiple threads.
 class AdjustmentLayer
 {
@@ -61,9 +80,15 @@ public:
     const wchar_t* const menuLabelId;
 
     virtual const wchar_t* Title(LANGID language) const = 0;
+    virtual const wchar_t* DefaultLayerName(LANGID language) const { return Title(language); }
     virtual Parameters DefaultParameters() const = 0;
-    virtual Parameters NormalizeParameters(Parameters parameters) const = 0;
-    virtual void RenderRow(const PixelRow& row, Parameters parameters) const = 0;
+    virtual Parameters NormalizeParameters(const Parameters& parameters) const = 0;
+    virtual size_t ParameterWordLimit() const = 0;
+    virtual void RenderRow(const PixelRow& row, const Parameters& parameters) const = 0;
+    virtual bool BeginSourceObservation(const void*) const { return false; }
+    virtual void EndSourceObservation() const {}
+    virtual std::unique_ptr<SourceRowObserver> ObserveSource(const void*) const { return {}; }
+    virtual bool WantsCanvasSample() const { return false; }
     // Keep the dialog and its preview calls within this synchronous edit.
     virtual bool Edit(HWND owner, Parameters& parameters, const Preview& preview, bool allowCanvasNavigation) const = 0;
 };
@@ -78,9 +103,13 @@ bool LocateCommandCatalog(const uint8_t* image, uint32_t imageSize, uint32_t tex
     uint32_t unwindRva, uint32_t unwindSize, Json::Value& entries, std::ostream& log);
 bool LocateCommandBindings(const uint8_t* image, uint32_t imageSize, uint32_t textRva, uint32_t textSize,
     uint32_t unwindRva, uint32_t unwindSize, Json::Value& entries, std::ostream& log);
+// Register definitions with process lifetime before Install(). A null gate allows creation.
+using CreationGate = bool (*)();
+void Register(const AdjustmentLayer& adjustment, bool supportsCreation = true, CreationGate gate = nullptr);
 void Install();
-bool PrepareMenu(HWND host);
-bool CanEdit(uint32_t type);
-void RequestCreate(HWND host, uint32_t type);
-void RequestEdit(HWND host, uint32_t type);
+bool TrackCanvasMouse(const MSG& message);
+bool CanSampleCanvas();
+bool RequestCanvasSample(const MSG& message);
+bool ReadCanvasSample(std::optional<SourceColor>& color);
+void CancelCanvasSample();
 }

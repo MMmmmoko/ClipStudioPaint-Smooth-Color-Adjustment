@@ -3,6 +3,7 @@
 #include"DUI/CatDuiThread.h"
 #include<SDL3/SDL.h>
 #include"ScriptAction_ApplyEffects.h"
+#include "UpdateCheck.h"
 
 
 
@@ -20,10 +21,7 @@ void About_Dlg::OnInitWindow()
 
 
     ui::Label* versionStr= static_cast<ui::Label*>(FindControl(L"text_version"));
-    //std::string vstr = "c5.0.0-m2.2.0-beta";
-    std::string vstr = "c5.0.0-m2.2.4-beta";
-
-    versionStr->SetUTF8Text(vstr);
+    versionStr->SetUTF8Text(UpdateCheck::CurrentTag);
     
 
 

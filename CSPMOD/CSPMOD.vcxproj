@@ -75,12 +75,17 @@
     <CSPMODDuiLibName Condition="'$(Configuration)'=='Debug'">duilib_d.lib</CSPMODDuiLibName>
     <CSPMODDuiLibName Condition="'$(CSPMODDuiLibName)'==''">duilib.lib</CSPMODDuiLibName>
   </PropertyGroup>
+  <PropertyGroup>
+    <CSPMODPrivateRoot Condition="'$(CSPMODPrivateRoot)'==''">$(MSBuildProjectDirectory)\..\..\CSPMODPrivate</CSPMODPrivateRoot>
+    <CSPMODBuildPrivate Condition="'$(CSPMODBuildPrivate)'=='' and Exists('$(CSPMODPrivateRoot)\CSPMODPrivate.props')">true</CSPMODBuildPrivate>
+  </PropertyGroup>
+  <Import Project="$(CSPMODPrivateRoot)\CSPMODPrivate.props" Condition="'$(CSPMODBuildPrivate)'=='true'" />
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(CSPMODDuiLibDir)\$(CSPMODDuiLibName);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(CSPMODDuiLibDir)\$(CSPMODDuiLibName);bcrypt.lib;advapi32.lib;shell32.lib;winhttp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -188,24 +193,12 @@
     <ClInclude Include="DUI\Dialog\About_Dlg.h" />
     <ClInclude Include="DUI\Dialog\ApplyEffects_Dlg.h" />
     <ClInclude Include="DUI\Dialog\CheckFunction_Dlg.h" />
-    <ClInclude Include="DUI\Dialog\ColWheelWnd.h" />
-    <ClInclude Include="DUI\Dialog\TestInvertAdjustmentDialog.h" />
     <ClInclude Include="DUI\Dialog\TimeLapseExport_Dlg.h" />
     <ClInclude Include="DUI\DuiCommon.h" />
-    <ClInclude Include="DUI\UserControl\BrushColorBlock.h" />
-    <ClInclude Include="DUI\UserControl\LchColorControl.h" />
-    <ClInclude Include="DUI\UserControl\LchColorControlContext.h" />
-    <ClInclude Include="DUI\UserControl\LchColorControl_Primary.h" />
-    <ClInclude Include="FilterPluginHost\ReplaceColor\ReplaceColor.h" />
-    <ClInclude Include="FilterPluginHost\ReplaceColor\ReplaceColorContext.h" />
-    <ClInclude Include="FilterPluginHost\ReplaceColor\ReplaceColorForm.h" />
-    <ClInclude Include="FilterPluginHost\ReplaceColor\ReplaceColorPlugin.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Graphic\CatWindow_Child.h" />
-    <ClInclude Include="Graphic\CSPMOD_ColorConvert.h" />
     <ClInclude Include="Graphic\D3D11Graphic.h" />
     <ClInclude Include="Graphic\Geometry.h" />
-    <ClInclude Include="Graphic\HSVColorConvert.h" />
     <ClInclude Include="Graphic\ok_color.h" />
     <ClInclude Include="Graphic\RenderSubWindow.h" />
     <ClInclude Include="Graphic\Texture.h" />
@@ -218,6 +211,7 @@
     <ClInclude Include="TA_HSV.h" />
     <ClInclude Include="TA_ToneCurve.h" />
     <ClInclude Include="TimeLapseExport.h" />
+    <ClInclude Include="UpdateCheck.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\src\json\json_reader.cpp" />
@@ -245,27 +239,14 @@
     <ClCompile Include="DUI\Dialog\About_Dlg.cpp" />
     <ClCompile Include="DUI\Dialog\ApplyEffects_Dlg.cpp" />
     <ClCompile Include="DUI\Dialog\CheckFunction_Dlg.cpp" />
-    <ClCompile Include="DUI\Dialog\ColWheelWnd.cpp" />
-    <ClCompile Include="DUI\Dialog\TestInvertAdjustmentDialog.cpp" />
     <ClCompile Include="DUI\Dialog\TimeLapseExport_Dlg.cpp" />
-    <ClCompile Include="DUI\UserControl\BrushColorBlock.cpp" />
-    <ClCompile Include="DUI\UserControl\LchColorControl.cpp" />
-    <ClCompile Include="DUI\UserControl\LchColorControlContext.cpp" />
-    <ClCompile Include="DUI\UserControl\LchColorControl_Primary.cpp" />
-    <ClCompile Include="FilterPluginHost\FilterPluginHost_Export.cpp" />
-    <ClCompile Include="FilterPluginHost\ReplaceColor\ReplaceColorContext.cpp" />
-    <ClCompile Include="FilterPluginHost\ReplaceColor\ReplaceColorForm.cpp" />
-    <ClCompile Include="FilterPluginHost\ReplaceColor\ReplaceColorPlugin.cpp" />
-    <ClCompile Include="FilterPluginHost\ReplaceColor\ReplaceColor.cpp" />
     <ClCompile Include="Graphic\CatWindow_Child.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
     </ClCompile>
-    <ClCompile Include="Graphic\CSPMOD_ColorConvert.cpp" />
     <ClCompile Include="Graphic\D3D11Graphic.cpp" />
-    <ClCompile Include="Graphic\HSVColorConvert.cpp" />
     <ClCompile Include="Graphic\RenderSubWindow.cpp" />
     <ClCompile Include="Graphic\Texture.cpp" />
     <ClCompile Include="Graphic\Window2DComponent_NOTDCOMP.cpp">
@@ -286,6 +267,7 @@
     <ClCompile Include="TA_HSV.cpp" />
     <ClCompile Include="TA_ToneCurve.cpp" />
     <ClCompile Include="TimeLapseExport.cpp" />
+    <ClCompile Include="UpdateCheck.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Common\src\json\json_valueiterator.inl" />
@@ -293,8 +275,7 @@
       <FileType>Document</FileType>
     </None>
     <None Include="DuiResource\lang\japanese.ini" />
-    <None Include="Graphic\Shaders\HSVConvert.hlsli" />
-    <None Include="Graphic\Shaders\Tolerance.hlsli" />
+    <None Include="InstallUpdate.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="DuiResource\lang\english.ini" />
@@ -309,8 +290,10 @@
     <Xml Include="DuiResource\themes\default\cspHelper_default\ColWheelWnd.xml" />
     <Xml Include="DuiResource\themes\default\cspHelper_default\ColWheelWndMenu.xml" />
     <Xml Include="DuiResource\themes\default\cspHelper_default\HelperMenu.xml" />
+    <Xml Include="DuiResource\themes\default\cspHelper_default\License_Dlg.xml" />
     <Xml Include="DuiResource\themes\default\cspHelper_default\ReplaceColorForm.xml" />
     <Xml Include="DuiResource\themes\default\cspHelper_default\TimeLapseExport_Dlg_.xml" />
+    <Xml Include="DuiResource\themes\default\cspHelper_default\Update_Dlg.xml" />
     <Xml Include="DuiResource\themes\default\global.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -341,101 +324,25 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="Graphic\Shaders\LchColorControlPrimaryHueCirclePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\LchColorControlPrimaryRectanglePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\LchColorControlPrimaryTrianglePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\LchColorControlPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorGenMaskPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorGenMaskPS_Add.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorGenMaskPS_Sub.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorPreviewSelecetAreaPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename)</VariableName>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Graphic\Shaders\%(Filename).h</HeaderFileOutput>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemGroup>
+    <DuiResourceFile Include="DuiResource\**\*" />
+  </ItemGroup>
+  <Target Name="PackDuiResource" BeforeTargets="ResourceCompile" Inputs="@(DuiResourceFile);$(MSBuildProjectFullPath)" Outputs="$(MSBuildProjectDirectory)\DuiResource.zip">
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="tar.exe -a -cf DuiResource.zip DuiResource" />
+  </Target>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ItemGroup>
     <ClCompile Include="FreeTransformLocator.cpp" />
     <ClCompile Include="CustomAdjustmentLayer.cpp" />
+    <ClCompile Include="NativeCanvasCoordinates.cpp" />
+    <ClInclude Include="NativeCanvasCoordinates.h" />
     <ClCompile Include="CustomAdjustmentLayerLocator.cpp" />
     <ClInclude Include="CustomAdjustmentLayer.h" />
-    <ClCompile Include="TestInvertAdjustmentLayer.cpp" />
-    <ClInclude Include="TestInvertAdjustmentLayer.h" />
+    <Xml Include="DuiResource\themes\default\cspHelper_default\OklabCurvesDialog.xml" />
+    <Xml Include="DuiResource\themes\default\cspHelper_default\OklabHueSaturationDialog.xml" />
     <ClCompile Include="LevelsPreview.cpp" />
     <ClCompile Include="FreeTransform.cpp">
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

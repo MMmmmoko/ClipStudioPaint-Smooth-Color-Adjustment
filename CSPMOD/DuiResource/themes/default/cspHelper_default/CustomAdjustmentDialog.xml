@@ -43,6 +43,10 @@
                 <Control name="sample3" width="stretch"/>
                 <Control name="sample4" width="stretch"/>
             </HBox>
+            <HBox height="24" child_margin="18">
+                <CheckBox class="checkbox_1" name="preview" width="auto" font="system_14"
+                          text_id="STRID_CUSTOMADJUSTMENT_PREVIEW" normal_text_color="#CSPColor_Content"/>
+            </HBox>
             <HBox height="30" child_margin="8">
                 <Button class="adjustmentButton" name="reset" text_id="STRID_CUSTOMADJUSTMENT_RESET"/>
                 <Control />

@@ -28,7 +28,7 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 ### CSP
 
-此工具设计为**可以用于未来版本的CSP**，但是在使用未来版本的CSP时需要对功能是否可用进行一次验证。因为工具在生成关于新版本的信息时，即使没有报错也不代表CSP没有修改底层逻辑，这些无法预料的底层修改是可能造成本工具提供的功能产生错误的。测试的版本：4.0.3、4.1.4、4.2.0、4.2.2、5.0.0
+此工具设计为**可以用于未来版本的CSP**，但是在使用未来版本的CSP时需要对功能是否可用进行一次验证。因为工具在生成关于新版本的信息时，即使没有报错也不代表CSP没有修改底层逻辑，这些无法预料的底层修改是可能造成本工具提供的功能产生错误的。测试的版本：4.0.3、4.1.4、4.2.0、4.2.2、5.0.0、5.1.5
 
 **对于某些来源的学习版不可用**
 
@@ -39,17 +39,19 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 
 优动漫发生莫名其妙的无法启动的问题的时候，打开任务管理器结束里面的优动漫进程就好了。
 
+优动漫使用某些插件功能时可能不如CSP流畅。
+
 ### MacOS
 
-新版不可用（因为我现在准备开始用win画画了
+不可用（因为我现在准备开始用win画画了
 
 ### Linux
 
-旧版 `CSPPatchTool` 的 `-linux` 启动优化已暂停。
+旧版 `CSPPatchTool` 的 `-linux` 启动优化已暂停，关于流畅调色与Linux的CSP启动速度相关请见issue。
 
 ## 正版支持声明
 
-本工具不提供除“滤镜插件”之外的功能破解，请购买支持正版。
+本工具不提任何功能破解，请购买支持正版。
 
 ## 使用方法
 
@@ -67,6 +69,7 @@ https://github.com/MMmmmoko/ClipStudioPaint-Smooth-Color-Adjustment/releases
 缩时摄影会在导出时会再弹出一个对话框让你填写视频大小和时长，这里你可以不再受选项的限制，自己按需导出，导出大于1280像素大小的视频也是可以的，因为本来就录制得很大，只是CSP不让你导出大的。
 **有些版本缩时摄影选择非“原长”的视频时长时，才可以自定义视频时长**。
 **V3.0优动漫无法正确导出较大图像的视频**。
+
 
 ### 工具菜单
 
@@ -123,8 +126,6 @@ CSP流畅调色是一个免费提供的，用于改善CSP功能的辅助工具�
 
 ## 编译
 
-下面的内容不是写给普通使用者的，只使用工具的话不用看下面啦。
+算了不做详细说明了，依赖的东西有点小众，直接让AI帮你编译吧。
 
-我已将依赖都放置入库中Common/bin，部分文件超大，我将其打包了一下，需要将其中的压缩包就地解压，解压后的路径应该是Common/bin/*.lib，然后库中的VS解决方案基本就可以直接进行编译了，不过工程属性中仍然有部分难以修改的绝对路径。如果你想要编译和修改此工具，还需要对项目属性的【调试】中的路径和【生成事件->生成后事件】中的路径进行删除或手动指定。DEBUG模式下，需要将Dll文件使用的UI资源（DuiResource文件夹）放置在CLIPStudioPaint.exe 所在的文件夹内，RELEASE模式使用的是Dll内嵌资源，请参考Dui/CatDuiThread.cpp
-
-CSPMOD 默认使用同级 CatTuber64 仓库中 `project\ThirdPart\nim_duilib-main\duilib\duilib.vcxproj` 的头文件和生成库。目录不同可用 `/p:CSPMODDuiRoot=<nim_duilib-main 根目录>`，库输出目录不同可另用 `/p:CSPMODDuiLibDir=<库目录>`。请使用同一份 duilib 源码的头文件和生成库。只生成工作区产物时可附加 `/p:PostBuildEventUseInBuild=false`。
+`CSPMOD.sln` 可以从开源目录独立构建，自定义调整图层框架随开源版编译。维护者可将私有源码放在与开源仓库并排的 `CSPMODPrivate` 目录。CSPMOD 工程找到其中的 `CSPMODPrivate.props` 时会编译私有功能。可用 `/p:CSPMODBuildPrivate=false` 强制构建开源版，或用 `/p:CSPMODPrivateRoot=<路径>` 指定私有目录。

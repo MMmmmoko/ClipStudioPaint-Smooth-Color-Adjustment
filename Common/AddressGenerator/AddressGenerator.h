@@ -16,6 +16,9 @@ private:
     void Scan();
     void PushCSPHelperAddr();
     void PushCSPDataAddr();
+#ifdef CSPMOD_PRIVATE
+	void PushPaintColorAddr();
+#endif
     void PushTimeLapseExportAddr();
     void PushLayerObjectAddr();
     void PushCustomFilterAddr();

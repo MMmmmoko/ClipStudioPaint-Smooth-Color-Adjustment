@@ -1,5 +1,6 @@
 #pragma once
 #include"duilib/duilib.h"
+#include <functional>
 //class BasicForm;
 //class UIMiscThread;
 //class UIMainThread;
@@ -38,5 +39,7 @@
 class NativeModalWindow :public ui::WindowImplBase
 {
 public:
-    void DoModalNative(uintptr_t nativeWindowHandle, bool disableOwner = true);
+    using MessageFilter = std::function<bool(const MSG&)>;
+    void DoModalNative(uintptr_t nativeWindowHandle, bool disableOwner = true, MessageFilter filter = {},
+        MessageFilter ownerMouseFilter = {});
 };

@@ -3,7 +3,9 @@
 #include"AddressTable.h"
 #include"duilib/duilib.h"
 #include"DUI/CatDuiThread.h"
-#include"DUI/Dialog/ColWheelWnd.h"
+#ifdef CSPMOD_PRIVATE
+#include "PaintColor.h"
+#endif
 
 #include"CSPHelper.h"
 
@@ -29,6 +31,9 @@ void CspData::Init()
 
 
 	CspColorTable::Init();
+#ifdef CSPMOD_PRIVATE
+	PaintColor::Init();
+#endif
 
 }
 
@@ -139,17 +144,9 @@ int64_t CspData::Hook_OnSetPanelsShowStates(const void* object, uintptr_t showSt
 		ui::GlobalManager::Instance().Thread().PostTask(ui::kThreadUI, [] {CSPMOD::OnMainWindowStart(); });
 		mainWindowStart = true;
 	}
-	bool showPanels = !bool(showStates & 0x2);
-	if (showPanels)
-	{
-		if (ColWheelWnd::GetCurrentForm()&& ColWheelWnd::GetCurrentForm()->IsSyncVisibility())
-			ColWheelWnd::GetCurrentForm()->ShowWindow(ui::ShowWindowCommands::kSW_SHOW_NA);
-	}
-	else
-	{
-		if (ColWheelWnd::GetCurrentForm() && ColWheelWnd::GetCurrentForm()->IsSyncVisibility())
-			ColWheelWnd::GetCurrentForm()->ShowWindow(ui::ShowWindowCommands::kSW_HIDE);
-	}
+#ifdef CSPMOD_PRIVATE
+	PaintColor::SyncPanelVisibility(showStates);
+#endif
 	return orig_OnSetPanelsShowStates(object, showStates);
 }
 
@@ -261,34 +258,11 @@ void CspColorTable::Init()
 {
 
 	colorTableBaseAttr = AddressTable::GetAddress("CSPInfo_UIColorTable");
-	setCurrentPainColorFuncAttr = AddressTable::GetAddress("CSPPaintColor_SetColor_Func");//这个用于设置颜色
-	//setCurrentPainColorFuncAttr = (void*)0x141c83b50;//这个用于设置颜色
-
-
-	getTargetColorTypeInfoFuncAttr= AddressTable::GetAddress("CSPPaintColor_GetColorHost_Func");
-	setTargetColorTypeFuncAttr= AddressTable::GetAddress("CSPPaintColor_SetWorkingColor_Func");
-	releaseTargetColorTypeInfoFuncAttr= AddressTable::GetAddress("CSPPaintColor_ReleaseColorHost_Func");
-
-	setPaintColorFuncAttr = AddressTable::GetAddress("CSPPaintColor_OnColorChanged_Func");//这个用于监听颜色变化
-
-
-
 	//无论如何进行一个内部hook
 	CSPMOD::Hook((void*)(ui::ColorManager::ConvertToUiColor), Hook_ColorManager_ConvertToUiColor, (void**)&orig_ColorManager_ConvertToUiColor);
-	
-	
-	
-	//CSPMOD::Hook(setCurrentPainColorFuncAttr, Hook_SetCurrentPaintColor, (void**)&orig_SetCurrentPaintColor);
-	if (CSPHelper::isProUser())
-	{
-		if (setCurrentPainColorFuncAttr)
-			CSPMOD::Hook(setTargetColorTypeFuncAttr, Hook_SetTargetColorType, (void**)&orig_SetTargetColorType);
-
-		if (setPaintColorFuncAttr)
-		CSPMOD::Hook(setPaintColorFuncAttr, Hook_SetPaintColor, (void**)&orig_SetPaintColor);
-	}
-
 }
+
+
 
 
 
@@ -303,130 +277,6 @@ CspColorTable::Theme CspColorTable::GetTheme()
 		return Theme::Dark;
 	else
 		return Theme::Light;
-}
-
-
-
-
-
-//void CspColorTable::SetCurrentPaintColor(const Color96& col)
-//{
-//	typedef void(*SetColorFunc)(const Color96* colAddr);
-//	SetColorFunc  setColorFunc= (SetColorFunc)(0x141c83b50);
-//	setColorFunc(&col);
-//}
-
-//测试60ms间隔设置
-static bool needSetColor = false;
-static Color96 targetCol;
-static uint64_t lastSetTimeMS = 0;
-static bool hasTaskRunning = false;
-void CspColorTable::_Task_SetCurrentPaintColor()
-{
-	if (SDL_GetTicks() - lastSetTimeMS > 16)
-	{
-		lastSetTimeMS = SDL_GetTicks();
-
-		typedef void(*SetColorFunc)(const Color96* colAddr);
-		SetColorFunc  setColorFunc = (SetColorFunc)(setCurrentPainColorFuncAttr);
-		setColorFunc(&targetCol);
-
-
-
-		needSetColor = false;
-		hasTaskRunning = false;
-		return;
-	}
-
-
-	ui::GlobalManager::Instance().Thread().PostDelayedTask(ui::kThreadUI, _Task_SetCurrentPaintColor,16 );
-}
-
-
-void CspColorTable::SetCurrentPaintColor(const Color96& col)
-{
-
-	//if (SDL_GetTicks() - lastSetTimeMS > 16)
-	{
-		lastSetTimeMS = SDL_GetTicks();
-		typedef void(*SetColorFunc)(const Color96* colAddr);
-		SetColorFunc  setColorFunc = (SetColorFunc)(setCurrentPainColorFuncAttr);
-		setColorFunc(&col);
-
-		//CspColorTable::orig_SetCurrentPaintColor(&col);
-		needSetColor = false;
-		return;
-	}
-	
-
-	targetCol = col;
-	needSetColor = true;
-
-	if (!hasTaskRunning)
-	{
-		hasTaskRunning = true;
-		_Task_SetCurrentPaintColor();
-	}
-
-
-}
-
-void CspColorTable::GetMainPaintColor(Color96* col)
-{
-	typedef uintptr_t(*FI2)(uintptr_t arg1, uintptr_t arg2);
-
-	uint8_t infoBuffer[0X60];
-	((FI2)getTargetColorTypeInfoFuncAttr)((uintptr_t)infoBuffer, Main);
-	SDL_memcpy(col, infoBuffer+0x10,sizeof(Color96));
-	((FI2)releaseTargetColorTypeInfoFuncAttr)((uintptr_t)infoBuffer, 0);
-}
-
-void CspColorTable::GetSubPaintColor(Color96* col)
-{
-	typedef uintptr_t(*FI2)(uintptr_t arg1, uintptr_t arg2);
-
-	uint8_t infoBuffer[0X60];
-	((FI2)getTargetColorTypeInfoFuncAttr)((uintptr_t)infoBuffer, Sub);
-	SDL_memcpy(col, infoBuffer+0x10,sizeof(Color96));
-	((FI2)releaseTargetColorTypeInfoFuncAttr)((uintptr_t)infoBuffer, 0);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void CspColorTable::SetPaintColorType(PaintColorType type)
-{
-	if (getTargetColorTypeInfoFuncAttr && orig_SetTargetColorType && releaseTargetColorTypeInfoFuncAttr)
-	{
-
-		if (type < PaintColorType::Transparent)
-		{
-			typedef uintptr_t(*FI2)(uintptr_t arg1, uintptr_t arg2);
-
-			uint8_t infoBuffer[0X60];
-			((FI2)getTargetColorTypeInfoFuncAttr)((uintptr_t)infoBuffer, type);
-			//((FI2)setTargetColorTypeFuncAttr)(type,(uintptr_t)infoBuffer );
-			//((FI2)orig_SetTargetColorType)(type,(uintptr_t)infoBuffer );
-			orig_SetTargetColorType(type, infoBuffer);
-			((FI2)releaseTargetColorTypeInfoFuncAttr)((uintptr_t)infoBuffer,0);
-
-		}
-
-
-
-	}
-
-
 }
 
 uintptr_t CspColorTable::GetColorTableAddr()
@@ -540,48 +390,4 @@ uint32_t CspColorTable::_GetColor96At(uintptr_t offset, uint32_t fullback)
 	pResultByte[1] = *(uint8_t*)(pColor + 3+4);
 	pResultByte[0] = *(uint8_t*)(pColor + 3+4+4);
 	return resultColor;
-}
-
-//int64_t CspColorTable::Hook_SetCurrentPaintColor(const Color96* arg0)
-//{
-//	if (ColWheelWnd::GetCurrentForm())
-//	{
-//		ColWheelWnd::GetCurrentForm()->SetColor((Color96*)arg0);
-//	}
-//	return orig_SetCurrentPaintColor(arg0);
-//}
-
-int64_t CspColorTable::Hook_SetTargetColorType(uintptr_t type, const void* infoBuffer)
-{
-
-	auto retult = orig_SetTargetColorType(type, infoBuffer);
-	if (ColWheelWnd::GetCurrentForm())
-	{
-		{
-			//原版色盘上取色后这里得到的颜色为0 
-			//Color96 col;
-			//typedef uintptr_t(*FI2)(uintptr_t arg1, uintptr_t arg2);
-			//uint8_t _infoBuffer[0X60];
-			//((FI2)getTargetColorTypeInfoFuncAttr)((uintptr_t)_infoBuffer, type);
-			//SDL_memcpy(&col, _infoBuffer + 0x10, sizeof(Color96));
-			//((FI2)releaseTargetColorTypeInfoFuncAttr)((uintptr_t)_infoBuffer, 0);
-
-			ColWheelWnd::GetCurrentForm()->SetColorType((PaintColorType)type);
-		}
-
-	}
-	return retult;
-}
-
-int64_t CspColorTable::Hook_SetPaintColor(void* unknown, uintptr_t type, Color96* col)
-{
-
-
-
-	auto retult = orig_SetPaintColor(unknown, type, col);
-	if (ColWheelWnd::GetCurrentForm())
-	{
-		ColWheelWnd::GetCurrentForm()->SetTypeColor((PaintColorType)type, col);
-	}
-	return retult;
 }

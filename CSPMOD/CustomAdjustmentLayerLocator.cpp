@@ -8,6 +8,39 @@
 
 namespace CustomAdjustmentLayer
 {
+namespace
+{
+uint32_t FindLayerNameSite(const NativeCode::Code& code, const uint8_t* image, uint32_t imageSize)
+{
+    // Resolve the registered LayerName key, then find the layer field passed to the serializer.
+    constexpr char name[] = "LayerName";
+    uint32_t token = 0;
+    for (auto at : code.Find("48 8D 15 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8D 0D"))
+    {
+        const auto key = code.Relative(at, 3, 7);
+        if (!key || sizeof(name) > imageSize - key || memcmp(image + key, name, sizeof(name)) != 0)
+            continue;
+        if (token)
+            return 0;
+        token = code.Relative(at + 7, 3, 7);
+    }
+    if (!token)
+        return 0;
+
+    uint32_t site = 0;
+    for (auto at : code.Find("48 8D 91 ?? ?? ?? ?? 48 8D 4C 24 ?? E8 ?? ?? ?? ?? "
+            "4C 8B C0 48 8D 15 ?? ?? ?? ?? 48 8B CE E8 ?? ?? ?? ??"))
+    {
+        if (code.Relative(at + 20, 3, 7) != token || !code.Call(at + 12) || !code.Call(at + 30))
+            continue;
+        if (site)
+            return 0;
+        site = at;
+    }
+    return site;
+}
+}
+
 bool Locate(const uint8_t* image, uint32_t imageSize, uint32_t textRva, uint32_t textSize,
     uint32_t unwindRva, uint32_t unwindSize, Json::Value& entries, std::ostream& log)
 {
@@ -401,14 +434,25 @@ bool LocateDialogNavigation(const uint8_t* image, uint32_t imageSize, uint32_t t
     const auto getTools = code.Call(getBefore.front() + 5);
     const auto beginCanvas = code.Call(enter.front() + 5);
     const auto endCanvas = code.Call(leave.front() + 5);
-    const bool knownCanvasModeField = code.Match(endCanvas + 34, "A0 00 00 00") ||
-        code.Match(endCanvas + 34, "90 00 00 00");
+    const auto canvasCleanup = code.Containing(endCanvas);
+    const bool legacyCleanup = code.Match(endCanvas,
+        "48 89 5C 24 18 48 89 54 24 10 56 57 41 56 48 81 EC 90 00 00 00 "
+        "4C 8B F2 48 8B D9 33 F6 8D 7E FF 39 B1 ?? 00 00 00 74 ?? 48 8B 0A 48 85 C9 74 ?? E8") &&
+        (code.Match(endCanvas + 34, "A0 00 00 00") || code.Match(endCanvas + 34, "90 00 00 00"));
+    // The newer cleanup queries the tool state before clearing modal canvas mode.
+    // It still takes the manager in RCX and the shared dialog reference in RDX.
+    const bool queriedCleanup = code.Match(endCanvas,
+        "48 89 5C 24 18 48 89 54 24 10 55 56 57 41 56 41 57 48 81 EC 90 00 00 00 "
+        "4C 8B F2 48 8B D9 48 8B 01 FF 50 08 BE 01 00 00 00 45 33 FF 85 C0 75 ?? "
+        "44 39 BB 48 01 00 00 41 8B EF 74 ?? 8B EE BF FF FF FF FF 44 39 BB A0 00 00 00 "
+        "74 ?? 49 8B 0E 48 85 C9 74 ?? E8");
     if (!getTools || code.Call(getAfter.front() + 5) != getTools ||
+        code.Containing(beginCanvas).begin != beginCanvas || canvasCleanup.begin != endCanvas ||
         !code.Match(beginCanvas, "48 89 5C 24 10 57 48 83 EC 60 8B FA 48 8B D9 48 8D 54 24 50 "
             "48 8B 49 40 E8 ?? ?? ?? ?? 90 0F 57 C0 F3 0F 7F 44 24 30") ||
-        !code.Match(endCanvas, "48 89 5C 24 18 48 89 54 24 10 56 57 41 56 48 81 EC 90 00 00 00 "
-            "4C 8B F2 48 8B D9 33 F6 8D 7E FF 39 B1 ?? 00 00 00 74 ?? 48 8B 0A 48 85 C9 74 ?? E8") ||
-        !knownCanvasModeField)
+        (!legacyCleanup && !queriedCleanup) ||
+        code.Find("49 8B 5E 08 48 85 DB 74 ?? 8B C7 F0 0F C1 43 08",
+            endCanvas, canvasCleanup.end).size() != 1)
         return fail("CanvasToolABI");
     const auto toolGetter = code.Containing(getTools);
     const auto cast = toolGetter.begin == getTools ? code.Find(
@@ -636,6 +680,19 @@ bool LocateNativeMenu(const uint8_t* image, uint32_t imageSize, uint32_t textRva
     for (size_t i = 0; i < statusReturns.size(); ++i)
         entries["CustomAdjustment_MenuStatusReturn_" + std::to_string(i)] = statusReturns[i];
     log << "CustomAdjustment: verified native correction layer menu and command selection\n";
+
+    const auto labelCtor = code.Call(itemCtor + 27);
+    const auto labelVtable = code.Match(labelCtor, "40 53 48 83 EC 20 48 8D 05 ?? ?? ?? ?? "
+        "48 8B D9 48 89 01 33 C0 48 89 41 08 48 89 41 10 E8") ? code.Relative(labelCtor + 6, 3, 7) : 0;
+    const auto nameSite = FindLayerNameSite(code, image, imageSize);
+    if (labelVtable && nameSite)
+    {
+        entries["CustomAdjustment_LayerNameSite"] = nameSite;
+        entries["CustomAdjustment_LayerNameVtable"] = labelVtable;
+        log << "CustomAdjustment: verified serialized layer name field and native string type\n";
+    }
+    else
+        log << "WARNING: CustomAdjustment layer naming is unavailable on this host\n";
     return true;
 }
 

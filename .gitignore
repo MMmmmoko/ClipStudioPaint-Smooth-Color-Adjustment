@@ -8,6 +8,7 @@
 
 # ZIP resource file
 CSPMOD/DuiResource.zip
+CSPMOD/LicenseConfig.local.h
 
 #duilib header
 #Common/include/duilib/

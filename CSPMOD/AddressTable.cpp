@@ -18,7 +18,11 @@
 namespace
 {
 // Increment when the address table format or locator results change.
-constexpr unsigned tableSchema = 26;
+#ifdef CSPMOD_PRIVATE
+constexpr unsigned tableSchema = 33;
+#else
+constexpr unsigned tableSchema = 34;
+#endif
 constexpr auto tableName = L"CSPAddrTable.json";
 constexpr auto logName = L"CSPAddrTable.build.log";
 

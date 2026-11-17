@@ -51,6 +51,9 @@
     <Filter Include="Dui\UserControl">
       <UniqueIdentifier>{55d9bcb1-131c-4871-8c5f-82451eba6763}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AddressGenerator">
+      <UniqueIdentifier>{d0ce1c33-44d7-403e-b5e8-f640c50843ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -60,6 +63,9 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="AddressTable.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateCheck.h">
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\src\json\json_tool.h">
@@ -123,25 +129,10 @@
     <ClInclude Include="..\Common\FilterPlugIn\FilterPluginHost_Export.h">
       <Filter>FilterPluginHost</Filter>
     </ClInclude>
-    <ClInclude Include="FilterPluginHost\ReplaceColor\ReplaceColorPlugin.h">
-      <Filter>FilterPluginHost\ReplaceColor</Filter>
-    </ClInclude>
-    <ClInclude Include="FilterPluginHost\ReplaceColor\ReplaceColor.h">
-      <Filter>FilterPluginHost\ReplaceColor</Filter>
-    </ClInclude>
-    <ClInclude Include="FilterPluginHost\ReplaceColor\ReplaceColorForm.h">
-      <Filter>FilterPluginHost\ReplaceColor</Filter>
-    </ClInclude>
-    <ClInclude Include="FilterPluginHost\ReplaceColor\ReplaceColorContext.h">
-      <Filter>FilterPluginHost\ReplaceColor</Filter>
-    </ClInclude>
     <ClInclude Include="Graphic\D3D11Graphic.h">
       <Filter>Graphic</Filter>
     </ClInclude>
     <ClInclude Include="Graphic\Texture.h">
-      <Filter>Graphic</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphic\HSVColorConvert.h">
       <Filter>Graphic</Filter>
     </ClInclude>
     <ClInclude Include="Graphic\RenderSubWindow.h">
@@ -153,33 +144,24 @@
     <ClInclude Include="Graphic\Window2DComponent_NOTDCOMP.h">
       <Filter>Graphic</Filter>
     </ClInclude>
-    <ClInclude Include="DUI\Dialog\ColWheelWnd.h">
-      <Filter>Dui\Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="DUI\UserControl\LchColorControl.h">
-      <Filter>Dui\UserControl</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphic\CSPMOD_ColorConvert.h">
-      <Filter>Graphic</Filter>
-    </ClInclude>
-    <ClInclude Include="DUI\UserControl\LchColorControl_Primary.h">
-      <Filter>Dui\UserControl</Filter>
-    </ClInclude>
     <ClInclude Include="Graphic\Geometry.h">
       <Filter>Graphic</Filter>
-    </ClInclude>
-    <ClInclude Include="DUI\UserControl\LchColorControlContext.h">
-      <Filter>Dui\UserControl</Filter>
-    </ClInclude>
-    <ClInclude Include="DUI\UserControl\BrushColorBlock.h">
-      <Filter>Dui\UserControl</Filter>
     </ClInclude>
     <ClInclude Include="Graphic\ok_color.h">
       <Filter>Graphic</Filter>
     </ClInclude>
+    <ClInclude Include="LevelsPreview.h">
+      <Filter>ToneAdjustment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\AddressGenerator\AddressGenerator.h">
+      <Filter>AddressGenerator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UpdateCheck.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
@@ -251,28 +233,10 @@
     <ClCompile Include="ScriptAction_ApplyEffects.cpp">
       <Filter>FunctionExpansion</Filter>
     </ClCompile>
-    <ClCompile Include="FilterPluginHost\ReplaceColor\ReplaceColorPlugin.cpp">
-      <Filter>FilterPluginHost\ReplaceColor</Filter>
-    </ClCompile>
-    <ClCompile Include="FilterPluginHost\FilterPluginHost_Export.cpp">
-      <Filter>FilterPluginHost</Filter>
-    </ClCompile>
-    <ClCompile Include="FilterPluginHost\ReplaceColor\ReplaceColor.cpp">
-      <Filter>FilterPluginHost\ReplaceColor</Filter>
-    </ClCompile>
-    <ClCompile Include="FilterPluginHost\ReplaceColor\ReplaceColorForm.cpp">
-      <Filter>FilterPluginHost\ReplaceColor</Filter>
-    </ClCompile>
-    <ClCompile Include="FilterPluginHost\ReplaceColor\ReplaceColorContext.cpp">
-      <Filter>FilterPluginHost\ReplaceColor</Filter>
-    </ClCompile>
     <ClCompile Include="Graphic\D3D11Graphic.cpp">
       <Filter>Graphic</Filter>
     </ClCompile>
     <ClCompile Include="Graphic\Texture.cpp">
-      <Filter>Graphic</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphic\HSVColorConvert.cpp">
       <Filter>Graphic</Filter>
     </ClCompile>
     <ClCompile Include="Graphic\RenderSubWindow.cpp">
@@ -284,23 +248,35 @@
     <ClCompile Include="Graphic\Window2DComponent_NOTDCOMP.cpp">
       <Filter>Graphic</Filter>
     </ClCompile>
-    <ClCompile Include="DUI\Dialog\ColWheelWnd.cpp">
-      <Filter>Dui\Dialog</Filter>
+    <ClCompile Include="LevelsPreview.cpp">
+      <Filter>ToneAdjustment</Filter>
     </ClCompile>
-    <ClCompile Include="DUI\UserControl\LchColorControl.cpp">
-      <Filter>Dui\UserControl</Filter>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator.cpp">
+      <Filter>AddressGenerator</Filter>
     </ClCompile>
-    <ClCompile Include="Graphic\CSPMOD_ColorConvert.cpp">
-      <Filter>Graphic</Filter>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_ColorBalance.cpp">
+      <Filter>AddressGenerator</Filter>
     </ClCompile>
-    <ClCompile Include="DUI\UserControl\LchColorControl_Primary.cpp">
-      <Filter>Dui\UserControl</Filter>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_CSPData.cpp">
+      <Filter>AddressGenerator</Filter>
     </ClCompile>
-    <ClCompile Include="DUI\UserControl\LchColorControlContext.cpp">
-      <Filter>Dui\UserControl</Filter>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_CSPHelper.cpp">
+      <Filter>AddressGenerator</Filter>
     </ClCompile>
-    <ClCompile Include="DUI\UserControl\BrushColorBlock.cpp">
-      <Filter>Dui\UserControl</Filter>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_CustomFilter.cpp">
+      <Filter>AddressGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_HSV.cpp">
+      <Filter>AddressGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_LayerObject.cpp">
+      <Filter>AddressGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_TimeLapseExport.cpp">
+      <Filter>AddressGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_ToneCurve.cpp">
+      <Filter>AddressGenerator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -313,12 +289,7 @@
     <None Include="DuiResource\lang\japanese.ini">
       <Filter>Dui\Lang</Filter>
     </None>
-    <None Include="Graphic\Shaders\Tolerance.hlsli">
-      <Filter>Graphic\Shaders</Filter>
-    </None>
-    <None Include="Graphic\Shaders\HSVConvert.hlsli">
-      <Filter>Graphic\Shaders</Filter>
-    </None>
+    <None Include="InstallUpdate.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="DuiResource\lang\english.ini">
@@ -353,6 +324,9 @@
     <Xml Include="DuiResource\themes\default\cspHelper_default\About_Dlg.xml">
       <Filter>Dui\Dialog</Filter>
     </Xml>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\Update_Dlg.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
     <Xml Include="DuiResource\themes\default\cspHelper_default\ReplaceColorForm.xml">
       <Filter>FilterPluginHost\ReplaceColor</Filter>
     </Xml>
@@ -360,6 +334,9 @@
       <Filter>Dui\Dialog</Filter>
     </Xml>
     <Xml Include="DuiResource\themes\default\cspHelper_default\ColWheelWndMenu.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\License_Dlg.xml">
       <Filter>Dui\Dialog</Filter>
     </Xml>
   </ItemGroup>
@@ -377,64 +354,27 @@
     <FxCompile Include="Graphic\Shaders\FilterVS.hlsl">
       <Filter>Graphic\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorPS.hlsl">
-      <Filter>Graphic\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorGenMaskPS.hlsl">
-      <Filter>Graphic\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorGenMaskPS_Add.hlsl">
-      <Filter>Graphic\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorGenMaskPS_Sub.hlsl">
-      <Filter>Graphic\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\ReplaceColorPreviewSelecetAreaPS.hlsl">
-      <Filter>Graphic\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\LchColorControlPS.hlsl">
-      <Filter>Graphic\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\LchColorControlPrimaryRectanglePS.hlsl">
-      <Filter>Graphic\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\LchColorControlPrimaryTrianglePS.hlsl">
-      <Filter>Graphic\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Graphic\Shaders\LchColorControlPrimaryHueCirclePS.hlsl">
-      <Filter>Graphic\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Graphic\Shaders\AlphaBlurPS.hlsl">
       <Filter>Graphic\Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator.cpp" />
-    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_ColorBalance.cpp" />
-    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_CSPData.cpp" />
-    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_CSPHelper.cpp" />
-    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_CustomFilter.cpp" />
-    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_HSV.cpp" />
-    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_LayerObject.cpp" />
-    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_TimeLapseExport.cpp" />
-    <ClCompile Include="..\Common\AddressGenerator\AddressGenerator_ToneCurve.cpp" />
-    <ClInclude Include="..\Common\AddressGenerator\AddressGenerator.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="FreeTransformLocator.cpp" />
     <ClCompile Include="CustomAdjustmentLayer.cpp" />
+    <ClCompile Include="NativeCanvasCoordinates.cpp" />
+    <ClInclude Include="NativeCanvasCoordinates.h" />
     <ClCompile Include="CustomAdjustmentLayerLocator.cpp" />
     <ClInclude Include="CustomAdjustmentLayer.h" />
-    <ClCompile Include="DUI\Dialog\TestInvertAdjustmentDialog.cpp" />
-    <ClInclude Include="DUI\Dialog\TestInvertAdjustmentDialog.h" />
-    <ClCompile Include="TestInvertAdjustmentLayer.cpp" />
-    <ClInclude Include="TestInvertAdjustmentLayer.h" />
-    <ClCompile Include="LevelsPreview.cpp" />
+    <Xml Include="DuiResource\themes\default\cspHelper_default\OklabCurvesDialog.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
+    <Xml Include="DuiResource\themes\default\cspHelper_default\OklabHueSaturationDialog.xml">
+      <Filter>Dui\Dialog</Filter>
+    </Xml>
     <ClCompile Include="FreeTransform.cpp" />
     <ClInclude Include="FreeTransform.h" />
     <FxCompile Include="Graphic\Shaders\FreeTransformCS.hlsl" />
     <ClInclude Include="FreeTransformLocator.h" />
-    <ClInclude Include="LevelsPreview.h" />
     <ClInclude Include="NativeCode.h" />
   </ItemGroup>
 </Project>

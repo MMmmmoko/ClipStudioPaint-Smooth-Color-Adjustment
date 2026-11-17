@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window size="640,415" caption="0,0,0,28" use_system_caption="false" sys_menu="true"
+        shadow_type="default" shadow_attached="true" shadow_snap="true" layered_window="true"
+        icon="public/caption/logo.ico">
+    <Class name="UpdateButton" width="128" height="32" border_size="1" border_round="2,2"
+           border_color="#CSPColor_Separator" fade_hot="false" font="system_14"
+           normal_text_color="#CSPColor_Content" hot_color="#CSPColor_CaptionNoFocus"/>
+    <VBox bkcolor="#CSPColor_PanelBG">
+        <HBox height="28" normal_color="#CSPColor_CaptionFocus" disabled_color="#CSPColor_CaptionNoFocus">
+            <Label text_id="STRID_ABOUT_SOFTWARANAME" margin="8,0,8,0" valign="center"
+                   text_align="vcenter" normal_text_color="#CSPColor_CaptionContent" font="system_14"/>
+            <Control/>
+            <Button class="btn_wnd_close_11" name="close" width="40" height="stretch"
+                    tooltip_text_id="STRING_CLOSE"
+                    normal_image="file='icon_close.svg' width='24' height='24' valign='center' halign='center'"/>
+        </HBox>
+        <VBox margin="22,15,22,16">
+            <Label name="versions" height="24" normal_text_color="#CSPColor_Content" font="system_bold_16"/>
+            <Label text_id="STRID_UPDATE_NOTES" height="24" margin="0,8,0,0"
+                   normal_text_color="#CSPColor_Content" font="system_14"/>
+            <RichEdit name="notes" height="stretch" multiline="true" word_wrap="true"
+                      vscrollbar="true" limit_text="4194304" text_padding="10,8,10,8" font="system_14"
+                      normal_text_color="#CSPColor_Content" border_size="1" border_color="#CSPColor_Separator"/>
+            <Progress name="progress" visible="false" height="8" margin="0,10,0,0" min="0" max="100"
+                      bkcolor="#CSPColor_Separator" progress_color="#CSPColor_BlueButton"/>
+            <Label name="status" height="24" margin="0,5,0,5"
+                   normal_text_color="#CSPColor_Content" font="system_14"/>
+            <HBox height="32">
+                <Button class="UpdateButton" name="skip" text_id="STRID_UPDATE_SKIP"/>
+                <Control/>
+                <Button class="UpdateButton" name="later" text_id="STRID_UPDATE_LATER" margin="0,0,8,0"/>
+                <Button class="UpdateButton" name="download" text_id="STRID_UPDATE_DOWNLOAD"
+                        normal_text_color="#FFFFFF" bkcolor="#CSPColor_BlueButton"
+                        hot_color="#CSPColor_BlueButtonHot" pushed_color="#CSPColor_BlueButtonPush"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</Window>
