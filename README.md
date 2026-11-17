@@ -128,4 +128,3 @@ CSP流畅调色是一个免费提供的，用于改善CSP功能的辅助工具�
 
 算了不做详细说明了，依赖的东西有点小众，直接让AI帮你编译吧。
 
-`CSPMOD.sln` 可以从开源目录独立构建，自定义调整图层框架随开源版编译。维护者可将私有源码放在与开源仓库并排的 `CSPMODPrivate` 目录。CSPMOD 工程找到其中的 `CSPMODPrivate.props` 时会编译私有功能。可用 `/p:CSPMODBuildPrivate=false` 强制构建开源版，或用 `/p:CSPMODPrivateRoot=<路径>` 指定私有目录。
