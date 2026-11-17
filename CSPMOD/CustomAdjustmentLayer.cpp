@@ -3,6 +3,7 @@
 #include "AddressTable.h"
 #include "CSPMOD.h"
 #include "CspData.h"
+#include "CustomAdjustmentPreview.h"
 #include "NativeCanvasCoordinates.h"
 #include "duilib/duilib.h"
 
@@ -368,6 +369,8 @@ struct RowContext
     SourceRowObserver* observer;
     SourceSample* sample;
     bool bypass;
+    ParallelPreview::Frame* preview;
+    ParallelPreview::Region previewRegion;
     int x = 0, y = 0, row = 0;
     bool first = true;
 };
@@ -379,7 +382,7 @@ void RenderRow(const void* closure, const RowLayout* layout, uint8_t* destinatio
     auto& context = **static_cast<RowContext* const*>(closure);
     const PixelRow row{destination, source, alpha, layout->destinationStride,
         layout->sourceStride, layout->alphaStride, layout->width};
-    if (context.observer || context.sample)
+    if (context.observer || context.sample || context.preview)
     {
         // SelectTile records the current source origin. The native loop advances the planes between rows.
         int origin[2];
@@ -391,11 +394,14 @@ void RenderRow(const void* closure, const RowLayout* layout, uint8_t* destinatio
             context.row = 0;
             context.first = false;
         }
-        const int y = context.y + context.row++;
+        const int line = context.row++;
+        const int y = context.y + line;
         if (context.observer)
             context.observer->CaptureRow(context.x, y, row);
         if (context.sample)
             context.sample->Capture(context.x, y, row);
+        if (context.preview && context.previewRegion.Render(*context.preview, context.x, context.y, line, row))
+            return;
     }
     if (context.bypass)
         row.CopyBgr();
@@ -409,6 +415,15 @@ struct RenderSnapshot
     std::unique_ptr<const RowRenderer> renderer;
 };
 
+struct RenderPreview
+{
+    RenderPreview(std::shared_ptr<const RenderSnapshot> snapshot, const ParallelPreview::Inputs& inputs)
+        : snapshot(std::move(snapshot)), frame(inputs) {}
+
+    const std::shared_ptr<const RenderSnapshot> snapshot;
+    ParallelPreview::Frame frame;
+};
+
 struct RenderState
 {
     RenderState(const AdjustmentLayer& adjustment, std::shared_ptr<const RenderSnapshot> initial)
@@ -419,6 +434,7 @@ struct RenderState
     std::atomic<bool> bypass{false};
     std::mutex parameterUpdate;
     std::shared_ptr<const RenderSnapshot> snapshot;
+    std::shared_ptr<RenderPreview> preview;
 };
 
 void ManageRenderState(void* from, void* to, int operation)
@@ -453,17 +469,17 @@ std::shared_ptr<const RenderSnapshot> GetRenderSnapshot(uint8_t* info)
     return std::atomic_load(&GetRenderState(info).snapshot);
 }
 
-bool SetParameters(uint8_t* info, const Parameters& parameters)
+std::shared_ptr<const RenderSnapshot> SetParameters(uint8_t* info, const Parameters& parameters)
 {
     auto& state = GetRenderState(info);
     const std::lock_guard<std::mutex> lock(state.parameterUpdate);
     const auto previous = std::atomic_load(&state.snapshot);
     if (previous->parameters == parameters)
-        return false;
+        return {};
     auto next = std::make_shared<const RenderSnapshot>(RenderSnapshot{
         parameters, state.adjustment.PrepareRender(parameters, previous->renderer.get())});
-    std::atomic_store(&state.snapshot, std::move(next));
-    return true;
+    std::atomic_store(&state.snapshot, next);
+    return next;
 }
 
 uint32_t GetInfoType(const uint8_t* info)
@@ -482,12 +498,15 @@ int Render(const void*, uint8_t* info, void* destination, const void* region, vo
         return 0;
 
     static const CallableTable<decltype(&RenderRow)> table{nullptr, RenderRow};
-    const bool bypass = GetRenderState(info).bypass.load();
-    const auto snapshot = GetRenderSnapshot(info);
+    auto& state = GetRenderState(info);
+    const bool bypass = state.bypass.load();
+    const auto snapshot = std::atomic_load(&state.snapshot);
+    const auto preview = !bypass && adjustment->SupportsParallelPreview() ? std::atomic_load(&state.preview) : nullptr;
     const auto observer = adjustment->ObserveSource(info);
     const auto sample = adjustment->WantsCanvasSample() ? std::atomic_load(&activeSample) : nullptr;
     RowContext context{snapshot->renderer.get(), source, observer.get(),
-        sample && sample->renderIdentity == &GetRenderState(info) ? sample.get() : nullptr, bypass};
+        sample && sample->renderIdentity == &state ? sample.get() : nullptr, bypass,
+        preview && preview->snapshot == snapshot ? &preview->frame : nullptr, {}};
     auto* contextPointer = &context;
     Callable row{reinterpret_cast<uintptr_t>(&table) | 1u};
     memcpy(row.data, &contextPointer, sizeof(contextPointer));
@@ -629,6 +648,7 @@ struct EditSession
     uint8_t* info;
     Parameters pending;
     bool armed = false;
+    std::unique_ptr<ParallelPreview::Work> previewWork;
 
     void Notify()
     {
@@ -641,8 +661,30 @@ struct EditSession
 
     void Apply(const Parameters& parameters)
     {
-        if (SetParameters(info, parameters))
-            Notify();
+        auto& state = GetRenderState(info);
+        const bool parallelPreview = state.adjustment.SupportsParallelPreview();
+        const auto previous = parallelPreview ? GetRenderSnapshot(info) : nullptr;
+        const auto snapshot = SetParameters(info, parameters);
+        if (!snapshot)
+            return;
+
+        if (parallelPreview)
+        {
+            const auto lastPreview = std::atomic_load(&state.preview);
+            const auto inputs = lastPreview && lastPreview->snapshot == previous ?
+                lastPreview->frame.ObservedInputs() : ParallelPreview::Inputs{};
+            previewWork.reset();
+            auto preview = std::make_shared<RenderPreview>(snapshot, inputs);
+            if (!inputs.empty())
+            {
+                // Let CSP begin its refresh while the workers prepare private tiles.
+                previewWork = std::make_unique<ParallelPreview::Work>(
+                    std::shared_ptr<ParallelPreview::Frame>(preview, &preview->frame),
+                    std::shared_ptr<const RowRenderer>(snapshot, snapshot->renderer.get()));
+            }
+            std::atomic_store(&state.preview, std::move(preview));
+        }
+        Notify();
     }
 
     void Queue(const Parameters& parameters)
@@ -659,6 +701,8 @@ struct EditSession
     void SetPreview(bool enabled)
     {
         CancelTimer();
+        if (!enabled)
+            StopParallelPreview();
         const bool changed = enabled && SetParameters(info, pending);
         const bool wasBypassed = GetRenderState(info).bypass.exchange(!enabled);
         if (changed || wasBypassed == enabled)
@@ -668,10 +712,21 @@ struct EditSession
     void Finish(const Parameters& parameters)
     {
         CancelTimer();
-        const bool changed = SetParameters(info, parameters);
+        const bool usedParallelPreview = StopParallelPreview();
+        const auto changed = SetParameters(info, parameters);
         const bool wasBypassed = GetRenderState(info).bypass.exchange(false);
-        if (changed || wasBypassed)
+        if (changed || wasBypassed || usedParallelPreview)
             Notify();
+    }
+
+    bool StopParallelPreview()
+    {
+        auto& state = GetRenderState(info);
+        if (!state.adjustment.SupportsParallelPreview())
+            return false;
+        const auto preview = std::atomic_exchange(&state.preview, std::shared_ptr<RenderPreview>{});
+        previewWork.reset();
+        return preview != nullptr;
     }
 
     void CancelTimer()

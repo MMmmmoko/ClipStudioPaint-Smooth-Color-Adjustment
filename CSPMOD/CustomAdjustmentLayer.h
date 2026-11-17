@@ -100,6 +100,8 @@ public:
     // A prepared renderer is shared by the host's rendering workers. Previous is from this layer type.
     virtual std::unique_ptr<const RowRenderer> PrepareRender(const Parameters& parameters,
         const RowRenderer* previous) const = 0;
+    // The renderer must give the same result for copied, packed rows on any worker.
+    virtual bool SupportsParallelPreview() const { return false; }
     virtual bool BeginSourceObservation(const void*) const { return false; }
     virtual void EndSourceObservation() const {}
     virtual std::unique_ptr<SourceRowObserver> ObserveSource(const void*) const { return {}; }

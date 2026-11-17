@@ -365,6 +365,7 @@
     <ClInclude Include="NativeCanvasCoordinates.h" />
     <ClCompile Include="CustomAdjustmentLayerLocator.cpp" />
     <ClInclude Include="CustomAdjustmentLayer.h" />
+    <ClInclude Include="CustomAdjustmentPreview.h" />
     <Xml Include="DuiResource\themes\default\cspHelper_default\OklabCurvesDialog.xml">
       <Filter>Dui\Dialog</Filter>
     </Xml>
