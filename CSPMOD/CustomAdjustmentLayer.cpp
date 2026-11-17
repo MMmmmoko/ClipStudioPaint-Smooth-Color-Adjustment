@@ -363,8 +363,7 @@ std::shared_ptr<SourceSample> activeSample;
 
 struct RowContext
 {
-    const AdjustmentLayer* adjustment;
-    const Parameters* parameters;
+    const RowRenderer* renderer;
     void* source;
     SourceRowObserver* observer;
     SourceSample* sample;
@@ -399,19 +398,27 @@ void RenderRow(const void* closure, const RowLayout* layout, uint8_t* destinatio
             context.sample->Capture(context.x, y, row);
     }
     if (context.bypass)
-        row.TransformBgr([](uint8_t* output, const uint8_t* input) { std::copy_n(input, 3, output); });
+        row.CopyBgr();
     else
-        context.adjustment->RenderRow(row, *context.parameters);
+        context.renderer->RenderRow(row);
 }
+
+struct RenderSnapshot
+{
+    Parameters parameters;
+    std::unique_ptr<const RowRenderer> renderer;
+};
 
 struct RenderState
 {
-    explicit RenderState(const Parameters& initial)
-        : parameters(std::make_shared<const Parameters>(initial)) {}
+    RenderState(const AdjustmentLayer& adjustment, std::shared_ptr<const RenderSnapshot> initial)
+        : adjustment(adjustment), snapshot(std::move(initial)) {}
 
+    const AdjustmentLayer& adjustment;
     std::atomic<unsigned> references{1};
     std::atomic<bool> bypass{false};
-    std::shared_ptr<const Parameters> parameters;
+    std::mutex parameterUpdate;
+    std::shared_ptr<const RenderSnapshot> snapshot;
 };
 
 void ManageRenderState(void* from, void* to, int operation)
@@ -441,16 +448,21 @@ RenderState& GetRenderState(uint8_t* info)
     return **reinterpret_cast<RenderState**>(info + 0x88);
 }
 
-std::shared_ptr<const Parameters> GetParameters(uint8_t* info)
+std::shared_ptr<const RenderSnapshot> GetRenderSnapshot(uint8_t* info)
 {
-    return std::atomic_load(&GetRenderState(info).parameters);
+    return std::atomic_load(&GetRenderState(info).snapshot);
 }
 
 bool SetParameters(uint8_t* info, const Parameters& parameters)
 {
-    if (*GetParameters(info) == parameters)
+    auto& state = GetRenderState(info);
+    const std::lock_guard<std::mutex> lock(state.parameterUpdate);
+    const auto previous = std::atomic_load(&state.snapshot);
+    if (previous->parameters == parameters)
         return false;
-    std::atomic_store(&GetRenderState(info).parameters, std::make_shared<const Parameters>(parameters));
+    auto next = std::make_shared<const RenderSnapshot>(RenderSnapshot{
+        parameters, state.adjustment.PrepareRender(parameters, previous->renderer.get())});
+    std::atomic_store(&state.snapshot, std::move(next));
     return true;
 }
 
@@ -471,10 +483,10 @@ int Render(const void*, uint8_t* info, void* destination, const void* region, vo
 
     static const CallableTable<decltype(&RenderRow)> table{nullptr, RenderRow};
     const bool bypass = GetRenderState(info).bypass.load();
-    const auto parameters = GetParameters(info);
+    const auto snapshot = GetRenderSnapshot(info);
     const auto observer = adjustment->ObserveSource(info);
     const auto sample = adjustment->WantsCanvasSample() ? std::atomic_load(&activeSample) : nullptr;
-    RowContext context{adjustment, parameters.get(), source, observer.get(),
+    RowContext context{snapshot->renderer.get(), source, observer.get(),
         sample && sample->renderIdentity == &GetRenderState(info) ? sample.get() : nullptr, bypass};
     auto* contextPointer = &context;
     Callable row{reinterpret_cast<uintptr_t>(&table) | 1u};
@@ -484,8 +496,8 @@ int Render(const void*, uint8_t* info, void* destination, const void* region, vo
 
 void WriteParameters(const void*, uint8_t* info, void* stream)
 {
-    const auto parameters = GetParameters(info);
-    for (const auto word : *parameters)
+    const auto snapshot = GetRenderSnapshot(info);
+    for (const auto word : snapshot->parameters)
         write32(stream, word);
 }
 
@@ -583,12 +595,19 @@ SharedInfo* BuildInfo(SharedInfo* output, uint32_t type, SharedInfo* source)
         {
             static const CallableTable<decltype(&WriteParameters)> writer{nullptr, WriteParameters};
             static const CallableTable<decltype(&ReadParameters)> reader{nullptr, ReadParameters};
-            const auto parameters = !create && source && GetAdjustment(source->object) == adjustment ?
-                *GetParameters(source->object) : adjustment->DefaultParameters();
+            std::shared_ptr<const RenderSnapshot> snapshot;
+            if (!create && source && GetAdjustment(source->object) == adjustment)
+                snapshot = GetRenderSnapshot(source->object);
+            else
+            {
+                auto parameters = adjustment->DefaultParameters();
+                auto renderer = adjustment->PrepareRender(parameters, nullptr);
+                snapshot = std::make_shared<const RenderSnapshot>(RenderSnapshot{std::move(parameters), std::move(renderer)});
+            }
             const Callable write{reinterpret_cast<uintptr_t>(&writer) | 1u};
             const Callable read{reinterpret_cast<uintptr_t>(&reader) | 1u};
             Callable render{reinterpret_cast<uintptr_t>(&renderTable)};
-            auto* state = new RenderState(parameters);
+            auto* state = new RenderState(*adjustment, std::move(snapshot));
             memcpy(render.data, &state, sizeof(state));
             setStreams(result->object, &write, &read);
             setRender(result->object, &render);
@@ -782,7 +801,7 @@ bool EditAdjustment(HWND window, const SharedInfo& controller, const SharedInfo&
             return false;
     }
 
-    const auto original = *GetParameters(info);
+    const auto original = GetRenderSnapshot(info)->parameters;
     auto parameters = original;
     EditSession session{window, controller, layer, info, original};
     if (newlyCreated)

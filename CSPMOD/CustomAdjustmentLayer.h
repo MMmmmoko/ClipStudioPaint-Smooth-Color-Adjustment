@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <functional>
@@ -56,6 +57,18 @@ struct PixelRow
             }
         }
     }
+
+    void CopyBgr() const
+    {
+        TransformBgr([](uint8_t* output, const uint8_t* input) { std::copy_n(input, 3, output); });
+    }
+};
+
+class RowRenderer
+{
+public:
+    virtual ~RowRenderer() = default;
+    virtual void RenderRow(const PixelRow& row) const = 0;
 };
 
 class SourceRowObserver
@@ -84,7 +97,9 @@ public:
     virtual Parameters DefaultParameters() const = 0;
     virtual Parameters NormalizeParameters(const Parameters& parameters) const = 0;
     virtual size_t ParameterWordLimit() const = 0;
-    virtual void RenderRow(const PixelRow& row, const Parameters& parameters) const = 0;
+    // A prepared renderer is shared by the host's rendering workers. Previous is from this layer type.
+    virtual std::unique_ptr<const RowRenderer> PrepareRender(const Parameters& parameters,
+        const RowRenderer* previous) const = 0;
     virtual bool BeginSourceObservation(const void*) const { return false; }
     virtual void EndSourceObservation() const {}
     virtual std::unique_ptr<SourceRowObserver> ObserveSource(const void*) const { return {}; }
