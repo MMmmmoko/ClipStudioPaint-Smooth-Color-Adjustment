@@ -95,7 +95,13 @@ bool CursorManager::SetCursor(CursorType cursorType)
 }
 
 /** 从内存数据中加载光标
+*  实现位于 CatTuber64/duilib_CodePatch/CursorManager_Windows_cpp_patch.cpp，
+*  以保留 .cur 文件中的热点坐标（图标当光标用时热点会变成图像中心）。
 */
+HCURSOR LoadCursorFromData(const Window* pWindow, std::vector<uint8_t>& fileData);
+
+//原实现，已由上面的外部实现替换
+#if 0
 static HCURSOR LoadCursorFromData(const Window* pWindow, std::vector<uint8_t>& fileData)
 {
     if (fileData.empty() || (pWindow == nullptr)) {
@@ -164,6 +170,7 @@ static HCURSOR LoadCursorFromData(const Window* pWindow, std::vector<uint8_t>& f
     ASSERT(hIcon != nullptr);
     return (HCURSOR)hIcon;
 }
+#endif
 
 bool CursorManager::SetImageCursor(const Window* pWindow, const FilePath& curImagePath)
 {

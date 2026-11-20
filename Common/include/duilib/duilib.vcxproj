@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -213,6 +213,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\CursorManager_Windows_cpp_patch.cpp" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\DrawSkiaImage_cpp_patch.cpp" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\GlobalManager_cpp_patch.cpp" />
     <ClCompile Include="..\..\..\CatTuber64\duilib_CodePatch\ImageDecoder_patch.cpp" />
